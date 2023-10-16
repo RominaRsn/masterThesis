@@ -2,53 +2,56 @@ import matplotlib.pyplot as plt
 import numpy as np
 import mne
 import time
+from sklearn.model_selection import train_test_split
+from metrics import metrics
 
-sample_data_folder = mne.datasets.sample.data_path()
-sample_data_raw_file = (
-    sample_data_folder / "MEG" / "sample" / "sample_audvis_filt-0-40_raw.fif"
-)
-raw = mne.io.read_raw_fif(sample_data_raw_file)
-
-print(raw.info)
-
-EEG_Clean1 = mne.io.read_raw_brainvision("D:\data\denoising\datafortraining\clean\subclinical182_ch3.vhdr");
-signals = mne.ioraw_data = EEG_Clean1.get_data()
-sampling_freq = 250
-
-print(signals[1])
-plt.plot(signals[1])
-#plt.show()
-
-def loadclean():
-    EEG_Clean1 = mne.io.read_raw_brainvision("D:\data\denoising\datafortraining\clean\subclinical182_ch1.vhdr")
-    EEG_Clean2 = mne.io.read_raw_brainvision("D:\data\denoising\datafortraining\clean\subclinical182_ch2.vhdr")
-    EEG_Clean3 = mne.io.read_raw_brainvision("D:\data\denoising\datafortraining\clean\subclinical182_ch3.vhdr")
-    signals = mne.ioraw_data = EEG_Clean1.get_data()
-    clean_data2 = mne.ioraw_data = EEG_Clean2.get_data()
-    signals = np.append(signals, clean_data2, axis=1)
-    clean_data2 = mne.ioraw_data = EEG_Clean3.get_data()
-    signals = np.append(signals, clean_data2, axis=1)
-    sampling_freq = 250
-    return (signals, sampling_freq)
-
-
-def loadnoisy():
-    EEG_NoisyF1 = mne.io.read_raw_brainvision(
-        r"D:\data\denoising\datafortraining\noisy_f3\subclinical182_newnoisescaledfhp30iir_3_1.vhdr")
-    EEG_NoisyF2 = mne.io.read_raw_brainvision(
-        r"D:\data\denoising\datafortraining\noisy_f3\subclinical182_newnoisescaledfhp30iir_3_2.vhdr")
-    EEG_NoisyF3 = mne.io.read_raw_brainvision(
-        r"D:\data\denoising\datafortraining\noisy_f3\subclinical182_newnoisescaledfhp30iir_3_3.vhdr")
-
-    noisy_signals = mne.ioraw_data = EEG_NoisyF1.get_data()
-    noisy_dataF4 = mne.ioraw_data = EEG_NoisyF2.get_data()
-    noisy_signals = np.append(noisy_signals, noisy_dataF4, axis=1)
-
-    noisy_dataF4 = mne.ioraw_data = EEG_NoisyF3.get_data()
-    noisy_signals = np.append(noisy_signals, noisy_dataF4, axis=1)
-    sampling_freq = 250
-    return (noisy_signals, sampling_freq)
-
+#
+# sample_data_folder = mne.datasets.sample.data_path()
+# sample_data_raw_file = (
+#     sample_data_folder / "MEG" / "sample" / "sample_audvis_filt-0-40_raw.fif"
+# )
+# raw = mne.io.read_raw_fif(sample_data_raw_file)
+#
+# print(raw.info)
+#
+# EEG_Clean1 = mne.io.read_raw_brainvision("D:\data\denoising\datafortraining\clean\subclinical182_ch3.vhdr");
+# signals = mne.ioraw_data = EEG_Clean1.get_data()
+# sampling_freq = 250
+#
+# print(signals[1])
+# plt.plot(signals[1])
+# #plt.show()
+#
+# def loadclean():
+#     EEG_Clean1 = mne.io.read_raw_brainvision("D:\data\denoising\datafortraining\clean\subclinical182_ch1.vhdr")
+#     EEG_Clean2 = mne.io.read_raw_brainvision("D:\data\denoising\datafortraining\clean\subclinical182_ch2.vhdr")
+#     EEG_Clean3 = mne.io.read_raw_brainvision("D:\data\denoising\datafortraining\clean\subclinical182_ch3.vhdr")
+#     signals = mne.ioraw_data = EEG_Clean1.get_data()
+#     clean_data2 = mne.ioraw_data = EEG_Clean2.get_data()
+#     signals = np.append(signals, clean_data2, axis=1)
+#     clean_data2 = mne.ioraw_data = EEG_Clean3.get_data()
+#     signals = np.append(signals, clean_data2, axis=1)
+#     sampling_freq = 250
+#     return (signals, sampling_freq)
+#
+#
+# def loadnoisy():
+#     EEG_NoisyF1 = mne.io.read_raw_brainvision(
+#         r"D:\data\denoising\datafortraining\noisy_f3\subclinical182_newnoisescaledfhp30iir_3_1.vhdr")
+#     EEG_NoisyF2 = mne.io.read_raw_brainvision(
+#         r"D:\data\denoising\datafortraining\noisy_f3\subclinical182_newnoisescaledfhp30iir_3_2.vhdr")
+#     EEG_NoisyF3 = mne.io.read_raw_brainvision(
+#         r"D:\data\denoising\datafortraining\noisy_f3\subclinical182_newnoisescaledfhp30iir_3_3.vhdr")
+#
+#     noisy_signals = mne.ioraw_data = EEG_NoisyF1.get_data()
+#     noisy_dataF4 = mne.ioraw_data = EEG_NoisyF2.get_data()
+#     noisy_signals = np.append(noisy_signals, noisy_dataF4, axis=1)
+#
+#     noisy_dataF4 = mne.ioraw_data = EEG_NoisyF3.get_data()
+#     noisy_signals = np.append(noisy_signals, noisy_dataF4, axis=1)
+#     sampling_freq = 250
+#     return (noisy_signals, sampling_freq)
+#
 
 # Model configuration
 input_shape = (500, 1)
@@ -57,57 +60,72 @@ batch_size = 32
 no_epochs = 1
 
 
-train_test_split = 0.4
+#train_test_split = 0.4
 validation_split = 0.1
 verbosity = 1
 max_norm_value = 6.0
 
+#
+# start_time = time.time()
+# #load EEG
+# clean_EEG = loadclean()
+# #clean_EEG = loadsmallclean()
+# clean_data = clean_EEG[0]
+# sampling_freq = clean_EEG[1]
+#
+# #noisy_data = loadnoisy()
+# noisy_data = loadnoisy()
+# #noisy_data = loadsmallnoisy()
+#
+# noisy_dataF3 = noisy_data[0]
+#
+#
+# end_time = time.time()
+# elapsed_time = end_time - start_time
+#
+# print(f"Elapsed time 1: {elapsed_time} seconds")
+# num_chanClean, num_SamplesClean = clean_data.shape
+# nChan = num_chanClean
+# num_chanNoisy, num_SamplesNoisy = noisy_dataF3.shape
+#
+# val_clean = []
+# val_noisy = []
+#
+# start_time = time.time()
+#
+# for i in range(0, 180):
+#     for j in range(0, 23040):
+#         val_clean.append(clean_data[i, j * 2 * sampling_freq : (j + 1) * 2 * sampling_freq])
+#         val_noisy.append(noisy_dataF3[i, j * 2 * sampling_freq : (j + 1) * 2 * sampling_freq])
+#
+#
+# data_cleaned = np.array(val_clean)
+# data_noisy = np.array(val_noisy)
+# # Specify the file path
+# file_path_clean = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\data_file\clean_0.npy'
+# file_path_noisy = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\data_file\noisy_0.npy'
+# # Save the matrix to a NumPy binary file
+# np.save(file_path_clean, data_cleaned)
+# np.save(file_path_noisy, data_noisy)
+#
+#
+# print(data_cleaned.shape)
+# print(data_noisy.shape)
+#
+#
+# end_time = time.time()
+# elapsed_time = end_time - start_time
+#
+# print(f"Elapsed time: {elapsed_time} seconds")
+
+metrics = metrics()
+
+#Loading normalized data
 
 start_time = time.time()
-#load EEG
-clean_EEG = loadclean()
-#clean_EEG = loadsmallclean()
-clean_data = clean_EEG[0]
-sampling_freq = clean_EEG[1]
 
-#noisy_data = loadnoisy()
-noisy_data = loadnoisy()
-#noisy_data = loadsmallnoisy()
-
-noisy_dataF3 = noisy_data[0]
-
-
-end_time = time.time()
-elapsed_time = end_time - start_time
-
-print(f"Elapsed time 1: {elapsed_time} seconds")
-num_chanClean, num_SamplesClean = clean_data.shape
-nChan = num_chanClean
-num_chanNoisy, num_SamplesNoisy = noisy_dataF3.shape
-
-val_clean = []
-val_noisy = []
-
-start_time = time.time()
-
-for i in range(0, 180):
-    for j in range(0, 23040):
-        val_clean.append(clean_data[i, j * 2 * sampling_freq : (j + 1) * 2 * sampling_freq])
-        val_noisy.append(noisy_dataF3[i, j * 2 * sampling_freq : (j + 1) * 2 * sampling_freq])
-
-
-data_cleaned = np.array(val_clean)
-data_noisy = np.array(val_noisy)
-# Specify the file path
-file_path_clean = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\data_file\clean_0.npy'
-file_path_noisy = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\data_file\noisy_0.npy'
-# Save the matrix to a NumPy binary file
-np.save(file_path_clean, data_cleaned)
-np.save(file_path_noisy, data_noisy)
-
-
-print(data_cleaned.shape)
-print(data_noisy.shape)
+data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized.npy")
+data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized.npy")
 
 
 end_time = time.time()
@@ -115,17 +133,70 @@ elapsed_time = end_time - start_time
 
 print(f"Elapsed time: {elapsed_time} seconds")
 
-#Normalize data
+
+
+
+# Step 1: Split into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
+
+# Step 2: Split the training set into training and validation sets
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.1, random_state=42)
+
+# Now, you have:
+# - X_train, y_train: Training set
+# - X_val, y_val: Validation set
+# - X_test, y_test: Test set
+
+# You can print the shapes to check the sizes of the sets
+print("Training set shape:", X_train.shape)
+print("Validation set shape:", X_val.shape)
+print("Test set shape:", X_test.shape)
 
 
 
 
+start_time = time.time()
+
+snr_matrix = metrics.snr(X_train, y_train)
+
+print(snr_matrix)
+end_time = time.time()
+elapsed_time = end_time - start_time
+
+print(f"snr calculation: {elapsed_time} seconds")
 
 
 
 
+sampling_freq = 250
+y_axis = np.linspace(0, 2 * sampling_freq)
+for i in range(0,5):
+    fig, axes = plt.subplots(nrows=2, ncols=1)
 
 
+    row_index = np.random.randint(0, len(data_clean_normalized))
+    axes[0].plot(data_clean_normalized[row_index], label = 'Clean Data')
+    axes[0].set_title('Clean data')
+    axes[0].set_ylabel('Signal amplitude')
+    axes[0].set_xlabel('Time')
+
+
+    axes[1].plot(data_noisy_normalized[row_index], label = 'Noisy Data')
+    axes[1].set_title('Noisy data')
+    axes[1].set_ylabel('Signal amplitude')
+    axes[1].set_xlabel('Time')
+
+    #test_array = np.array(noisy_dataF3[row_index, col_index : col_index + 500])
+    #print(test_array.shape())
+
+    # Add overall title
+    fig.suptitle('Comparison of clean and noisy data')
+
+    # Adjust layout to prevent overlap
+    plt.tight_layout()
+
+    # Show the plot
+    plt.show()
 
 
 

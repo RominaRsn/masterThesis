@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import mne
 import time
+from sklearn import preprocessing
 
 sample_data_folder = mne.datasets.sample.data_path()
 sample_data_raw_file = (
@@ -98,6 +99,13 @@ for i in range(0, 180):
 
 data_cleaned = np.array(val_clean)
 data_noisy = np.array(val_noisy)
+
+data_cleaned_normalized = preprocessing.normalize(data_cleaned)
+data_noisy_normalized = preprocessing.normalize(data_noisy)
+
+
+#normalize data
+
 # Specify the file path
 file_path_clean = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_0.npy'
 file_path_noisy = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_0.npy'
@@ -106,8 +114,22 @@ np.save(file_path_clean, data_cleaned)
 np.save(file_path_noisy, data_noisy)
 
 
-print(data_cleaned.shape)
-print(data_noisy.shape)
+
+start_time = time.time()
+# Specify the file path
+file_path_clean = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized.npy'
+file_path_noisy = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized.npy'
+# Save the matrix to a NumPy binary file
+np.save(file_path_clean, data_cleaned_normalized)
+np.save(file_path_noisy, data_noisy_normalized)
+
+end_time = time.time()
+elapsed_time = end_time - start_time
+
+print(f"Normalization time: {elapsed_time} seconds")
+
+print(data_cleaned_normalized.shape)
+print(data_noisy_normalized.shape)
 
 
 end_time = time.time()
