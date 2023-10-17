@@ -1,0 +1,61 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import mne
+import time
+from keras.models import load_model
+
+import tensorflow
+from sklearn.model_selection import train_test_split
+from metrics import metrics
+import tensorflow as tf
+import numpy as np
+import os
+from tensorflow import keras
+from keras import layers,Sequential
+from keras.models import *
+from keras.layers import *
+from keras.optimizers import *
+from keras.callbacks import ModelCheckpoint, LearningRateScheduler
+from keras import backend as keras
+
+def Novel_CNN(input_size=(500, 1)):
+    inputs = Input(input_size)
+    conv1 = Conv1D(32, 3, activation='relu', padding='same', kernel_initializer='he_normal')(inputs)
+    conv1 = Conv1D(32, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv1)
+    pool1 = AveragePooling1D(pool_size=2)(conv1)
+
+    conv2 = Conv1D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(pool1)
+    conv2 = Conv1D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv2)
+    pool2 = AveragePooling1D(pool_size=2)(conv2)
+
+    conv3 = Conv1D(128, 3, activation='relu', padding='same', kernel_initializer='he_normal')(pool2)
+    conv3 = Conv1D(128, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv3)
+    pool3 = AveragePooling1D(pool_size=2)(conv3)
+
+    conv4 = Conv1D(256, 3, activation='relu', padding='same', kernel_initializer='he_normal')(pool3)
+    conv4 = Conv1D(256, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv4)
+    drop4 = Dropout(0.5)(conv4)
+    pool4 = AveragePooling1D(pool_size=2)(drop4)
+
+    conv5 = Conv1D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal')(pool4)
+    conv5 = Conv1D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv5)
+    drop5 = Dropout(0.5)(conv5)
+
+    pool5 = AveragePooling1D(pool_size=2)(drop5)
+
+    conv6 = Conv1D(1024, 3, activation='relu', padding='same', kernel_initializer='he_normal')(pool5)
+    conv6 = Conv1D(1024, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv6)
+    drop6 = Dropout(0.5)(conv6)
+
+    pool6 = AveragePooling1D(pool_size=2)(drop6)
+
+    conv7 = Conv1D(2048, 3, activation='relu', padding='same', kernel_initializer='he_normal')(pool6)
+    conv7 = Conv1D(2048, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv7)
+    drop7 = Dropout(0.5)(conv7)
+
+    flatten1 = Flatten()(drop7)
+    output1 = Dense(500)(flatten1)  # Adjusted Dense layer output size
+    model = Model(inputs=inputs, outputs=output1)
+
+    model.summary()
+    return model
