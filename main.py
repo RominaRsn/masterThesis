@@ -1,9 +1,9 @@
-import matplotlib.pyplot as plt
-import numpy as np
 import mne
+import graphviz
 import time
 from keras.models import load_model
-
+import keras
+import model
 import tensorflow
 from sklearn.model_selection import train_test_split
 from metrics import metrics
@@ -12,10 +12,10 @@ from keras.layers import Conv1D, Conv1DTranspose, MaxPooling1D
 from keras.constraints import max_norm
 from scipy.signal import butter,filtfilt,iirnotch
 from keras.utils import plot_model
-import tensorflow
-from numba import jit, cuda
-import model
+#from numba import jit, cuda
 
+import numpy as np
+import matplotlib.pyplot as plt
 #
 # sample_data_folder = mne.datasets.sample.data_path()
 # sample_data_raw_file = (
@@ -163,12 +163,15 @@ noisy_train, noisy_val, clean_train, clean_val = train_test_split(noisy_train, c
 # print("Validation set shape:", noisy_val.shape)
 # print("Test set shape:", noisy_test.shape)
 
-nosiy_train_t = np.transpose(noisy_train)
-clean_train_t = np.transpose(clean_train)
+# nosiy_train_t = np.transpose(noisy_train)
+# clean_train_t = np.transpose(clean_train)
 
 
-reshaped_data_noisy = nosiy_train_t.reshape(np.shape(noisy_train)[0], np.shape(noisy_train)[1], 1)
-reshaped_data_clean = clean_train_t.reshape(np.shape(noisy_train)[0], np.shape(noisy_train)[1], 1)
+reshaped_data_noisy = noisy_train.reshape(np.shape(noisy_train)[0], np.shape(noisy_train)[1], 1)
+reshaped_data_clean = clean_train.reshape(np.shape(noisy_train)[0], np.shape(noisy_train)[1], 1)
+
+reshaped_data_noisy_validation = noisy_val.reshape(np.shape(clean_val)[0], np.shape(clean_val)[1], 1)
+reshaped_data_clean_validation = clean_val.reshape(np.shape(clean_val)[0], np.shape(clean_val)[1], 1)
 
 print(reshaped_data_noisy.shape)
 print(reshaped_data_clean.shape)
@@ -218,36 +221,65 @@ print(reshaped_data_clean.shape)
 
 #
 # #Encoder model
+nLatentNeurons = 96
+input_shape = (500, 1)
 with tensorflow.device('/device:GPU:0'):
-    model = model.Novel_CNN((500,1))
+    #model = model.Novel_CNN((500,1))
+    model = Sequential()
+    model.add(Conv1D(128, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                     kernel_initializer='he_uniform', input_shape=input_shape))
+    model.add(Conv1D(nLatentNeurons, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                     kernel_initializer='he_uniform'))
+    model.add(
+        Conv1DTranspose(nLatentNeurons, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                        kernel_initializer='he_uniform'))
+    model.add(
+        Conv1DTranspose(nLatentNeurons, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                        kernel_initializer='he_uniform'))
+    model.add(
+        Conv1D(1, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='sigmoid', padding='same'))
 
-    # Print model summary to see the architecture
-    plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=True)
+    model.summary()
 
+    #Print model summary to see the architecture
+    # plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=True)
+    #
     model.compile(optimizer='adam', loss='mean_squared_error')
-    #model.save("C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis")
-
+    # model.save("C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis")
+    #
     # x_train_1 = np.transpose(noisy_train)[:,0:1000]
     # print(reshaped_data_noisy.shape)
     # print(reshaped_noisy_train.shape)
     #
     #
-    start_time = time.time()
-    model.fit(
+    # start_time = time.time()
+    history = model.fit(
         reshaped_data_noisy,
         reshaped_data_clean,
-        epochs=no_epochs,
-        batch_size=32,
-        validation_split=validation_split
+        epochs=1,
+        batch_size=64,
+        validation_data=(reshaped_data_noisy_validation,reshaped_data_clean_validation)
     )
+    model.save('my_model_simple.h5')
 
-    # Record the end time
-    end_time = time.time()
+    # Access training and validation loss from model.history
+    train_loss = history.history['loss']
+    val_loss = history.history['val_loss']
 
-    # Calculate and print the elapsed time
-    elapsed_time = end_time - start_time
-    print(f"Elapsed Time: {elapsed_time} seconds")
-    model.save('my_model.h5')
+    # Create a plot of training and validation loss
+    plt.plot(train_loss, label='Training Loss')
+    plt.plot(val_loss, label='Validation Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.show()
+    # # Record the end time
+    # end_time = time.time()
+    #
+    # # Calculate and print the elapsed time
+    # elapsed_time = end_time - start_time
+    # print(f"Elapsed Time: {elapsed_time} seconds")
+    # model.save('my_model.h5')
 
 #
 #     nLatentNeurons = 96
@@ -297,7 +329,12 @@ with tensorflow.device('/device:GPU:0'):
 #     print(f"Elapsed Time: {elapsed_time} seconds")
 #     model.save('my_model.h5')
 
-# model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\my_model.h5")
+#model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\my_model.h5")
+
+# Plot the model and save it to a file (optional)
+#plot_model(model, to_file='model_plot1.png', show_shapes=True, show_layer_names=True)
+
+
 # print("shape")
 # print(noisy_test.shape)
 # a = noisy_test[100, :].reshape(1, 500, 1)
@@ -335,56 +372,68 @@ with tensorflow.device('/device:GPU:0'):
 
 #
 # #comparing the metrics of the test sets
-# noisy_test_t = np.transpose(noisy_test)
-# clean_test_t = np.transpose(clean_test)
+noisy_test_t = np.transpose(noisy_test)
+clean_test_t = np.transpose(clean_test)
 #
-# reshaped_data_noisy_test = noisy_test_t.reshape(np.shape(noisy_test)[0], np.shape(noisy_test)[1], 1)
+reshaped_data_noisy_test = noisy_test_t.reshape(np.shape(noisy_test)[0], np.shape(noisy_test)[1], 1)
+print(reshaped_data_noisy_test)
 # reshaped_data_clean_test = clean_test_t.reshape(np.shape(noisy_test)[0], np.shape(noisy_test)[1], 1)
 # prediction_clean = model.predict(reshaped_data_noisy_test)
 #
 #
-# file_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\predictionOfTestSet.npy'
+#file_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\predictionOfTestSet.npy'
 # # Save the matrix to a NumPy binary file
 # np.save(file_path, prediction_clean)
-prediction_clean = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\predictionOfTestSet.npy")
+prediction_clean = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\predictionOfTestSetComplexModel.npy")
+print(prediction_clean.shape)
+print(prediction_clean)
 # print(prediction_clean[1000, : ,0])
 # plt.plot(prediction_clean[1000, : ,0])
 # plt.show()
 #prediction_clean_resized = np.reshape(prediction_clean.shape[0], prediction_clean.shape[1])
-reshaped_array_alternative = prediction_clean.squeeze(axis=-1)
-print(reshaped_array_alternative.shape)
+# prediction_clean = model.predict(reshaped_data_noisy_test)
+#reshaped_array_alternative = prediction_clean.squeeze(axis=-1)
+# file_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\predictionOfTestSetComplexModel.npy'
+# # Save the matrix to a NumPy binary file
+# np.save(file_path, prediction_clean)
+#print(reshaped_array_alternative.shape)
 #metrics to compare cleaned signal with the encoder
 
-
-# snr = metrics.snr(reshaped_array_alternative[0,:], clean_test[0,:])
+# filteredSignal = metrics.filtering_signals(noisy_test, 250, 45, 0.5, 50, 4)
+# snr = metrics.snr(prediction_clean[0,:], clean_test[0,:])
 #
 # print(snr)
-
 #
+# #
 # sampling_freq = 250
 # y_axis = np.linspace(0, 2 * sampling_freq)
-# for i in range(0,5):
-#     fig, axes = plt.subplots(nrows=3, ncols=1)
+# for i in range(10,15):
+#     fig, axes = plt.pyplot.subplots(nrows=4, ncols=1)
 #
 #
 #     row_index = i
 #     #col_index = np.random.randint(0, 11520000/500)
 #
-#     axes[0].plot(noisy_test[row_index, :], label = 'Clean Data')
-#     axes[0].set_title('Clean data')
+#     axes[0].plot(noisy_test[row_index, :], label = 'Noisy Data')
+#     axes[0].set_title('Noisy data')
 #     axes[0].set_ylabel('Signal amplitude')
 #     axes[0].set_xlabel('Time')
 #
 #
-#     axes[1].plot(clean_test[row_index, :], label = 'Noisy Data')
-#     axes[1].set_title('Noisy data')
+#     axes[1].plot(clean_test[row_index, :], label = 'clean Data')
+#     axes[1].set_title('clean data')
 #     axes[1].set_ylabel('Signal amplitude')
 #     axes[1].set_xlabel('Time')
 #
-#     axes[2].plot(reshaped_array_alternative[row_index, :], label = 'clean Data_ predicted')
-#     axes[2].set_title('Noisy data')
+#     axes[2].plot(prediction_clean[row_index, :], label = 'clean Data_ predicted')
+#     axes[2].set_title('cleaned data')
 #     axes[2].set_ylabel('Signal amplitude')
 #     axes[2].set_xlabel('Time')
+#
+#     axes[3].plot(filteredSignal[row_index, :], label = 'filtered signal')
+#     axes[3].set_title('filtered signal')
+#     axes[3].set_ylabel('Signal amplitude')
+#     axes[3].set_xlabel('Time')
 #
 #     #test_array = np.array(noisy_dataF3[row_index, col_index : col_index + 500])
 #     #print(test_array.shape())
@@ -393,11 +442,11 @@ print(reshaped_array_alternative.shape)
 #     fig.suptitle('Comparison of clean and noisy data')
 #
 #     # Adjust layout to prevent overlap
-#     plt.tight_layout()
+#     plt.pyplot.tight_layout()
 #
 #     # Show the plot
-#     plt.show()
-
+#     plt.pyplot.show()
+#
 
 # #
 #

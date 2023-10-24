@@ -17,6 +17,7 @@ from keras.layers import *
 from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as keras
+from keras.constraints import max_norm
 
 def Novel_CNN(input_size=(500, 1)):
     inputs = Input(input_size)
@@ -59,3 +60,21 @@ def Novel_CNN(input_size=(500, 1)):
 
     model.summary()
     return model
+
+def simpleModel(input_shape=(500,1)):
+    max_norm_value = 6.0
+    model = Sequential()
+    model.add(Conv1D(128, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                     kernel_initializer='he_uniform', input_shape=input_shape))
+    model.add(Conv1D(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                     kernel_initializer='he_uniform'))
+    model.add(
+        Conv1DTranspose(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                        kernel_initializer='he_uniform'))
+    model.add(
+        Conv1DTranspose(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                        kernel_initializer='he_uniform'))
+    model.add(
+        Conv1D(1, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='sigmoid', padding='same'))
+
+    model.summary()
