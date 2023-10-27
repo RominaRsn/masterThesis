@@ -66,6 +66,7 @@ def simpleModel(input_shape=(500,1)):
     model = Sequential()
     model.add(Conv1D(128, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
                      kernel_initializer='he_uniform', input_shape=input_shape))
+
     model.add(Conv1D(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
                      kernel_initializer='he_uniform'))
     model.add(
@@ -78,3 +79,39 @@ def simpleModel(input_shape=(500,1)):
         Conv1D(1, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='sigmoid', padding='same'))
 
     model.summary()
+    return model
+
+def paper_Model(input_shape=(500, 1)):
+    max_norm_value = 6.0
+    model = Sequential()
+    # Encoder
+    model.add(Conv1D(128, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                     kernel_initializer='he_uniform', input_shape=input_shape))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Conv1D(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                     kernel_initializer='he_uniform'))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Conv1D(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                     kernel_initializer='he_uniform'))
+
+    # Decoder
+    model.add(Conv1DTranspose(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                              kernel_initializer='he_uniform'))
+    model.add(UpSampling1D(size=2))
+    model.add(Conv1DTranspose(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                              kernel_initializer='he_uniform'))
+    model.add(UpSampling1D(size=2))
+    model.add(Conv1DTranspose(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                              kernel_initializer='he_uniform'))
+    model.add(UpSampling1D(size=2))
+
+    # Output layer
+    model.add(
+        Conv1D(1, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='sigmoid', padding='same'))
+
+    # Compile the model
+    model.compile(optimizer='adam', loss='mean_squared_error')
+
+    model.summary()
+    return model
+paper_Model()

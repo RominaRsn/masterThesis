@@ -4,7 +4,7 @@ import numpy as np
 import time
 from sklearn.model_selection import train_test_split
 from scipy.signal import butter,filtfilt,iirnotch
-import metrics
+from masterThesis.metrics import metrics
 from keras.utils import plot_model
 import os
 
@@ -43,20 +43,55 @@ noisy_train, noisy_val, clean_train, clean_val = train_test_split(noisy_train, c
 # reshaped_data_clean = clean_train_t.reshape(np.shape(noisy_train)[0], np.shape(noisy_train)[1], 1)
 
 reshaped_noisy_test = noisy_test.reshape(noisy_test.shape[0], noisy_test.shape[1], 1)
-model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\my_model_simple.h5")
+model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\my_model_Cnn.h5")
 
 # Plot the model and save it to a file (optional)
-plot_model(model, to_file='model_plot_simpleModel.png', show_shapes=True, show_layer_names=True)
-
-result = model.predict(reshaped_noisy_test[0:2039, :, :]);
-result = result.squeeze(axis=-1)
+##plot test_prediction with time from 0 to 500 ms
 
 
-filteredSignal = metrics.metrics.filtering_signals(noisy_test, 250, 45, 0.5, 50, 4)
+x = np.linspace(0, 500, 500)
+plot_model(model, to_file='model_plot_CnnModel.png', show_shapes=True, show_layer_names=True)
+test_input = np.zeros((1, 500))
+test_prediction = model.predict(test_input)
+print(test_prediction)
 
-sampling_freq = 250
+test_input = np.ones((1, 500))
+test_prediction1 = model.predict(test_input)
+print(test_prediction)
+
+
+
+fig, axes = plt.subplots(nrows=2, ncols=1)
+
+#col_index = np.random.randint(0, 11520000/500)
+
+axes[0].plot(test_prediction[0, :], label = 'zero Data')
+axes[0].set_title('zero data')
+axes[0].set_ylabel('Signal amplitude')
+axes[0].set_xlabel('Time')
+
+
+axes[1].plot(test_prediction1[0, :], label = 'one Data')
+axes[1].set_title('one data')
+axes[1].set_ylabel('Signal amplitude')
+axes[1].set_xlabel('Time')
+
+plt.tight_layout()
+
+# Show the plot
+plt.show()
+
+# result = model.predict(reshaped_noisy_test[0:2039, :, :]);
+# print(result.shape)
+# print(result)
+# #result = result.squeeze(axis=-1)
+#
+#
+# filteredSignal = metrics.filtering_signals(noisy_test, 250, 45, 0.5, 50, 4)
+#
+# sampling_freq = 250
 # y_axis = np.linspace(0, 2 * sampling_freq)
-# for i in range(20,25):
+# for i in range(10,15):
 #     fig, axes = plt.subplots(nrows=4, ncols=1)
 #
 #
@@ -112,89 +147,3 @@ sampling_freq = 250
 #     with open(file_path, 'a') as fm:
 #         fm.write("SNRNoisy: %f\n" % a)
 #         # Write other data if needed
-
-
-#Calculating the metrics
-clean_input_test_vec = np.ravel(clean_test[0:2039, :])
-noisy_input_test_vec = np.ravel(noisy_test[0:2039, :])
-test_reconstructions_vec = np.ravel(result[0:2039, :])
-cornoisyclean = np.corrcoef(clean_input_test_vec, noisy_input_test_vec)
-corcleaned = np.corrcoef(clean_input_test_vec, test_reconstructions_vec)
-
-snrnoisy = metrics.metrics.snr(clean_input_test_vec, noisy_input_test_vec)
-
-snrcleaned = metrics.metrics.snr(clean_input_test_vec, test_reconstructions_vec)
-
-rrmseNoisy = metrics.metrics.rrmseMetric(clean_input_test_vec, noisy_input_test_vec)
-rrmseCleaned = metrics.metrics.rrmseMetric(clean_input_test_vec, test_reconstructions_vec)
-
-
-#compute rmse between noisy and clean test data
-diffNoisyClean = noisy_test[0:2039, :]-clean_test[0:2039, :]
-rmsNoisy = np.sqrt(np.mean(diffNoisyClean**2))
-
-#compute rmse bwtween cleaned and clean test data
-test_reconstructions = result.reshape((result.shape[0], result.shape[1]))
-diffCleanedClean = test_reconstructions-clean_test[0:2039, :]
-rmsCleaned = np.sqrt(np.mean(diffCleanedClean**2))
-
-# Get the user's home directory
-user_home = os.path.expanduser("~")
-# Specify the file path in the Downloads directory
-file_path = os.path.join(user_home, "Downloads", "your_file.txt")
-
-fm = open(file_path, 'w')
-
-fm.write("SNRNoisy: %f\n" % snrnoisy);
-fm.write("SNRCleaned: %f\n" % snrcleaned);
-fm.write("RMSNoisy: %f\n" % rmsNoisy);
-fm.write("RMSCleaned: %f\n" % rmsCleaned);
-fm.write("RMSENoisy: %f\n" % rrmseNoisy);
-fm.write("RMSECleaned: %f\n" % rrmseCleaned);
-fm.write("PearsonCorrNoisy: %f\n" % cornoisyclean[0, 1]);
-fm.write("PearsonCorrCleaned: %f\n" % corcleaned[0, 1]);
-fm.close()
-
-
-#compute rmse between noisy and clean test data
-diffNoisyClean = noisy_test[0:2039, :]-clean_test[0:2039, :]
-rmsNoisy = np.sqrt(np.mean(diffNoisyClean**2))
-
-
-filtered_Signal = np.ravel(filteredSignal[0:2039, :])
-print(filteredSignal.shape)
-print(clean_input_test_vec.shape)
-print(noisy_input_test_vec.shape)
-print(test_reconstructions_vec.shape)
-
-#compute rmse bwtween cleaned and clean test data
-diffCleanedClean = filtered_Signal-clean_input_test_vec
-rmsCleaned = np.sqrt(np.mean(diffCleanedClean**2))
-
-cornoisyclean = np.corrcoef(clean_input_test_vec , noisy_input_test_vec)
-corcleaned = np.corrcoef(clean_input_test_vec , filtered_Signal)
-metrics.metrics.snr
-snrnoisy = metrics.metrics.snr(clean_input_test_vec, noisy_input_test_vec)
-snrcleaned = metrics.metrics.snr(clean_input_test_vec, filtered_Signal)
-#covnoisyclean= np.cov(noisy_input_test, pure_input_test)
-#covcleanedclean = np.cov(reconstruction,pure_input_test)
-
-rrmseNoisy = metrics.metrics.rrmseMetric(clean_input_test_vec, noisy_input_test_vec)
-rrmseCleaned = metrics.metrics.rrmseMetric(clean_input_test_vec, filtered_Signal)
-
-#plt.figure()
-#plt.plot(filteredsignal)
-#plt.figure()
-#plt.plot(noisy_input_vec)
-
-fm = open(file_path, 'a')
-fm.write("SNRNoisy: %f\n" % snrnoisy);
-fm.write("SNRCleaned: %f\n" % snrcleaned);
-fm.write("RMSNoisy: %f\n" % rmsNoisy);
-fm.write("RMSCleaned: %f\n" % rmsCleaned);
-fm.write("RMSENoisy: %f\n" % rrmseNoisy);
-fm.write("RMSECleaned: %f\n" % rrmseCleaned);
-fm.write("PearsonCorrNoisy: %f\n" % cornoisyclean[0, 1]);
-fm.write("PearsonCorrCleaned: %f\n" % corcleaned[0, 1]);
-
-fm.close()

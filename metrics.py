@@ -5,7 +5,7 @@ class metrics:
     # Class attribute
     # Constructor method (called when an object is created)
 
-    def filtering_signals(self, data, fs, low_freq, high_freq, notch_freq, order):
+    def filtering_signals(data, fs, low_freq, high_freq, notch_freq, order):
         low_wn = low_freq / (fs * 0.5)
         high_wn = high_freq / (fs * 0.5)
         b, a = butter(order, low_wn)
@@ -17,7 +17,7 @@ class metrics:
         # data = filtfilt(b, a, data, axis=0)
         return data
 
-    def snr(self, firstSignal, secondSignal):
+    def snr(firstSignal, secondSignal):
         snr = 10 * np.log10(np.sum(secondSignal ** 2) / np.sum((firstSignal - secondSignal) ** 2))
         return snr
 
