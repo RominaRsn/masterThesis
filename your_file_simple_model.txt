@@ -1,0 +1,17 @@
+SNRNoisy: -1.095366
+SNRCleaned: -6.814454
+RMSNoisy: 0.050732
+RMSCleaned: 0.040741
+RMSENoisy: 1.134405
+RMSECleaned: 0.911007
+PearsonCorrNoisy: 0.356289
+PearsonCorrCleaned: 0.480633
+////////////////////////
+SNRNoisy: -1.095366
+SNRCleaned: -5.139513
+RMSNoisy: 0.050732
+RMSCleaned: 0.046243
+RMSENoisy: 1.134405
+RMSECleaned: 1.034020
+PearsonCorrNoisy: 0.356289
+PearsonCorrCleaned: 0.224711
