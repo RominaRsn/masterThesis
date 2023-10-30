@@ -226,7 +226,7 @@ print(reshaped_data_clean.shape)
 nLatentNeurons = 96
 input_shape = (500, 1)
 with tensorflow.device('/device:GPU:0'):
-    model = model.paper_Model((500,1))
+    model = model.simpleModel_modified((500,1))
     # model = Sequential()
     # model.add(Conv1D(128, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
     #                  kernel_initializer='he_uniform', input_shape=input_shape))
@@ -246,7 +246,7 @@ with tensorflow.device('/device:GPU:0'):
     #Print model summary to see the architecture
     # plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=True)
     #
-    #model.compile(optimizer='adam', loss='mean_squared_error')
+    model.compile(optimizer='adam', loss='mean_squared_error')
     # model.save("C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis")
     #
     # x_train_1 = np.transpose(noisy_train)[:,0:1000]
@@ -258,11 +258,11 @@ with tensorflow.device('/device:GPU:0'):
     history = model.fit(
         reshaped_data_noisy,
         reshaped_data_clean,
-        epochs=1,
+        epochs=3,
         batch_size=32,
         validation_data=(reshaped_data_noisy_validation,reshaped_data_clean_validation)
     )
-    model.save('my_model_paper.h5')
+    model.save('my_model_modified_simple.h5')
 
     # Access training and validation loss from model.history
     # train_loss = history.history['loss']

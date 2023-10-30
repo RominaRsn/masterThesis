@@ -58,7 +58,7 @@ def Novel_CNN(input_size=(500, 1)):
     output1 = Dense(500)(flatten1)  # Adjusted Dense layer output size
     model = Model(inputs=inputs, outputs=output1)
 
-    model.summary()
+    #model.summary()
     return model
 
 def simpleModel(input_shape=(500,1)):
@@ -112,6 +112,33 @@ def paper_Model(input_shape=(500, 1)):
     # Compile the model
     model.compile(optimizer='adam', loss='mean_squared_error')
 
+   # model.summary()
+    return model
+
+
+#a model with one more layer than simpleModel
+def simpleModel_modified(input_shape=(500,1)):
+    max_norm_value = 6.0
+    model = Sequential()
+    model.add(Conv1D(128, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                     kernel_initializer='he_uniform', input_shape=input_shape))
+
+    model.add(Conv1D(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                     kernel_initializer='he_uniform'))
+    model.add(Conv1D(64, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                     kernel_initializer='he_uniform'))  # Additional Conv1D
+
+    model.add(
+        Conv1DTranspose(64, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                        kernel_initializer='he_uniform'))
+    model.add(
+        Conv1DTranspose(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                                                             kernel_initializer='he_uniform'))
+    model.add(
+        Conv1DTranspose(128, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+                                                             kernel_initializer='he_uniform'))
+    model.add(
+        Conv1D(1, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='sigmoid', padding='same'))
+
     model.summary()
     return model
-paper_Model()
