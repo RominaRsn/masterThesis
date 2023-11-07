@@ -16,32 +16,69 @@ input_shape = (500, 1)
 input_channels = 1
 # Define your model
 
-class MyModel(nn.Module):
+# 28*28 ==> 9 ==> 28*28
+class AE(torch.nn.Module):
     def __init__(self):
-        super(MyModel, self).__init__()
-        self.model = nn.Sequential(
-            nn.Conv1d(500, 128, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Conv1d(128, 96, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.ConvTranspose1d(96, 96, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.ConvTranspose1d(96, 96, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Conv1d(96, 500, kernel_size=3, padding=1),
-            nn.Sigmoid()
+        super().__init__()
+
+        # Building an linear encoder with Linear
+        # layer followed by Relu activation function
+        # 784 ==> 9
+        self.encoder = torch.nn.Sequential(
+            torch.nn.Linear(28 * 28, 128),
+            torch.nn.ReLU(),
+            torch.nn.Linear(128, 64),
+            torch.nn.ReLU(),
+            torch.nn.Linear(64, 36),
+            torch.nn.ReLU(),
+            torch.nn.Linear(36, 18),
+            torch.nn.ReLU(),
+            torch.nn.Linear(18, 9)
+        )
+
+        self.decoder = torch.nn.Sequential(
+            torch.nn.Linear(9, 18),
+            torch.nn.ReLU(),
+            torch.nn.Linear(18, 36),
+            torch.nn.ReLU(),
+            torch.nn.Linear(36, 64),
+            torch.nn.ReLU(),
+            torch.nn.Linear(64, 128),
+            torch.nn.ReLU(),
+            torch.nn.Linear(128, 28 * 28),
+            torch.nn.Sigmoid()
         )
 
     def forward(self, x):
-        return self.model(x)
-
-# Initialize the model with your input shape
-model = MyModel()
-
-zero_input = torch.zeros(1,500,1)
-yero_output = model(zero_input)
-print(yero_output.shape)
-print(yero_output)
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
+# class MyModel(nn.Module):
+#     def __init__(self):
+#         super(MyModel, self).__init__()
+#         self.model = nn.Sequential(
+#             nn.Conv1d(500, 128, kernel_size=3, padding=1),
+#             nn.ReLU(),
+#             nn.Conv1d(128, 96, kernel_size=3, padding=1),
+#             nn.ReLU(),
+#             nn.ConvTranspose1d(96, 96, kernel_size=3, padding=1),
+#             nn.ReLU(),
+#             nn.ConvTranspose1d(96, 96, kernel_size=3, padding=1),
+#             nn.ReLU(),
+#             nn.Conv1d(96, 500, kernel_size=3, padding=1),
+#             nn.Sigmoid()
+#         )
+#
+#     def forward(self, x):
+#         return self.model(x)
+#
+# # Initialize the model with your input shape
+# model = MyModel()
+#
+# zero_input = torch.zeros(1,500,1)
+# yero_output = model(zero_input)
+# print(yero_output.shape)
+# print(yero_output)
 #max_norm_value = 6  # Your specified maximum norm value
 
 # Create a custom class for weight-normalized Conv1D

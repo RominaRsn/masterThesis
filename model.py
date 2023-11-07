@@ -6,7 +6,7 @@ from keras.models import load_model
 
 import tensorflow
 from sklearn.model_selection import train_test_split
-from metrics import metrics
+from masterThesis.metrics import metrics
 import tensorflow as tf
 import numpy as np
 import os
@@ -76,7 +76,7 @@ def simpleModel(input_shape=(500,1)):
         Conv1DTranspose(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
                         kernel_initializer='he_uniform'))
     model.add(
-        Conv1D(1, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='sigmoid', padding='same'))
+        Conv1D(1, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='tanh', padding='same'))
 
     model.summary()
     return model
@@ -120,25 +120,63 @@ def paper_Model(input_shape=(500, 1)):
 def simpleModel_modified(input_shape=(500,1)):
     max_norm_value = 6.0
     model = Sequential()
-    model.add(Conv1D(128, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+    model.add(Conv1D(128, kernel_size=3, activation='relu',
                      kernel_initializer='he_uniform', input_shape=input_shape))
 
-    model.add(Conv1D(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+    model.add(Conv1D(96, kernel_size=3, activation='relu',
                      kernel_initializer='he_uniform'))
-    model.add(Conv1D(64, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+    model.add(Conv1D(64, kernel_size=3, activation='relu',
                      kernel_initializer='he_uniform'))  # Additional Conv1D
 
     model.add(
-        Conv1DTranspose(64, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+        Conv1DTranspose(64, kernel_size=3, activation='relu',
                         kernel_initializer='he_uniform'))
     model.add(
-        Conv1DTranspose(96, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+        Conv1DTranspose(128, kernel_size=3, activation='relu',
                                                              kernel_initializer='he_uniform'))
     model.add(
-        Conv1DTranspose(128, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='relu',
+        Conv1DTranspose(96, kernel_size=3, activation='relu',
                                                              kernel_initializer='he_uniform'))
     model.add(
-        Conv1D(1, kernel_size=3, kernel_constraint=max_norm(max_norm_value), activation='sigmoid', padding='same'))
+        Conv1D(1, kernel_size=3, activation='sigmoid', padding='same'))
 
     model.summary()
     return model
+
+def simpleModel_modified2(input_shape=(500,1)):
+    # Define the input layer
+    input_layer = Input(shape=(500, 1))  # Assuming 1 channel (e.g., for time series data)
+
+    # Encoding layers
+    encoded1 = Conv1D(128, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(input_layer)
+    encoded1 = MaxPooling1D(2, padding='same')(encoded1)
+
+    encoded2 = Conv1D(128, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded1)
+    encoded2 = MaxPooling1D(2, padding='same')(encoded2)
+
+    encoded3 = Conv1D(128, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded2)
+    encoded3 = MaxPooling1D(2, padding='same')(encoded3)
+
+    # Decoding layers (symmetric to the encoding layers)
+    decoded3 = Conv1D(128, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded3)
+    decoded3 = UpSampling1D(2)(decoded3)
+
+    decoded2 = Conv1D(128, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(decoded3)
+    decoded2 = UpSampling1D(2)(decoded2)
+
+    decoded1 = Conv1D(128, 3, activation='relu',kernel_initializer='he_uniform', padding='valid')(decoded2)
+    decoded1 = UpSampling1D(2)(decoded1)
+
+    output_layer = Conv1D(1, 3, activation='tanh',kernel_initializer='he_uniform', padding='same')(decoded1)  # 1 channel for reconstruction
+
+    # Create the autoencoder model
+    autoencoder = Model(input_layer, output_layer)
+
+    # Compile the autoencoder
+    autoencoder.compile(optimizer='adam', loss='mean_squared_error')
+
+    # Print the summary of the autoencoder model
+    autoencoder.summary()
+    return autoencoder
+
+simpleModel_modified2()

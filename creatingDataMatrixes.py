@@ -100,6 +100,13 @@ for i in range(0, 180):
 data_cleaned = np.array(val_clean)
 data_noisy = np.array(val_noisy)
 
+
+small_data_cleaned = data_cleaned[0:1000, :]
+small_data_noisy = data_noisy[0:1000, :]
+np.save(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\small_data_cleaned.npy', small_data_cleaned)
+np.save(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\small_data_noisy.npy', small_data_noisy)
+
+
 data_cleaned_normalized = preprocessing.normalize(data_cleaned)
 data_noisy_normalized = preprocessing.normalize(data_noisy)
 
