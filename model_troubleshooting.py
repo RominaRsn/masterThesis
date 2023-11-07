@@ -9,6 +9,9 @@ from keras.utils import plot_model
 import os
 import model
 import spicy
+import tensorflow as tf
+import pickle
+import masterThesis.metrics as metrics
 
 model = model.simpleModel_modified2()
 #model.load_weights(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\my_model_modified_simple.h5")
@@ -35,7 +38,7 @@ reshaped_data_clean = clean_train.reshape(np.shape(noisy_train)[0], np.shape(noi
 # sample1 = reshaped_data_noisy[0].transpose()
 #
 
-a = 100000
+a = noisy_train.shape[0]
 smaller_reshaped_data_clean = reshaped_data_clean[0:a]
 smaller_reshaped_data_noisy = reshaped_data_noisy[0:a]
 # # Desired new shape
@@ -60,15 +63,28 @@ smaller_reshaped_data_noisy = reshaped_data_noisy[0:a]
 
 #print(smaller_reshaped_data_clean_padded.shape)
 #model.compile(optimizer='adam', loss='mean_squared_error')
+callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
+
 model.optimizer.learning_rate = 1e-6
-model.fit(
+history = model.fit(
     smaller_reshaped_data_noisy,
     smaller_reshaped_data_clean,
-    epochs=1,
+    epochs=5,
     batch_size=32,
     validation_split=0.1,
+    callbacks=[callback],
+    shuffle=True
 
 )
+model = history.model
+history.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\dummy_model_h.h5")
+model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\dummy_model.h5")
+result = model.predict(noisy_test.reshape(noisy_test.shape[0], noisy_test.shape[1], 1))
+np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\dummy_model_h.npy", result)
+
+with open(r'E:\pickle\trainHistoryDict', 'wb') as file_pi:
+    pickle.dump(history.history, file_pi)
+
 
 x = np.arange(500)
 result = model.predict(noisy_train[0, :].reshape(1, 500, 1))
@@ -160,8 +176,8 @@ sampling_freq = 250
 # #
 # plt.show()
 #
-for i in range(0,5):
-    fig, axes = plt.subplots(nrows=3, ncols=1)
+for i in range(0, 5):
+    fig, axes = plt.subplots(nrows=3, ncols=1, sharey='col')
 
     #row_index = 5
     row_index = np.random.randint(0, a)
@@ -184,7 +200,7 @@ for i in range(0,5):
     result = result.reshape(500, 1)
     #result = result.transpose()
 
-    axes[2].plot(result/3, label='predicted data')
+    axes[2].plot(result[row_index, :], label='predicted data')
     axes[2].set_title('predicted data')
     axes[2].set_ylabel('Signal amplitude')
     axes[2].set_xlabel('Time')
@@ -200,6 +216,11 @@ for i in range(0,5):
 
     # Show the plot
     plt.show()
+    print("instance: ", i)
+    snr_on_sample = metrics.metrics.snr(result[i], clean_test[i])
+    print(snr_on_sample)
+    snr_on_sample = metrics.metrics.snr(noisy_test[i], clean_test[i])
+    print(snr_on_sample)
 
 
 #
