@@ -28,19 +28,29 @@ data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThe
 noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
 
 # Step 2: Split the training set into training and validation sets
-noisy_train, noisy_val, clean_train, clean_val = train_test_split(noisy_train, clean_train, test_size=0.1, random_state=42)
+#noisy_train, noisy_val, clean_train, clean_val = train_test_split(noisy_train, clean_train, test_size=0.1, random_state=42)
 
 
 
 reshaped_data_noisy = noisy_train.reshape(np.shape(noisy_train)[0], np.shape(noisy_train)[1], 1)
 reshaped_data_clean = clean_train.reshape(np.shape(noisy_train)[0], np.shape(noisy_train)[1], 1)
 
+
+reshaped_data_noisy_test = noisy_test.reshape(np.shape(noisy_test)[0], np.shape(noisy_test)[1], 1)
+reshaped_data_clean_test = clean_test.reshape(np.shape(noisy_test)[0], np.shape(noisy_test)[1], 1)
+
+
 # sample1 = reshaped_data_noisy[0].transpose()
 #
 
-a = noisy_train.shape[0]
-smaller_reshaped_data_clean = reshaped_data_clean[0:a]
-smaller_reshaped_data_noisy = reshaped_data_noisy[0:a]
+a = 100000
+smaller_reshaped_data_clean_train = reshaped_data_clean[0:a]
+smaller_reshaped_data_noisy_train = reshaped_data_noisy[0:a]
+
+smaller_reshaped_data_clean_test = reshaped_data_clean_test[0:5]
+smaller_reshaped_data_noisy_test = reshaped_data_noisy_test[0:5]
+
+
 # # Desired new shape
 # new_shape = (1, 504, 1)
 #
@@ -66,36 +76,32 @@ smaller_reshaped_data_noisy = reshaped_data_noisy[0:a]
 callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
 
 model.optimizer.learning_rate = 1e-6
-history = model.fit(
-    smaller_reshaped_data_noisy,
-    smaller_reshaped_data_clean,
-    epochs=5,
+model.fit(
+    smaller_reshaped_data_noisy_train,
+    smaller_reshaped_data_clean_train,
+    epochs=1,
     batch_size=32,
     validation_split=0.1,
     callbacks=[callback],
     shuffle=True
 
 )
-model = history.model
-history.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\dummy_model_h.h5")
-model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\dummy_model.h5")
-result = model.predict(noisy_test.reshape(noisy_test.shape[0], noisy_test.shape[1], 1))
-np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\dummy_model_h.npy", result)
+#model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\dummy_model.h5")
+result = model.predict(smaller_reshaped_data_noisy_test)
+#np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\dummy_model_h.npy", result)
 
-with open(r'E:\pickle\trainHistoryDict', 'wb') as file_pi:
-    pickle.dump(history.history, file_pi)
+# with open(r'E:\pickle\trainHistoryDict', 'wb') as file_pi:
+#     pickle.dump(history.history, file_pi)
 
-
-x = np.arange(500)
-result = model.predict(noisy_train[0, :].reshape(1, 500, 1))
+#result = model.predict(noisy_train[0, :].reshape(1, 500, 1))
 # print(result)
 # result =  result.reshape(500, 1)
-cross_corr = spicy.signal.correlate(result, clean_train[0, :].reshape(1, 500, 1), mode='same')
+#cross_corr = spicy.signal.correlate(result, clean_train[0, :].reshape(1, 500, 1), mode='same')
 #plt.plot(cross_corr.reshape(500,1))
 
-coref = np.corrcoef(result.squeeze(axis= -1), clean_train[0, :])
+#coref = np.corrcoef(result.squeeze(axis= -1), clean_train[0, :])
 
-print(coref)
+#print(coref)
 
 sampling_freq = 250
 
@@ -179,7 +185,7 @@ sampling_freq = 250
 for i in range(0, 5):
     fig, axes = plt.subplots(nrows=3, ncols=1, sharey='col')
 
-    #row_index = 5
+    row_index = i
     row_index = np.random.randint(0, a)
     #col_index = np.random.randint(0, 11520000/500)
 
@@ -188,7 +194,7 @@ for i in range(0, 5):
     axes[0].set_ylabel('Signal amplitude')
     axes[0].set_xlabel('Time')
 
-    print(smaller_reshaped_data_clean[row_index, :].shape)
+    #print(smaller_reshaped_data_clean_test[row_index, :].shape)
 
 
     axes[1].plot(noisy_test[row_index, :], label = 'Noisy Data')
@@ -196,8 +202,7 @@ for i in range(0, 5):
     axes[1].set_ylabel('Signal amplitude')
     axes[1].set_xlabel('Time')
 
-    result = model.predict(noisy_test[row_index, :].reshape(1, 500, 1))
-    result = result.reshape(500, 1)
+    #result = model.predict(result)
     #result = result.transpose()
 
     axes[2].plot(result[row_index, :], label='predicted data')
