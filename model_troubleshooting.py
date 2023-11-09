@@ -18,8 +18,8 @@ model = model.simpleModel_modified2()
 
 
 
-data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized.npy")
-data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized.npy")
+data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
+data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
 
 
 
@@ -43,7 +43,7 @@ reshaped_data_clean_test = clean_test.reshape(np.shape(noisy_test)[0], np.shape(
 # sample1 = reshaped_data_noisy[0].transpose()
 #
 
-a = 100000
+a = 10
 smaller_reshaped_data_clean_train = reshaped_data_clean[0:a]
 smaller_reshaped_data_noisy_train = reshaped_data_noisy[0:a]
 
@@ -86,8 +86,8 @@ model.fit(
     shuffle=True
 
 )
-#model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\dummy_model.h5")
-result = model.predict(smaller_reshaped_data_noisy_test)
+model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers.h5")
+result = model.predict(reshaped_data_noisy_test)
 #np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\dummy_model_h.npy", result)
 
 # with open(r'E:\pickle\trainHistoryDict', 'wb') as file_pi:
