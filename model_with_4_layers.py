@@ -74,24 +74,24 @@ smaller_reshaped_data_noisy_test = reshaped_data_noisy_test[0:5]
 
 #print(smaller_reshaped_data_clean_padded.shape)
 #model.compile(optimizer='adam', loss='mean_squared_error')
-# model = model.load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers.h5")
-# callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
-#
-# model.optimizer.learning_rate = 1e-6
-# model.fit(
-#     smaller_reshaped_data_noisy_train,
-#     smaller_reshaped_data_clean_train,
-#     epochs=9,
-#     batch_size=32,
-#     validation_split=0.1,
-#     callbacks=[callback],
-#     shuffle=True
-#
-# )
-# model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_moreEpoch.h5")
-# result = model.predict(reshaped_data_noisy_test)
-# np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_result_moreEpoch.npy", result)
-result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_result_moreEpoch.npy")
+model = model.encoder_with_4_layers()
+callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
+
+model.optimizer.learning_rate = 1e-6
+model.fit(
+    smaller_reshaped_data_noisy_train,
+    smaller_reshaped_data_clean_train,
+    epochs=5,
+    batch_size=32,
+    validation_split=0.1,
+    callbacks=[callback],
+    shuffle=True
+
+)
+model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_four_layers.h5")
+result = model.predict(reshaped_data_noisy_test)
+np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_four_layers_results.npy", result)
+#result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_result_moreEpoch.npy")
 # with open(r'E:\pickle\trainHistoryDict', 'wb') as file_pi:
 #     pickle.dump(history.history, file_pi)
 
