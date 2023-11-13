@@ -119,7 +119,7 @@ filteredSignal_30 = nk.signal_filter(noisy_test, sampling_rate=250, lowcut=0.1, 
 
 signalIndexVector = [0, 1, 3, 7, 11, 13, 14, 16, 17]
 for i in signalIndexVector:
-    fig, axes = plt.subplots(nrows=6, ncols=1, sharey='col')
+    fig, axes = plt.subplots(nrows=3, ncols=1, sharey='col')
 
     row_index = i
     max_range = np.max(noisy_test[row_index, :])
@@ -148,21 +148,21 @@ for i in signalIndexVector:
     #plt.ylim(min_range, max_range)
 
 
-    axes[3].plot(filteredSignal_30[row_index, :] + .55, label ='filtered signal-30')
-    axes[3].set_title('filtered signal-30')
-    axes[3].set_ylabel('Signal amplitude')
-    axes[3].set_xlabel('Time')
-
-    axes[4].plot(filteredSignal_45[row_index, :] + .55, label ='filtered signal-45')
-    axes[4].set_title('filtered signal-45')
-    axes[4].set_ylabel('Signal amplitude')
-    axes[4].set_xlabel('Time')
-
-
-    axes[5].plot(filteredSignal_70[row_index, :] + .55, label ='filtered signal-70')
-    axes[5].set_title('filtered signal-70')
-    axes[5].set_ylabel('Signal amplitude')
-    axes[5].set_xlabel('Time')
+    # axes[3].plot(filteredSignal_30[row_index, :] + .55, label ='filtered signal-30')
+    # axes[3].set_title('filtered signal-30')
+    # axes[3].set_ylabel('Signal amplitude')
+    # axes[3].set_xlabel('Time')
+    #
+    # axes[4].plot(filteredSignal_45[row_index, :] + .55, label ='filtered signal-45')
+    # axes[4].set_title('filtered signal-45')
+    # axes[4].set_ylabel('Signal amplitude')
+    # axes[4].set_xlabel('Time')
+    #
+    #
+    # axes[5].plot(filteredSignal_70[row_index, :] + .55, label ='filtered signal-70')
+    # axes[5].set_title('filtered signal-70')
+    # axes[5].set_ylabel('Signal amplitude')
+    # axes[5].set_xlabel('Time')
 
     #plt.ylim(min_range, max_range)
 
