@@ -14,6 +14,10 @@ min_val = min(min_clean, min_noisy)
 
 data_clean_normalized = (data_clean - min_val) / (max_val - min_val)
 data_noisy_normalized = (data_noisy - min_val) / (max_val - min_val)
+avg = (np.mean(data_clean_normalized) + np.mean(data_noisy_normalized))/2
+
+data_clean_normalized = data_clean_normalized - avg
+data_noisy_normalized = data_noisy_normalized - avg
 
 np.save(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy', data_clean_normalized)
 np.save(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy', data_noisy_normalized)

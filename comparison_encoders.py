@@ -20,7 +20,7 @@ result_5layer = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\mast
 
 
 signalIndexVector = [0, 1, 3, 7, 11, 13, 14, 16, 17]
-for i in signalIndexVector:
+for i in range(100, 121):
     fig, axes = plt.subplots(nrows=5, ncols=1, sharey='col')
 
     row_index = i

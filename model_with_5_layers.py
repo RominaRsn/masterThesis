@@ -43,8 +43,8 @@ reshaped_data_clean_test = clean_test.reshape(np.shape(noisy_test)[0], np.shape(
 
 # sample1 = reshaped_data_noisy[0].transpose()
 #
-
 a = noisy_train.shape[0]
+
 smaller_reshaped_data_clean_train = reshaped_data_clean[0:a]
 smaller_reshaped_data_noisy_train = reshaped_data_noisy[0:a]
 
@@ -81,16 +81,16 @@ model.optimizer.learning_rate = 1e-6
 model.fit(
     smaller_reshaped_data_noisy_train,
     smaller_reshaped_data_clean_train,
-    epochs=5,
+    epochs=2,
     batch_size=32,
     validation_split=0.1,
     callbacks=[callback],
     shuffle=True
 
 )
-model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers.h5")
-result = model.predict(reshaped_data_noisy_test)
-np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers_results.npy", result)
+model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers_more_filters.h5")
+result = model.predict(smaller_reshaped_data_noisy_test)
+np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers_results_more_filters.npy", result)
 #result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_result_moreEpoch.npy")
 # with open(r'E:\pickle\trainHistoryDict', 'wb') as file_pi:
 #     pickle.dump(history.history, file_pi)
@@ -190,7 +190,9 @@ filteredSignal_30 = nk.signal_filter(noisy_test, sampling_rate=250, lowcut=0.1, 
 # #
 # plt.show()
 #
-signalIndexVector = [0, 1, 3, 7, 11, 13, 14, 16, 17]
+#signalIndexVector = [0, 1, 3, 7, 11, 13, 14, 16, 17]
+signalIndexVector = [0, 1, 3, 4]
+
 for i in signalIndexVector:
     fig, axes = plt.subplots(nrows=6, ncols=1, sharey='col')
 
@@ -219,19 +221,19 @@ for i in signalIndexVector:
     axes[2].set_ylabel('Signal amplitude')
     axes[2].set_xlabel('Time')
 
-
-    axes[3].plot(filteredSignal_30[row_index, :] + .55, label ='filtered signal-30')
+    #
+    axes[3].plot(filteredSignal_30[row_index, :], label ='filtered signal-30')
     axes[3].set_title('filtered signal-30')
     axes[3].set_ylabel('Signal amplitude')
     axes[3].set_xlabel('Time')
 
-    axes[4].plot(filteredSignal_45[row_index, :] + .55, label ='filtered signal-45')
+    axes[4].plot(filteredSignal_45[row_index, :], label ='filtered signal-45')
     axes[4].set_title('filtered signal-45')
     axes[4].set_ylabel('Signal amplitude')
     axes[4].set_xlabel('Time')
 
 
-    axes[5].plot(filteredSignal_70[row_index, :] + .55, label ='filtered signal-70')
+    axes[5].plot(filteredSignal_70[row_index, :], label ='filtered signal-70')
     axes[5].set_title('filtered signal-70')
     axes[5].set_ylabel('Signal amplitude')
     axes[5].set_xlabel('Time')
