@@ -17,11 +17,11 @@ result_3layer = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\mast
 result_4layer = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_four_layers_results.npy")
 result_5layer = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers_results.npy")
 
-
+result_5layer_more_filter = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers_results_more_filters.npy")
 
 signalIndexVector = [0, 1, 3, 7, 11, 13, 14, 16, 17]
-for i in range(100, 121):
-    fig, axes = plt.subplots(nrows=5, ncols=1, sharey='col')
+for i in signalIndexVector:
+    fig, axes = plt.subplots(nrows=6 , ncols=1, sharey='col')
 
     row_index = i
     #row_index = np.random.randint(0, a)
@@ -43,22 +43,26 @@ for i in range(100, 121):
     #result = model.predict(result)
     #result = result.transpose()
 
-    axes[2].plot(result_3layer[row_index, :], label='predicted data with 3 layers in encoder')
+    axes[2].plot(result_3layer[row_index, :] - .55, label='predicted data with 3 layers in encoder')
     axes[2].set_title('predicted data with 3 layers in encoder')
     axes[2].set_ylabel('Signal amplitude')
     axes[2].set_xlabel('Time')
 
 
-    axes[3].plot(result_4layer[row_index, :], label ='predicted data with 4 layers in encoder')
+    axes[3].plot(result_4layer[row_index, :] - .55, label ='predicted data with 4 layers in encoder')
     axes[3].set_title('predicted data with 4 layers in encoder')
     axes[3].set_ylabel('Signal amplitude')
     axes[3].set_xlabel('Time')
 
-    axes[4].plot(result_5layer[row_index, :], label ='filtered signal-45')
+    axes[4].plot(result_5layer[row_index, :] - .55, label ='predicted data with 5 layers in encoder')
     axes[4].set_title('predicted data with 5 layers in encoder')
     axes[4].set_ylabel('Signal amplitude')
     axes[4].set_xlabel('Time')
 
+    axes[5].plot(result_5layer_more_filter[row_index, :], label ='predicted data with 5 layers in encoder with more filters')
+    axes[5].set_title('predicted data with 5 layers in encoder with more filters')
+    axes[5].set_ylabel('Signal amplitude')
+    axes[5].set_xlabel('Time')
 
 
 
