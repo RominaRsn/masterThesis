@@ -143,6 +143,49 @@ def simpleModel_modified(input_shape=(500,1)):
     model.summary()
     return model
 
+
+
+
+def model_with_three_layers_more_filters(input_shape=(500,1)):
+    # Define the input layer
+    input_layer = Input(shape=(500, 1))  # Assuming 1 channel (e.g., for time series data)
+
+    # Encoding layers
+    encoded1 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(input_layer)
+    encoded1 = MaxPooling1D(2, padding='same')(encoded1)
+
+    encoded2 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded1)
+    encoded2 = MaxPooling1D(2, padding='same')(encoded2)
+
+    encoded3 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded2)
+    encoded3 = MaxPooling1D(2, padding='same')(encoded3)
+
+    # Decoding layers (symmetric to the encoding layers)
+    decoded3 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded3)
+    decoded3 = UpSampling1D(2)(decoded3)
+
+    decoded2 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(decoded3)
+    decoded2 = UpSampling1D(2)(decoded2)
+
+    decoded1 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='valid')(decoded2)
+    decoded1 = UpSampling1D(2)(decoded1)
+
+    output_layer = Conv1D(1, 3, activation='tanh',kernel_initializer='he_uniform', padding='same')(decoded1)  # 1 channel for reconstruction
+
+    # Create the autoencoder model
+    autoencoder = Model(input_layer, output_layer)
+
+    # Compile the autoencoder
+    autoencoder.compile(optimizer='adam', loss='mean_squared_error')
+
+    # Print the summary of the autoencoder model
+    autoencoder.summary()
+    return autoencoder
+
+
+
+
+
 def simpleModel_modified2(input_shape=(500,1)):
     # Define the input layer
     input_layer = Input(shape=(500, 1))  # Assuming 1 channel (e.g., for time series data)

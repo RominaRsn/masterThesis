@@ -18,6 +18,9 @@ import re
 import pandas as pd
 import masterThesis.feature_extraction as feature_extraction
 
+def linelength(data):
+    data_diff = np.diff(data)
+    return np.sum(np.absolute(data_diff), axis=1)
 
 def extract_number(filename):
     # Use regular expression to find the number after "sz"
@@ -43,9 +46,6 @@ def countNumberOfSeizuresPerPerson(patient_number, channel_number):
             cnt += 1
     return cnt
 
-print(countNumberOfSeizuresPerPerson(2,2))
-
-
 #Iterate through the sorted files
 
 storage_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\filtered_data_romina"
@@ -64,6 +64,15 @@ for p in range(1, 51):
             path = os.path.join(storage_path, f"result_pat_{p}_sz_{i}_ch_{ch_num}.npy")
             np.save(path, result)
             print(f"result_pat_{p}_sz_{i}_ch_{ch_num}.npy saved")
+
+            old_ll = linelength(data_clean_normalized)
+            new_ll = linelength(result.squeeze(-1))
+            ll = np.vstack((old_ll, new_ll))
+            path = os.path.join(storage_path, f"ll_pat_{p}_sz_{i}_ch_{ch_num}.npy")
+            np.save(path, ll)
+
+
+
 
 
 
