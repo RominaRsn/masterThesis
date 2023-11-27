@@ -125,19 +125,26 @@ def binarize_array(arr, keepdims = False):
 
 
 def window_labels(sample_label, window_size, stride_size):
-    block_list = []
-    for seizure_id, label_block in sample_label.groupby(level=0):
+    # block_list = []
+    # for seizure_id, label_block in sample_label.groupby(level=0):
+    #
+    #     label_block= np.array(label_block)
+    #     window_labels = feature_extraction.chunk_data(label_block, window_size, stride_size, flatten_inside_window=True)
+    #     window_label = binarize_array(window_labels, keepdims = False)
+    #     window_label = pd.DataFrame(window_label, columns= ['label'])
+    #     window_label.set_index(pd.MultiIndex.from_arrays((seizure_id* np.ones_like(window_label.index), window_label.index)), inplace=True)
+    #     block_list.append(window_label)
+    #
+    # labels_df= pd.concat(block_list, axis=0)
+    #
+    # return labels_df
+    window_labels = feature_extraction.chunk_data(sample_label, window_size, stride_size, flatten_inside_window=True)
+    window_label = binarize_array(window_labels, keepdims=False)
+    #window_label = pd.DataFrame(window_label, columns=['label'])
+    window_label = np.array(window_label)
+    return window_label
+    #window_label.set_index(pd.MultiIndex.from_arrays((seizure_id* np.ones_like(window_label.index), window_label.index)), inplace=True)
 
-        label_block= np.array(label_block)
-        window_labels = feature_extraction.chunk_data(label_block, window_size, stride_size, flatten_inside_window=True)
-        window_label = binarize_array(window_labels, keepdims = False)
-        window_label = pd.DataFrame(window_label, columns= ['label'])
-        window_label.set_index(pd.MultiIndex.from_arrays((seizure_id* np.ones_like(window_label.index), window_label.index)), inplace=True)
-        block_list.append(window_label)
-
-    labels_df= pd.concat(block_list, axis=0)
-
-    return labels_df
 
 def import_csv(path):
     data = pd.read_csv(path, index_col=(0,1))

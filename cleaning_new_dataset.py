@@ -48,12 +48,13 @@ def countNumberOfSeizuresPerPerson(patient_number, channel_number):
 
 #Iterate through the sorted files
 
-storage_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\filtered_data_romina"
+storage_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_filtered"
 
-for p in range(1, 51):
+for p in range(1, 2):
     for ch_num in range(1,5):
         sz_num = countNumberOfSeizuresPerPerson(p, ch_num)
         for i in range(1, sz_num+1):
+            print(f"pat_{p}_sz_{i}_ch_{ch_num}")
             file_path = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_{ch_num}.npy")
             data = np.load(file_path)
             max_clean = np.max(data)
@@ -61,6 +62,7 @@ for p in range(1, 51):
             data_clean_normalized = (data - min_clean) / (max_clean - min_clean)
             data_clean_normalized = data_clean_normalized - np.average(data_clean_normalized)
             result = model.predict(data_clean_normalized)
+            #print(f"result shape: {result.shape}")
             path = os.path.join(storage_path, f"result_pat_{p}_sz_{i}_ch_{ch_num}.npy")
             np.save(path, result)
             print(f"result_pat_{p}_sz_{i}_ch_{ch_num}.npy saved")
@@ -68,6 +70,8 @@ for p in range(1, 51):
             old_ll = linelength(data_clean_normalized)
             new_ll = linelength(result.squeeze(-1))
             ll = np.vstack((old_ll, new_ll))
+            #print(f"result shape: {ll.shape}")
+            #
             path = os.path.join(storage_path, f"ll_pat_{p}_sz_{i}_ch_{ch_num}.npy")
             np.save(path, ll)
 
@@ -114,9 +118,9 @@ for p in range(1, 51):
 
 
 
-df = pd.read_csv(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s\pat_1_sz_1.csv")
-
-condition = df.iloc[:,0] == 1
-label = df[condition]
-label_np_1 = label["label"].to_numpy()
+# df = pd.read_csv(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s\pat_1_sz_1.csv")
+#
+# condition = df.iloc[:,0] == 1
+# label = df[condition]
+# label_np_1 = label["label"].to_numpy()
 
