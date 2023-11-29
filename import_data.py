@@ -5,7 +5,7 @@ import new_functions
 import matplotlib.pyplot as plt
 import neurokit2 as nk
 
-data_path = r'C:\Users\RominaRsn\Desktop\Data\export'
+data_path = r'D:\RealData\Data\export'
 project = 'brainmep'
 if project == 'brainmep':
 
@@ -14,7 +14,8 @@ if project == 'brainmep':
 exam_window = 2    # in sec
 stride = 1        # in sec
 window_size = exam_window * sampling_freq
-stride_size = stride * sampling_freq
+#stride_size = stride * sampling_freq
+stride_size = 0
 storagePath = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data'
 storagePath_labels = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s'
 old_interval = np.linspace(0, 512, 512, endpoint=False, dtype = int)
