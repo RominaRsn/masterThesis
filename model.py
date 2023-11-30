@@ -18,6 +18,7 @@ from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as keras
 from keras.constraints import max_norm
+from keras.layers import LeakyReLU
 
 def Novel_CNN(input_size=(500, 1)):
     inputs = Input(input_size)
@@ -314,4 +315,34 @@ def encoder_with_5_layers(input_shape=(500,1)):
     autoencoder.summary()
     return autoencoder
 
-encoder_with_5_layers()
+def deep_CNN():
+    # Define the input layer
+    model = Sequential()
+    model.add(Conv1D(32, 3, activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=(500, 1)))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(64, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(128, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(32, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(64, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(128, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(32, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(64, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(128, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(1, 3, activation='tanh', kernel_initializer='he_uniform', padding='same'))
+
+    model.summary()
+    model.compile(optimizer='adam', loss='mean_squared_error')
+
+    return model
+
+
+
+

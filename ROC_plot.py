@@ -140,115 +140,120 @@ path_extension_labels = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\mast
 list_th_0 = []
 
 for p in range(5,10):
-    ch_num = 1
     sz_num = countNumberOfSeizuresPerPerson(p)
     innerList = []
     for i in range(1, sz_num + 1):
-
-        file_path_ll = os.path.join(path_extension_ll, f"ll_pat_{p}_sz_{i}_ch_{ch_num}.npy")
-        ll = np.load(file_path_ll)
-        new_ll = ll[1, :]
-        old_ll = ll[0, :]
-
-
-        file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{i}_labels.npy")
-        ##df = pd.read_csv(file_path_labels)
-        ##condition = df.iloc[:, 0] == 1
-        ##label = df[condition]
-        label = np.load(file_path_labels)
-
-        print("--------------------")
-        print(new_ll.shape)
-        print(label.shape)
-
-        # Creating Thresholds
-        old_avg = np.average(old_ll)
-        old_std = np.std(old_ll)
-        thresholds_old = [old_avg - 3 * old_std, old_avg - 2 * old_std, old_avg - old_std, old_avg, old_avg + old_std, old_avg + 2 * old_std, old_avg + 3 * old_std]
-
-        avg = np.average(new_ll)
-        std = np.std(new_ll)
-        thresholds = [avg - 3 * std, avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std]
-        # for th in thresholds:
-        #     new_ll_label = (new_ll > th).astype(int)
-        #     fpr, tpr, thresholds = roc_curve(label, new_ll_label)
-        #     roc_auc = auc(fpr, tpr)
-        #     plt.plot(fpr, tpr, lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
-        #
-        #
-        #
-        # for th in thresholds_old:
-        #     old_ll_label = (old_ll > th).astype(int)
-        #     fpr, tpr, thresholds = roc_curve(label, old_ll_label)
-        #     roc_auc = auc(fpr, tpr)
-        #     plt.plot(fpr, tpr, lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
-        #
-        # plt.xlabel('False Positive Rate')
-        # plt.ylabel('True Positive Rate')
-        # plt.title('Receiver Operating Characteristic (ROC) Curve')
-        # plt.legend(loc='lower right')
-        # plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random')
-        # plt.show()
-
-        # Create subplots
-        #fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # 1 row, 2 columns
-
-        # Plot ROC curves for 'new_ll'
-        sens_new = []
-        spec_new = []
-        #axs[0].set_title('ROC Curve for new_ll')
-        #axs[0].plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random')
-        for th in thresholds:
-            new_ll_label = (new_ll > th).astype(int)
-            sens1 = sensitivity(new_ll_label, label)
-            spec1 = specificity(new_ll_label, label)
-            sens_new.append(sens1["sens"])
-            spec_new.append(1 - spec1["spec"])
+        fig, axs = plt.subplots(1, 4, figsize=(20, 5))
+        fig.suptitle(f"Patient {p} - seizure {i}")
+        for ch_num in range(1,5):
+            file_path_ll = os.path.join(path_extension_ll, f"ll_pat_{p}_sz_{i}_ch_{ch_num}.npy")
+            ll = np.load(file_path_ll)
+            new_ll = ll[1, :]
+            old_ll = ll[0, :]
 
 
+            file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{i}_labels.npy")
+            ##df = pd.read_csv(file_path_labels)
+            ##condition = df.iloc[:, 0] == 1
+            ##label = df[condition]
+            label = np.load(file_path_labels)
+
+            print("--------------------")
+            print(new_ll.shape)
+            print(label.shape)
+
+            # Creating Thresholds
+            old_avg = np.average(old_ll)
+            old_std = np.std(old_ll)
+            thresholds_old = [old_avg - 3 * old_std, old_avg - 2 * old_std, old_avg - old_std, old_avg, old_avg + old_std, old_avg + 2 * old_std, old_avg + 3 * old_std]
+
+            avg = np.average(new_ll)
+            std = np.std(new_ll)
+            thresholds = [avg - 3 * std, avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std]
+            # for th in thresholds:
+            #     new_ll_label = (new_ll > th).astype(int)
+            #     fpr, tpr, thresholds = roc_curve(label, new_ll_label)
+            #     roc_auc = auc(fpr, tpr)
+            #     plt.plot(fpr, tpr, lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
+            #
+            #
+            #
+            # for th in thresholds_old:
+            #     old_ll_label = (old_ll > th).astype(int)
+            #     fpr, tpr, thresholds = roc_curve(label, old_ll_label)
+            #     roc_auc = auc(fpr, tpr)
+            #     plt.plot(fpr, tpr, lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
+            #
+            # plt.xlabel('False Positive Rate')
+            # plt.ylabel('True Positive Rate')
+            # plt.title('Receiver Operating Characteristic (ROC) Curve')
+            # plt.legend(loc='lower right')
+            # plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random')
+            # plt.show()
+
+            # Create subplots
+            #fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # 1 row, 2 columns
+
+            # Plot ROC curves for 'new_ll'
+            sens_new = []
+            spec_new = []
+            #axs[0].set_title('ROC Curve for new_ll')
+            #axs[0].plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random')
+            for th in thresholds:
+                new_ll_label = (new_ll > th).astype(int)
+                sens1 = sensitivity(new_ll_label, label)
+                spec1 = specificity(new_ll_label, label)
+                sens_new.append(sens1["sens"])
+                spec_new.append(1 - spec1["spec"])
 
 
-            # fpr, tpr, _ = roc_curve(label, new_ll_label)
-            # roc_auc = auc(fpr, tpr)
-            # axs[0].plot(fpr, tpr, lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
-        #
-        # axs[0].set_xlabel('False Positive Rate')
-        # axs[0].set_ylabel('True Positive Rate')
-        # axs[0].legend(loc='lower right')
 
-        # Plot ROC curves for 'old_ll'
-        # axs[1].set_title('ROC Curve for old_ll')
-        # axs[1].plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random')
-        sens_old = []
-        spec_old = []
-        for th in thresholds_old:
-            old_ll_label = (old_ll > th).astype(int)
-            sens2 = sensitivity(old_ll_label, label)
-            spec2 = specificity(old_ll_label, label)
-            sens_old.append(sens2["sens"])
-            spec_old.append(1 - spec2["spec"])
 
-        auc_old = auc(spec_old, sens_old)
-        auc_new = auc(spec_new, sens_new)
-        print("auc_old")
-        print(auc_old)
-        print("auc_new")
-        print(auc_new)
+                # fpr, tpr, _ = roc_curve(label, new_ll_label)
+                # roc_auc = auc(fpr, tpr)
+                # axs[0].plot(fpr, tpr, lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
+            #
+            # axs[0].set_xlabel('False Positive Rate')
+            # axs[0].set_ylabel('True Positive Rate')
+            # axs[0].legend(loc='lower right')
 
-        sens_30, spec_30 = ROCParamsForBWFiltering_30(p, i, ch_num, label)
-        auc_30 = auc(spec_30, sens_30)
-        plt.plot(spec_30, sens_30, label=f'ROC curve for bw-30hz (AUC = {auc_30:.2f})')
-        sens_45, spec_45 = ROCParamsForBWFiltering_45(p, i, ch_num, label)
-        auc_45 = auc(spec_45, sens_45)
-        plt.plot(spec_45, sens_45, label=f'ROC curve for bw-45 hz (AUC = {auc_45:.2f})')
-        sens_70, spec_70 = ROCParamsForBWFiltering_70(p, i, ch_num, label)
-        auc_70 = auc(spec_70, sens_70)
-        plt.plot(spec_70, sens_70, label=f'ROC curve for bw-70hz (AUC = {auc_70:.2f})')
+            # Plot ROC curves for 'old_ll'
+            # axs[1].set_title('ROC Curve for old_ll')
+            # axs[1].plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random')
+            sens_old = []
+            spec_old = []
+            for th in thresholds_old:
+                old_ll_label = (old_ll > th).astype(int)
+                sens2 = sensitivity(old_ll_label, label)
+                spec2 = specificity(old_ll_label, label)
+                sens_old.append(sens2["sens"])
+                spec_old.append(1 - spec2["spec"])
 
-        plt.plot(spec_new, sens_new, label=f'ROC curve for procesed data (AUC = {auc_new:.2f})')
-        plt.plot(spec_old, sens_old, label=f'ROC curve for unprocessed data (AUC = {auc_old:.2f})')
-        #plt.legend(["bw-30hz","bw-45hz", "bw-70hz","processed", "unprocessed"])
-        plt.legend()
+            auc_old = auc(spec_old, sens_old)
+            auc_new = auc(spec_new, sens_new)
+            print("auc_old")
+            print(auc_old)
+            print("auc_new")
+            print(auc_new)
+
+            sens_30, spec_30 = ROCParamsForBWFiltering_30(p, i, ch_num, label)
+            auc_30 = auc(spec_30, sens_30)
+            axs[ch_num -1].plot(spec_30, sens_30, label=f'ROC curve for bw-30hz (AUC = {auc_30:.2f})')
+            sens_45, spec_45 = ROCParamsForBWFiltering_45(p, i, ch_num, label)
+            auc_45 = auc(spec_45, sens_45)
+            axs[ch_num-1].plot(spec_45, sens_45, label=f'ROC curve for bw-45 hz (AUC = {auc_45:.2f})')
+            sens_70, spec_70 = ROCParamsForBWFiltering_70(p, i, ch_num, label)
+            auc_70 = auc(spec_70, sens_70)
+            axs[ch_num-1].plot(spec_70, sens_70, label=f'ROC curve for bw-70hz (AUC = {auc_70:.2f})')
+
+            axs[ch_num-1].plot(spec_new, sens_new, label=f'ROC curve for procesed data (AUC = {auc_new:.2f})')
+            axs[ch_num-1].plot(spec_old, sens_old, label=f'ROC curve for unprocessed data (AUC = {auc_old:.2f})')
+            #plt.legend(["bw-30hz","bw-45hz", "bw-70hz","processed", "unprocessed"])
+            axs[ch_num-1].set_xlabel('1 - Specificity')
+            axs[ch_num-1].set_ylabel('Sensitivity')
+            axs[ch_num-1].set_title(f'ROC Curve for channel {ch_num}')
+            axs[ch_num-1].legend(loc ="lower right")
+
         plt.show()
             # fpr, tpr, _ = roc_curve(label, old_ll_label)
             # roc_auc = auc(fpr, tpr)
