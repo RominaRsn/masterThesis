@@ -318,30 +318,52 @@ def encoder_with_5_layers(input_shape=(500,1)):
 def deep_CNN():
     # Define the input layer
     model = Sequential()
-    model.add(Conv1D(32, 3, activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=(500, 1)))
+    model.add(Conv1D(32, 1, activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=(500, 1)))
     model.add(LeakyReLU(alpha=0.02))
-    model.add(Conv1D(64, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv1D(64, 1, activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(LeakyReLU(alpha=0.02))
-    model.add(Conv1D(128, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv1D(128, 1, activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(LeakyReLU(alpha=0.02))
-    model.add(Conv1D(32, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv1D(32, 1, activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(LeakyReLU(alpha=0.02))
-    model.add(Conv1D(64, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv1D(64, 1, activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(LeakyReLU(alpha=0.02))
-    model.add(Conv1D(128, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv1D(128, 1, activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(LeakyReLU(alpha=0.02))
-    model.add(Conv1D(32, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv1D(32, 1, activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(LeakyReLU(alpha=0.02))
-    model.add(Conv1D(64, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv1D(64, 1, activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(LeakyReLU(alpha=0.02))
-    model.add(Conv1D(128, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv1D(128, 1, activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(LeakyReLU(alpha=0.02))
-    model.add(Conv1D(1, 3, activation='tanh', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv1D(1, 1, activation='tanh', kernel_initializer='he_uniform', padding='same'))
 
     model.summary()
     model.compile(optimizer='adam', loss='mean_squared_error')
 
     return model
+
+
+def RNN_lstm():
+  datanum = 500
+  model = tf.keras.Sequential()
+  model.add(Input(shape=(datanum,1)))
+  model.add(layers.LSTM(1,return_sequences = True ))
+
+  model.add(layers.Flatten())
+
+  model.add(layers.Dense(datanum))
+  model.add(layers.ReLU())
+  model.add(layers.Dropout(0.3))
+
+  model.add(layers.Dense(datanum))
+  model.add(layers.ReLU())
+  model.add(layers.Dropout(0.3))
+
+  model.add(layers.Dense(datanum))
+  model.summary()
+  model.compile(optimizer='adam', loss='mean_squared_error')
+  return model
 
 
 

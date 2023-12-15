@@ -118,36 +118,50 @@ def resample_block_labels(x):
 
 
 
-for p in patients_list:
-    patient_path = data_path + f'\\pat_{p}.csv'
-    data, labels = new_functions.import_csv(patient_path)
-    for seizure_id, seizure_block in data.groupby(level=0):
-        seizure_block = np.array(seizure_block)
-        resampled_block = resample_block(seizure_block)
-
-        for ch_num in range(0, data.shape[1]):
-            epoched_data_tmp = feature_extraction.chunk_data(resampled_block[:, ch_num], 500, stride_size)
-
-            print(f'ch_num{ch_num}, seizure_id:{seizure_id}, shape:{epoched_data_tmp.shape}')
-
-            name_extension = f'pat_{p}_sz_{seizure_id}_ch_{ch_num + 1}'
-            save_path = storagePath + f'\\{name_extension}'
-            np.save(save_path, epoched_data_tmp)
-            #plt.plot(epoched_data_tmp_np[0])
-    print('-------------------------------------')
-    for seizure_id, label_block in labels.groupby(level=0):
-        label_block = np.array(label_block)
-        resampled_labels = resample_block_labels(label_block)
-        #labels_df = pd.DataFrame(resampled_labels, columns=['label'])
-        epoched_labels = new_functions.window_labels(resampled_labels, 500, stride_size)
-        print(f'seizure_id:{seizure_id}, shape:{epoched_labels.shape}')
-
-        name_extension = f'pat_{p}_sz_{seizure_id}_labels'
-        save_path = storagePath_labels + f'\\{name_extension}'
-        np.save(save_path, epoched_labels)
-
+# for p in patients_list:
+#     patient_path = data_path + f'\\pat_{p}.csv'
+#     data, labels = new_functions.import_csv(patient_path)
+#     for seizure_id, seizure_block in data.groupby(level=0):
+#         seizure_block = np.array(seizure_block)
+#         resampled_block = resample_block(seizure_block)
+#
+#         for ch_num in range(0, data.shape[1]):
+#             epoched_data_tmp = feature_extraction.chunk_data(resampled_block[:, ch_num], 500, stride_size)
+#
+#             print(f'ch_num{ch_num}, seizure_id:{seizure_id}, shape:{epoched_data_tmp.shape}')
+#
+#             name_extension = f'pat_{p}_sz_{seizure_id}_ch_{ch_num + 1}'
+#             save_path = storagePath + f'\\{name_extension}'
+#             np.save(save_path, epoched_data_tmp)
+#             #plt.plot(epoched_data_tmp_np[0])
+#     print('-------------------------------------')
+#     for seizure_id, label_block in labels.groupby(level=0):
+#         label_block = np.array(label_block)
+#         resampled_labels = resample_block_labels(label_block)
+#         #labels_df = pd.DataFrame(resampled_labels, columns=['label'])
+#         epoched_labels = new_functions.window_labels(resampled_labels, 500, stride_size)
+#         print(f'seizure_id:{seizure_id}, shape:{epoched_labels.shape}')
+#
+#         name_extension = f'pat_{p}_sz_{seizure_id}_labels'
+#         save_path = storagePath_labels + f'\\{name_extension}'
+#         np.save(save_path, epoched_labels)
+#
 
         #np.save(f'pat_{p}_sz_{seizure_id}_ch_{ch_num}', epoched_data_tmp)
 
 
 #
+
+for p in patients_list:
+    patient_path = data_path + f'\\pat_{p}.csv'
+    data, labels = new_functions.import_csv(patient_path)
+    for seizure_id, label_block in labels.groupby(level=0):
+        label_block = np.array(label_block)
+        resampled_labels = resample_block_labels(label_block)
+        plt.plot(label_block, label='original')
+        plt.plot(resampled_labels, label='resampled', linestyle='dashed')
+        plt.legend()
+        plt.show()
+        print(label_block.shape)
+        print(resampled_labels.shape)
+        print('-------------------------------------')
