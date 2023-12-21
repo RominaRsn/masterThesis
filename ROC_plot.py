@@ -135,7 +135,7 @@ def specificity(generated_labels , true_labels):
 
 # path_extension_ll = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_filtered"
 path_extension_labels = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s"
-path_extension_ll = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cnn_combo\ll"
+path_extension_ll = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_filtered"
 
 
 list_th_0 = []
@@ -147,7 +147,7 @@ for p in range(10,20):
         fig, axs = plt.subplots(1, 1)
         fig.suptitle(f"Patient {p} - seizure {i}")
         for ch_num in range(1,2):
-            file_path_ll = os.path.join(path_extension_ll, f"ll_combo_pat_{p}_sz_{i}_ch_{ch_num}.npy")
+            file_path_ll = os.path.join(path_extension_ll, f"ll_pat_{p}_sz_{i}_ch_{ch_num}.npy")
             ll = np.load(file_path_ll)
             new_ll = ll[1, :]
             old_ll = ll[0, :]
@@ -242,7 +242,7 @@ for p in range(10,20):
             # axs[1].set_xlabel('False Positive Rate')
             # axs[1].set_ylabel('True Positive Rate')
             # axs[1].legend(loc='lower right')
-            axs.legend(loc='lower right')
+
 
 
             print("auc_old")
@@ -250,8 +250,10 @@ for p in range(10,20):
             print("auc_new")
             print(auc_new)
 
-            # sens_30, spec_30 = ROCParamsForBWFiltering_30(p, i, ch_num, label)
-            # auc_30 = auc(spec_30, sens_30)
+            sens_30, spec_30 = ROCParamsForBWFiltering_30(p, i, ch_num, label)
+            auc_30 = auc(spec_30, sens_30)
+            axs.plot(spec_30, sens_30, lw=2, label=f'ROC curve BW-30 (AUC = {auc_30:.2f})')
+            axs.legend(loc='lower right')
             # axs[ch_num -1].plot(spec_30, sens_30, label=f'ROC curve for bw-30hz (AUC = {auc_30:.2f})')
             # sens_45, spec_45 = ROCParamsForBWFiltering_45(p, i, ch_num, label)
             # auc_45 = auc(spec_45, sens_45)

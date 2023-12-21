@@ -114,10 +114,15 @@ storage_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\
 #             print(f"ll_pat_{p}_sz_{i}_ch_{ch_num}.npy saved")
 #             print(f"result shape: {ll.shape}")
 
+def normalize_over_channels(data):
+    max_clean = np.max(data)
+    min_clean = np.min(data)
+    data_clean_normalized = (data - min_clean) / (max_clean - min_clean)
+    data_clean_normalized = data_clean_normalized - np.average(data_clean_normalized)
+    return data_clean_normalized
 
-
-for p in range(3, 20):
-    for ch_num in range(1,2):
+for p in range(1,20):
+    for ch_num in range(2,5):
         sz_num = countNumberOfSeizuresPerPerson(p, ch_num)
         for i in range(1, sz_num+1):
             file_path = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_{ch_num}.npy")

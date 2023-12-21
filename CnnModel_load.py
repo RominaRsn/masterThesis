@@ -13,7 +13,7 @@ import masterThesis.metrics
 from keras.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 from scipy.ndimage import convolve1d
-
+import masterThesis.metrics as metrics
 
 data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
 data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
@@ -30,36 +30,38 @@ smaller_clean_train = clean_train[0:1000]
 #
 #
 # model = models.deep_CNN()
-model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\checkPoint_cnn.h5")
-
-#
-callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=20)
-# Define the checkpoint callback
-checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\checkPoint_cnn.h5'
-checkpoint = ModelCheckpoint(checkpoint_path,
-                             monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
-                             save_best_only=True,  # Save only if the validation performance improves
-                             mode='min',  # 'min' for loss, 'max' for accuracy, 'auto' will infer automatically
-                             verbose=1)  # Show messages about the checkpointing process
-
-
-
-model.optimizer.learning_rate = 1e-4
-model.fit(
-    noisy_train,
-    clean_train,
-    epochs=4,
-    batch_size=16,
-    validation_split=0.1,
-    callbacks=[callback, checkpoint],
-    shuffle=True
-)
-
-
-#result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\result_cnn_k1.npy")
-
+model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN.h5")
 result = model.predict(noisy_test)
-np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\result_cnn_k1.npy", result)
+np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\result_deep_CNN", result)
+#result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN.npy")
+#
+# callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=20)
+# # Define the checkpoint callback
+# checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\checkPoint_cnn.h5'
+# checkpoint = ModelCheckpoint(checkpoint_path,
+#                              monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
+#                              save_best_only=True,  # Save only if the validation performance improves
+#                              mode='min',  # 'min' for loss, 'max' for accuracy, 'auto' will infer automatically
+#                              verbose=1)  # Show messages about the checkpointing process
+#
+#
+#
+# model.optimizer.learning_rate = 1e-4
+# model.fit(
+#     noisy_train,
+#     clean_train,
+#     epochs=4,
+#     batch_size=16,
+#     validation_split=0.1,
+#     callbacks=[callback, checkpoint],
+#     shuffle=True
+# )
+#
+#
+# #result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\result_cnn_k1.npy")
+#
+# result = model.predict(noisy_test)
+# np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\result_cnn_k1.npy", result)
 # result = model.predict(noisy_train[0:100])
 # plt.subplot(3, 1, 1)
 # plt.plot(result[10, :, :], label='result')
@@ -128,95 +130,95 @@ np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained
 # # Apply the kernel to the signal
 # sharpened_signal = convolve1d(result[0, :], weights=sharpening_kernel, mode='constant', cval=0.0)
 # ##plotting
-signalIndexVector = [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20]
+# signalIndexVector = [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20]
+# #
+# for i in signalIndexVector:
+#     fig, axes = plt.subplots(nrows=3, ncols=1, sharey='col')
 #
-for i in signalIndexVector:
-    fig, axes = plt.subplots(nrows=3, ncols=1, sharey='col')
-
-    row_index = i
-    #row_index = np.random.randint(0, a)
-    #col_index = np.random.randint(0, 11520000/500)
-
-    axes[0].plot(clean_test[row_index, :], label = 'Clean Data')
-    axes[0].set_title('Clean data')
-    axes[0].set_ylabel('Signal amplitude')
-    axes[0].set_xlabel('Time')
-
-    #print(smaller_reshaped_data_clean_test[row_index, :].shape)
-
-
-    axes[1].plot(noisy_test[row_index, :], label = 'Noisy Data')
-    axes[1].set_title('Noisy data')
-    axes[1].set_ylabel('Signal amplitude')
-    axes[1].set_xlabel('Time')
-
-    #result = model.predict(result)
-    #result = result.transpose()
-
-    axes[2].plot(result[row_index, :], label='predicted data with CNN- big filter')
-    #axes[2].plot(convolve1d(result[row_index, :], weights=sharpening_kernel, mode='constant', cval=0.0), label='sharpened predicted data with CNN- big filter')
-    axes[2].set_title('predicted data with CNN- big filter')
-    axes[2].set_ylabel('Signal amplitude')
-    axes[2].set_xlabel('Time')
-    plt.legend()
-
-
-    # axes[3].plot(result_encoder[row_index, :], label='predicted data with AE')
-    # axes[3].plot(convolve1d(result_encoder[row_index, :], weights=sharpening_kernel, mode='constant', cval=0.0), label='sharpened predicted data with AE')
-    # axes[3].set_title('predicted data with AE')
-    # axes[3].set_ylabel('Signal amplitude')
-    # axes[3].set_xlabel('Time')
-    # plt.legend()
-    #
-    # axes[4].plot(result_cnn[row_index, :], label='predicted data with CNN')
-    # axes[4].plot(convolve1d(result_cnn[row_index, :], weights=sharpening_kernel, mode='constant', cval=0.0), label='sharpened predicted data with CNN')
-    # axes[4].set_title('predicted data with CNN')
-    # axes[4].set_ylabel('Signal amplitude')
-    # axes[4].set_xlabel('Time')
-
-    plt.legend()
-    plt.show()
+#     row_index = i
+#     #row_index = np.random.randint(0, a)
+#     #col_index = np.random.randint(0, 11520000/500)
+#
+#     axes[0].plot(clean_test[row_index, :], label = 'Clean Data')
+#     axes[0].set_title('Clean data')
+#     axes[0].set_ylabel('Signal amplitude')
+#     axes[0].set_xlabel('Time')
+#
+#     #print(smaller_reshaped_data_clean_test[row_index, :].shape)
+#
+#
+#     axes[1].plot(noisy_test[row_index, :], label = 'Noisy Data')
+#     axes[1].set_title('Noisy data')
+#     axes[1].set_ylabel('Signal amplitude')
+#     axes[1].set_xlabel('Time')
+#
+#     #result = model.predict(result)
+#     #result = result.transpose()
+#
+#     axes[2].plot(result[row_index, :], label='predicted data with CNN- big filter')
+#     #axes[2].plot(convolve1d(result[row_index, :], weights=sharpening_kernel, mode='constant', cval=0.0), label='sharpened predicted data with CNN- big filter')
+#     axes[2].set_title('predicted data with CNN- big filter')
+#     axes[2].set_ylabel('Signal amplitude')
+#     axes[2].set_xlabel('Time')
+#     plt.legend()
+#
+#
+#     # axes[3].plot(result_encoder[row_index, :], label='predicted data with AE')
+#     # axes[3].plot(convolve1d(result_encoder[row_index, :], weights=sharpening_kernel, mode='constant', cval=0.0), label='sharpened predicted data with AE')
+#     # axes[3].set_title('predicted data with AE')
+#     # axes[3].set_ylabel('Signal amplitude')
+#     # axes[3].set_xlabel('Time')
+#     # plt.legend()
+#     #
+#     # axes[4].plot(result_cnn[row_index, :], label='predicted data with CNN')
+#     # axes[4].plot(convolve1d(result_cnn[row_index, :], weights=sharpening_kernel, mode='constant', cval=0.0), label='sharpened predicted data with CNN')
+#     # axes[4].set_title('predicted data with CNN')
+#     # axes[4].set_ylabel('Signal amplitude')
+#     # axes[4].set_xlabel('Time')
+#
+#     plt.legend()
+#     plt.show()
 
 #Calculating the metrics
-# clean_input_test_vec = np.ravel(clean_test)
-# noisy_input_test_vec = np.ravel(noisy_test)
-# test_reconstructions_vec = np.ravel(result)
-# cornoisyclean = np.corrcoef(clean_input_test_vec, noisy_input_test_vec)
-# corcleaned = np.corrcoef(clean_input_test_vec, test_reconstructions_vec)
-#
-# snrnoisy = metrics.metrics.snr(clean_input_test_vec, noisy_input_test_vec)
-#
-# snrcleaned = metrics.metrics.snr(clean_input_test_vec, test_reconstructions_vec)
-#
-# rrmseNoisy = metrics.metrics.rrmseMetric(clean_input_test_vec, noisy_input_test_vec)
-# rrmseCleaned = metrics.metrics.rrmseMetric(clean_input_test_vec, test_reconstructions_vec)
-#
-#
-# #compute rmse between noisy and clean test data
-# diffNoisyClean = noisy_test - clean_test
-# rmsNoisy = np.sqrt(np.mean(diffNoisyClean**2))
-#
-# #compute rmse bwtween cleaned and clean test data
-# test_reconstructions = result.reshape((result.shape[0], result.shape[1]))
-# diffCleanedClean = test_reconstructions - clean_test
-# rmsCleaned = np.sqrt(np.mean(diffCleanedClean**2))
-#
-# # Get the user's home directory
-# user_home = os.path.expanduser("~")
-# # Specify the file path in the Downloads directory
-# file_path = os.path.join(user_home, "Downloads", "cnn_k1.txt")
-#
-# fm = open(file_path, 'w')
-# fm.write("Filtred signal with Cnn- kernelSize = 1\n")
-# fm.write("SNRNoisy: %f\n" % snrnoisy);
-# fm.write("SNRCleaned: %f\n" % snrcleaned);
-# fm.write("RMSNoisy: %f\n" % rmsNoisy);
-# fm.write("RMSCleaned: %f\n" % rmsCleaned);
-# fm.write("RMSENoisy: %f\n" % rrmseNoisy);
-# fm.write("RMSECleaned: %f\n" % rrmseCleaned);
-# fm.write("PearsonCorrNoisy: %f\n" % cornoisyclean[0, 1]);
-# fm.write("PearsonCorrCleaned: %f\n" % corcleaned[0, 1]);
-# fm.close()
+clean_input_test_vec = np.ravel(clean_test)
+noisy_input_test_vec = np.ravel(noisy_test)
+test_reconstructions_vec = np.ravel(result)
+cornoisyclean = np.corrcoef(clean_input_test_vec, noisy_input_test_vec)
+corcleaned = np.corrcoef(clean_input_test_vec, test_reconstructions_vec)
+
+snrnoisy = metrics.metrics.snr(clean_input_test_vec, noisy_input_test_vec)
+
+snrcleaned = metrics.metrics.snr(clean_input_test_vec, test_reconstructions_vec)
+
+rrmseNoisy = metrics.metrics.rrmseMetric(clean_input_test_vec, noisy_input_test_vec)
+rrmseCleaned = metrics.metrics.rrmseMetric(clean_input_test_vec, test_reconstructions_vec)
+
+
+#compute rmse between noisy and clean test data
+diffNoisyClean = noisy_test - clean_test
+rmsNoisy = np.sqrt(np.mean(diffNoisyClean**2))
+
+#compute rmse bwtween cleaned and clean test data
+test_reconstructions = result.reshape((result.shape[0], result.shape[1]))
+diffCleanedClean = test_reconstructions - clean_test
+rmsCleaned = np.sqrt(np.mean(diffCleanedClean**2))
+
+# Get the user's home directory
+user_home = os.path.expanduser("~")
+# Specify the file path in the Downloads directory
+file_path = os.path.join(user_home, "Downloads", "cnn_k7.txt")
+
+fm = open(file_path, 'w')
+fm.write("Filtred signal with Cnn- kernelSize = 3\n")
+fm.write("SNRNoisy: %f\n" % snrnoisy);
+fm.write("SNRCleaned: %f\n" % snrcleaned);
+fm.write("RMSNoisy: %f\n" % rmsNoisy);
+fm.write("RMSCleaned: %f\n" % rmsCleaned);
+fm.write("RMSENoisy: %f\n" % rrmseNoisy);
+fm.write("RMSECleaned: %f\n" % rrmseCleaned);
+fm.write("PearsonCorrNoisy: %f\n" % cornoisyclean[0, 1]);
+fm.write("PearsonCorrCleaned: %f\n" % corcleaned[0, 1]);
+fm.close()
 
 
 
