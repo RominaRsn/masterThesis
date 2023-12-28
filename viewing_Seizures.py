@@ -11,7 +11,8 @@ import neurokit2 as nk
 folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data"
 path_extension_labels = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s"
 
-model_ae = load_model(r"C:/Users/RominaRsn/PycharmProjects/MyMasterThesis/masterThesis/trained_models/ae_cheby_checkpoint.h5")
+#model_ae = load_model(r"C:/Users/RominaRsn/PycharmProjects/MyMasterThesis/masterThesis/trained_models/ae_cheby_checkpoint.h5")
+model_ae = load_model( r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_skip_layers_checkpoint.h5')
 model_gru = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\gru_checkpoint.h5")
 model_cnn = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN_bigger_kernel.h5")
 
@@ -80,8 +81,9 @@ for p in range(14, 51):
             elif(ch_num == 4):
                 data = data_4
 
-
-            result_ae = model_ae.predict(data)
+            num_zeros = (0, 12)
+            padded_data = np.pad(data, ((0, 0), num_zeros), mode='constant')
+            result_ae = model_ae.predict(padded_data)
             result_ae = result_ae.reshape(result_ae.shape[0], result_ae.shape[1])
 
             result_gru = model_gru.predict(data)
@@ -171,7 +173,7 @@ for p in range(14, 51):
                 plt.suptitle(f'Patient {p}, Seizure {i}, Channel {ch_num}, Index {j}')
                 plt.tight_layout()  # Adjust layout for better spacing
 
-                plt.savefig(f'C:/Users/RominaRsn/Desktop/report_dec_15/figs/patient_{p}_seizure_{i}_channel_{ch_num}')
+                #plt.savefig(f'C:/Users/RominaRsn/Desktop/report_dec_15/figs/patient_{p}_seizure_{i}_channel_{ch_num}')
 
 
-                #plt.show()
+                plt.show()
