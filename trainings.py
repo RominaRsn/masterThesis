@@ -181,9 +181,9 @@ sharpedened_result_1 = sharpenSignal(result_1)
 sharpedened_result_2 = sharpenSignal(result_2)
 sharpedened_result_3 = sharpenSignal(result_3)
 
-result_1 = cheby2_lowpass(result_1)
-result_2 = cheby2_lowpass(result_2)
-result_3 = cheby2_lowpass(result_3)
+# result_1 = cheby2_lowpass(result_1)
+# result_2 = cheby2_lowpass(result_2)
+# result_3 = cheby2_lowpass(result_3)
 #result_4 = cheby2_lowpass(result_4)
 
 
@@ -231,7 +231,7 @@ for i in signalIndexVector:
     #result = result.transpose()
 
     axes[2].plot(result_1[row_index, :], label='predicted data- all skip connections')
-    axes[2].plot(sharpedened_result_1[row_index, :], label='sharpened')
+    #axes[2].plot(sharpedened_result_1[row_index, :], label='sharpened')
     axes[2].set_title('predicted data - all skip connections')
     axes[2].set_ylabel('Signal amplitude')
     axes[2].set_xlabel('Time')
@@ -239,14 +239,14 @@ for i in signalIndexVector:
 
     #
     axes[3].plot(result_2[row_index, :], label ='predicted data- only input skip connection')
-    axes[3].plot(sharpedened_result_2[row_index, :], label='sharpened')
+    #axes[3].plot(sharpedened_result_2[row_index, :], label='sharpened')
     axes[3].set_title('predicted data - only input skip connection')
     axes[3].set_ylabel('Signal amplitude')
     axes[3].set_xlabel('Time')
     axes[3].legend(loc='lower right')
 
     axes[4].plot(result_3[row_index, :], label ='predicted data- 2 skip connection')
-    axes[4].plot(sharpedened_result_3[row_index, :], label='sharpened')
+    #axes[4].plot(sharpedened_result_3[row_index, :], label='sharpened')
     axes[4].set_title('predicted data - 2 skip connection')
     axes[4].set_ylabel('Signal amplitude')
     axes[4].set_xlabel('Time')

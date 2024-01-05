@@ -155,6 +155,7 @@ def low_cnn(input_shape=(500,1)):
     model.add(
         Conv1D(1, kernel_size=3, activation='sigmoid', padding='same'))
     model.summary()
+    model.compile(optimizer='adam', loss='mean_squared_error')
     return model
 
 
@@ -553,6 +554,53 @@ def encoder_with_5_layers(input_shape=(500,1)):
     autoencoder.summary()
     return autoencoder
 
-encoder_with_5_layers_skip_input()
 #encoder_with_5_layers(input_shape=(500,1))
+
+def encoder_with_5_layers_tanhActivation(input_shape=(500,1)):
+    # Define the input layer
+    input_layer = Input(shape=(500, 1))  # Assuming 1 channel (e.g., for time series data)
+
+    # Encoding layers
+    encoded1 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(input_layer)
+    encoded1 = MaxPooling1D(2, padding='same')(encoded1)
+
+    encoded2 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded1)
+    encoded2 = MaxPooling1D(2, padding='same')(encoded2)
+
+    encoded3 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='valid')(encoded2)
+    encoded3 = MaxPooling1D(2, padding='same')(encoded3)
+
+    encoded4 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded3)
+    encoded4 = MaxPooling1D(2, padding='same')(encoded4)
+
+    encoded5 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded4)
+    encoded5 = MaxPooling1D(2, padding='same')(encoded5)
+
+    # Decoding layers (symmetric to the encoding layers)
+    decoded5 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded5)
+    decoded5 = UpSampling1D(2)(decoded5)
+
+    decoded4 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded4)
+    decoded4 = UpSampling1D(2)(decoded4)
+
+    decoded3 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(encoded3)
+    decoded3 = UpSampling1D(2)(decoded3)
+
+    decoded2 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(decoded3)
+    decoded2 = UpSampling1D(2)(decoded2)
+
+    decoded1 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='valid')(decoded2)
+    decoded1 = UpSampling1D(2)(decoded1)
+
+    output_layer = Conv1D(1, 3, activation='tanh',kernel_initializer='he_uniform', padding='same')(decoded1)  # 1 channel for reconstruction
+
+    # Create the autoencoder model
+    autoencoder = Model(input_layer, output_layer)
+
+    # Compile the autoencoder
+    autoencoder.compile(optimizer='adam', loss='mean_squared_error')
+
+    # Print the summary of the autoencoder model
+    autoencoder.summary()
+    return autoencoder
 

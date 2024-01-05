@@ -7,7 +7,8 @@ from scipy.ndimage import convolve1d
 import neurokit2 as nk
 import scipy
 
-
+import keras
+from keras.models import load_model
 #
 # combo_model_result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cnn_combo\result\result_pat_14_sz_2_ch_1.npy")
 # combo_model_result = combo_model_result.squeeze(-1)
@@ -83,6 +84,26 @@ def specificity(generated_labels , true_labels):
         a = {"spec": TN/(TN+FP), "TN": TN, "FP": FP}
         return a
 
+def normalize_ch_data(data1, data2, data3, data4):
+    max_val = np.max([np.max(data1), np.max(data2), np.max(data3), np.max(data4)])
+    min_val = np.min([np.min(data1), np.min(data2), np.min(data3), np.min(data4)])
+    avg_val = (np.average(data1) + np.average(data2) + np.average(data3) + np.average(data4)) / 4
+
+    data1 = (data1 - min_val) / (max_val - min_val)
+    data1 = data1 - avg_val
+
+    data2 = (data2 - min_val) / (max_val - min_val)
+    data2 = data2 - avg_val
+
+    data3 = (data3 - min_val) / (max_val - min_val)
+    data3 = data3 - avg_val
+
+    data4 = (data4 - min_val) / (max_val - min_val)
+    data4 = data4 - avg_val
+
+    return data1, data2, data3, data4
+
+
 def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
@@ -121,6 +142,9 @@ auc_list_30 = []
 auc_list_45 = []
 auc_list_70 = []
 
+model_2 = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_skip_layers_checkpoint_oisk.h5')
+
+
 for p in range(1, 51):
     sz_num = countNumberOfSeizuresPerPerson(p)
 
@@ -132,12 +156,44 @@ for p in range(1, 51):
 
             label = np.load(file_path_labels)
 
-            predicted_data = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby", f"pat_{p}_sz_{i}_ch_{ch}.npy"))
+            file_path_1 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_1.npy")
+            file_path_2 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_2.npy")
+            file_path_3 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_3.npy")
+            file_path_4 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_4.npy")
+
+            data_1 = np.load(file_path_1)
+            data_2 = np.load(file_path_2)
+            data_3 = np.load(file_path_3)
+            data_4 = np.load(file_path_4)
+
+            data_1, data_2, data_3, data_4 = normalize_ch_data(data_1, data_2, data_3, data_4)
+
+            data = np.empty_like(data_1)
+            if (ch == 1):
+                data = data_1
+            elif (ch == 2):
+                data = data_2
+            elif (ch == 3):
+                data = data_3
+            elif (ch == 4):
+                data = data_4
+
+
+
+
+
+            num_zeros = (0, 12)
+
+            # Pad the array with zeros
+            padded_data = np.pad(data, ((0, 0), num_zeros), mode='constant')
+
+            #predicted_data = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby", f"pat_{p}_sz_{i}_ch_{ch}.npy"))
+            predicted_data = model_2.predict(padded_data)
             predicted_data = predicted_data.squeeze(-1)
             #predicted_data = sharpenSignal(predicted_data)
 
-            filteredSignal_45 = nk.signal_filter(data, sampling_rate=250, highcut=40,
-                                                 method='butterworth', order=4)
+            #filteredSignal_45 = nk.signal_filter(data, sampling_rate=250, highcut=40,
+            #                                    method='butterworth', order=4)
             # filteredSignal_70 = nk.signal_filter(data, sampling_rate=250, lowcut=0.1, highcut=70,
             #                                      method='butterworth', order=4)
             # filteredSignal_30 = nk.signal_filter(data, sampling_rate=250, lowcut=0.1, highcut=30,
@@ -147,7 +203,7 @@ for p in range(1, 51):
             new_ll = linelength(predicted_data)
             old_ll = linelength(data)
             # ll_30 = linelength(filteredSignal_30)
-            ll_45 = linelength(filteredSignal_45)
+            #ll_45 = linelength(filteredSignal_45)
             # ll_70 = linelength(filteredSignal_70)
 
             # new_ll = thetaBandPower(predicted_data)
@@ -172,18 +228,18 @@ for p in range(1, 51):
             #     sens_30.append(sens1["sens"])
             #     spec_30.append(1 - spec1["spec"])
 
-            avg_45 = np.average(ll_45)
-            std_45 = np.std(ll_45)
-            thresholds_45 = [avg_45 - 3 * std_45, avg_45 - 2 * std_45, avg_45 - std_45, avg_45, avg_45 + std_45, avg_45 + 2 * std_45, avg_45 + 3 * std_45]
-
-            sens_45 = []
-            spec_45 = []
-            for th in thresholds_45:
-                new_ll_label = (ll_45 > th).astype(int)
-                sens1 = sensitivity(new_ll_label, label)
-                spec1 = specificity(new_ll_label, label)
-                sens_45.append(sens1["sens"])
-                spec_45.append(1 - spec1["spec"])
+            # avg_45 = np.average(ll_45)
+            # std_45 = np.std(ll_45)
+            # thresholds_45 = [avg_45 - 3 * std_45, avg_45 - 2 * std_45, avg_45 - std_45, avg_45, avg_45 + std_45, avg_45 + 2 * std_45, avg_45 + 3 * std_45]
+            #
+            # sens_45 = []
+            # spec_45 = []
+            # for th in thresholds_45:
+            #     new_ll_label = (ll_45 > th).astype(int)
+            #     sens1 = sensitivity(new_ll_label, label)
+            #     spec1 = specificity(new_ll_label, label)
+            #     sens_45.append(sens1["sens"])
+            #     spec_45.append(1 - spec1["spec"])
 
 
             # avg_70 = np.average(ll_70)
@@ -231,19 +287,19 @@ for p in range(1, 51):
             auc_new = auc(spec_new, sens_new)
             auc_old = auc(spec_old, sens_old)
             # auc_30 = auc(spec_30, sens_30)
-            auc_45 = auc(spec_45, sens_45)
+            #auc_45 = auc(spec_45, sens_45)
             # auc_70 = auc(spec_70, sens_70)
 
             auc_list_new.append(auc_new)
             auc_list_old.append(auc_old)
             # auc_list_30.append(auc_30)
-            auc_list_45.append(auc_45)
+            #auc_list_45.append(auc_45)
             # auc_list_70.append(auc_70)
 
 
-            print(f"patient {p}, seizure {i}, channel {ch}, auc_new {auc_new}, auc_old {auc_old}, auc_40 {auc_45}")
+            print(f"patient {p}, seizure {i}, channel {ch}, auc_new {auc_new}, auc_old {auc_old}")
 
 
-print(f"mean auc_new {np.mean(auc_list_new)}, mean auc_old {np.mean(auc_list_old)}, mean auc_40 {np.mean(auc_list_45)}")
+print(f"mean auc_new {np.mean(auc_list_new)}, mean auc_old {np.mean(auc_list_old)}")
 #print(f"std auc_new {np.std(auc_list_new)}, std auc_old {np.std(auc_list_old)}")
 #print(f"mean auc_30 {np.mean(auc_list_30)}, mean auc_45 {np.mean(auc_list_45)}, mean auc_70 {np.mean(auc_list_70)}")
