@@ -29,6 +29,12 @@ expanded_noisy = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\mas
 
 noisy_train, noisy_test, clean_train, clean_test = train_test_split(expanded_noisy, expanded_clean, test_size=0.2, random_state=42)
 
+# np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\seg\noisy_train.npy", noisy_train)
+# np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\seg\noisy_test.npy", noisy_test)
+# np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\seg\clean_train.npy", clean_train)
+# np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\seg\clean_test.npy", clean_test)
+
+
 
 #
 # print("data loaded")
@@ -64,7 +70,13 @@ noisy_train, noisy_test, clean_train, clean_test = train_test_split(expanded_noi
 #model.fit(noisy_train, clean_train, epochs=10, batch_size=32, validation_split=0.2, callbacks=[ModelCheckpoint('resnet_checkpoint.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')])
 model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\ResNet\resnet_checkpoint.h5')
 
-result = model.predict(noisy_test[0:1])
+model.fit(noisy_train, clean_train, epochs=2, batch_size=32, validation_split=0.2, callbacks=[ModelCheckpoint('resnet_checkpoint.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')])
+
+
+
+result = model.predict(noisy_test[0:100])
+
+np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\seg\result.npy", result)
 
 r_ch1 = result[0][:, :, 0]
 r_ch2 = result[0][:, :, 1]

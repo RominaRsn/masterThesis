@@ -50,6 +50,9 @@ def normalize_ch_data(data1, data2, data3, data4):
     return data1, data2, data3, data4
 
 
+def are_consecutive(lst):
+    return all(lst[i] + 1 == lst[i + 1] for i in range(len(lst) - 1))
+
 for p in range(14, 51):
     sz_num = countNumberOfSeizuresPerPerson(p)
     for i in range(1, sz_num+1):
@@ -99,8 +102,8 @@ for p in range(14, 51):
             # result_ae = model_ae.predict(new_normalized_data)
             # result_ae = result_ae.squeeze(-1)
 
-            result_2 = model_2.predict(new_normalized_data)
-            result_2 = result_2.squeeze(-1)
+            # result_2 = model_2.predict(new_normalized_data)
+            # result_2 = result_2.squeeze(-1)
 
             # result_ae = result_ae.reshape(result_ae.shape[0], result_ae.shape[1])
 
@@ -114,45 +117,51 @@ for p in range(14, 51):
             seizure_filtered = [];
             index = np.where(label ==1)
             index_list = index[0].tolist()
-            cnt = 0
-            for j in index_list:
-                if(j != index_list[-1]):
-                    if(index_list.index(j) == index_list.index(j + 1) - 1):
-                        input_data = np.array(new_normalized_data[j, :])
-                        #base = peakutils.baseline(input_data, 50)
-                        input_data = input_data.reshape(input_data.shape[0], 1)
-                        seizure.append(input_data)
-                        seizure_filtered.append(result_2[j, :])
+
+            a = are_consecutive(index_list)
+
+            if(a == False):
+                print(f"pat_{p}_sz_{i}_ch_{ch_num}")
+                #seizure_filtered.append(result_2[j, :])
+            # cnt = 0
+            # for j in index_list:
+            #     if(j != index_list[-1]):
+            #         if(index_list.index(j) == index_list.index(j + 1) - 1):
+            #             input_data = np.array(new_normalized_data[j, :])
+            #             #base = peakutils.baseline(input_data, 50)
+            #             input_data = input_data.reshape(input_data.shape[0], 1)
+            #             seizure.append(input_data)
+            #             #seizure_filtered.append(result_2[j, :])
 
 
 
 
-            seizure = np.array(seizure)
-            seizure_filtered = np.array(seizure_filtered)
-            seizure = seizure.ravel()
-            seizure_filtered = seizure_filtered.ravel()
-
-            fig, axes = plt.subplots(nrows=2, ncols=1, sharey='col')
-
-            axes[0].plot(seizure, label='Original Data')
-            axes[0].set_title('Original Data')
-            axes[0].set_ylabel('Signal amplitude')
-            axes[0].set_xlabel('Time')
-            # plt.legend(loc='lower right')
-
-            # print(smaller_reshaped_data_clean_test[row_index, :].shape)
-
-            # axes[1].plot(base, label='Model AE Result')
+            # seizure = np.array(seizure)
+            # seizure_filtered = np.array(seizure_filtered)
+            # seizure = seizure.ravel()
+            # seizure_filtered = seizure_filtered.ravel()
+            #
+            # fig, axes = plt.subplots(nrows=2, ncols=1, sharey='col')
+            #
+            # axes[0].plot(seizure, label='Original Data')
+            # axes[0].set_title('Original Data')
+            # axes[0].set_ylabel('Signal amplitude')
+            # axes[0].set_xlabel('Time')
+            # # plt.legend(loc='lower right')
+            #
+            # # print(smaller_reshaped_data_clean_test[row_index, :].shape)
+            #
+            # # axes[1].plot(base, label='Model AE Result')
+            # # axes[1].set_title('Model AE Result')
+            # # axes[1].set_ylabel('Signal amplitude')
+            # # axes[1].set_xlabel('Time')
+            #
+            # axes[1].plot(seizure_filtered, label='Model AE Result')
             # axes[1].set_title('Model AE Result')
             # axes[1].set_ylabel('Signal amplitude')
             # axes[1].set_xlabel('Time')
-
-            axes[1].plot(seizure_filtered, label='Model AE Result')
-            axes[1].set_title('Model AE Result')
-            axes[1].set_ylabel('Signal amplitude')
-            axes[1].set_xlabel('Time')
-            plt.legend(loc='lower right')
-            plt.show()
+            # plt.legend(loc='lower right')
+            # plt.show()
 
 
                 #
