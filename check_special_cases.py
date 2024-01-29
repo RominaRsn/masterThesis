@@ -9,7 +9,8 @@ import scipy
 from sklearn.metrics import confusion_matrix
 import keras
 from keras.models import load_model
-from statistics import  mean
+from statistics import mean
+from sklearn.metrics import f1_score
 
 from keras.applications import ResNet50
 from keras.callbacks import ModelCheckpoint
@@ -54,6 +55,9 @@ from keras import layers, models, optimizers
 def classifiedAtLeastOnce(true_labels, predicted_labels):
     true_index = np.where(true_labels == 1)
     predicted_index = np.where(predicted_labels == 1)
+
+    # print(np.intersect1d(true_index, predicted_index))
+    # print("****************************************************************************************************")
 
     if np.intersect1d(true_index, predicted_index).size > 0:
         return 1
@@ -193,23 +197,140 @@ def sharpenSignal(data):
         data_sharpened[i, :] = convolve1d(data[i, :], weights=sharpening_kernel, mode='constant', cval=0.0)
     return data_sharpened
 
-def countSeizures(true_labels, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4):
-    true_index = np.where(true_labels == 1)
-    true_index = np.array(true_index)
 
-    predicted_index_1 = np.where(predicted_labels_1 == 1)
-    predicted_index_1 = np.array(predicted_index_1)
+def seizureClassification(true_labels, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4):
+    # true_index = np.where(true_labels == 1)
+    # true_index = np.array(true_index)
+    #
+    # predicted_index_1 = np.where(predicted_labels_1 == 1)
+    # predicted_index_1 = np.array(predicted_index_1)
+    #
+    # predicted_index_2 = np.where(predicted_labels_2 == 1)
+    # predicted_index_2 = np.array(predicted_index_2)
+    #
+    # predicted_index_3 = np.where(predicted_labels_3 == 1)
+    # predicted_index_3 = np.array(predicted_index_3)
+    #
+    # predicted_index_4 = np.where(predicted_labels_4 == 1)
+    # predicted_index_4 = np.array(predicted_index_4)
 
-    predicted_index_2 = np.where(predicted_labels_2 == 1)
-    predicted_index_2 = np.array(predicted_index_2)
+    if(np.array_equal(predicted_labels_1, predicted_labels_2) and np.array_equal(predicted_labels_2, predicted_labels_3) and np.array_equal(predicted_labels_3, predicted_labels_4)):
+        print("all equal")
 
-    predicted_index_3 = np.where(predicted_labels_3 == 1)
-    predicted_index_3 = np.array(predicted_index_3)
+    predicted_label_each_threshold = []
 
-    predicted_index_4 = np.where(predicted_labels_4 == 1)
-    predicted_index_4 = np.array(predicted_index_4)
+    for i in range(0, predicted_labels_1.shape[1]):
+        mat_1 = predicted_labels_1[:, i]
+        mat_2 = predicted_labels_2[:, i]
+        mat_3 = predicted_labels_3[:, i]
+        mat_4 = predicted_labels_4[:, i]
 
-    
+        print(mat_1 + mat_2 + mat_3 + mat_4)
+
+        predicted_label = np.empty_like(true_labels)
+        for j in range(0, len(mat_1)):
+            if mat_1[j] == 1 or mat_2[j] == 1 or mat_3[j] == 1 or mat_4[j] == 1:
+                predicted_label[j] = 1
+            else:
+                predicted_label[j] = 0
+                print("negative")
+        predicted_label_each_threshold.append(predicted_label)
+
+    predicted_label_each_threshold = np.array(predicted_label_each_threshold)
+    predicted_label_each_threshold = predicted_label_each_threshold.T
+    #if(np.array_equal(predicted_label_each_threshold[:, 1], predicted_label_each_threshold[:, 6])):
+        #print("equal")
+    conf_list = []
+    for i in range(0, predicted_label_each_threshold.shape[1]):
+        conf_matrix = confusion_matrix(true_labels, predicted_label_each_threshold[:, i]).ravel()
+        conf_list.append(conf_matrix)
+
+
+
+    return conf_list
+
+
+
+def getLabels(data):
+    avg = np.average(data)
+    std = np.std(data)
+    thresholds = [avg - 3 * std, avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std]
+
+    ll = linelength(data)
+    new_label = []
+    for th in thresholds:
+        new_label.append((ll > th).astype(int))
+
+    array = np.array(new_label)
+    array = array.T
+    return array
+
+
+
+
+# for p in range(1, 2):
+#     sz_num = countNumberOfSeizuresPerPerson(p)
+#
+#     for i in range(1, sz_num + 1):
+#         file_path_1 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_1.npy")
+#         file_path_2 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_2.npy")
+#         file_path_3 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_3.npy")
+#         file_path_4 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_4.npy")
+#
+#         data_1 = np.load(file_path_1)
+#         data_2 = np.load(file_path_2)
+#         data_3 = np.load(file_path_3)
+#         data_4 = np.load(file_path_4)
+#
+#         mean_val_1 = np.mean(data_1)
+#         std_val_1 = np.std(data_1)
+#         new_normalized_data_1 = (data_1 - mean_val_1) / std_val_1
+#         new_normalized_data_1 = (new_normalized_data_1) / (np.max(new_normalized_data_1) - np.min(new_normalized_data_1))
+#
+#         mean_val_2 = np.mean(data_2)
+#         std_val_2 = np.std(data_2)
+#         new_normalized_data_2 = (data_2 - mean_val_2) / std_val_2
+#         new_normalized_data_2 = (new_normalized_data_2) / (np.max(new_normalized_data_2) - np.min(new_normalized_data_2))
+#
+#         mean_val_3 = np.mean(data_3)
+#         std_val_3 = np.std(data_3)
+#         new_normalized_data_3 = (data_3 - mean_val_3) / std_val_3
+#
+#         mean_val_4 = np.mean(data_4)
+#         std_val_4 = np.std(data_4)
+#         new_normalized_data_4 = (data_4 - mean_val_4) / std_val_4
+#
+#         file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{i}_labels.npy")
+#         label = np.load(file_path_labels)
+#
+#
+#         predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby", f"pat_{p}_sz_{i}_ch_1.npy"))
+#         #predicted_data_1 = predicted_data_1.squeeze(-1)
+#
+#         predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby", f"pat_{p}_sz_{i}_ch_2.npy"))
+#         #predicted_data_2 = predicted_data_2.squeeze(-1)
+#
+#         predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby", f"pat_{p}_sz_{i}_ch_3.npy"))
+#         #predicted_data_3 = predicted_data_3.squeeze(-1)
+#
+#         predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby", f"pat_{p}_sz_{i}_ch_4.npy"))
+#         #predicted_data_4 = predicted_data_4.squeeze(-1)
+#
+#         predicted_labels_1 = getLabels(predicted_data_1)
+#         predicted_labels_2 = getLabels(predicted_data_2)
+#         predicted_labels_3 = getLabels(predicted_data_3)
+#         predicted_labels_4 = getLabels(predicted_data_4)
+#
+#         if (np.array_equal(predicted_labels_1, predicted_labels_2) and np.array_equal(predicted_labels_2,
+#                                                                                       predicted_labels_3) and np.array_equal(
+#                 predicted_labels_3, predicted_labels_4)):
+#             print("all equal")
+#
+#         conf_mat = seizureClassification(label, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+#
+#         print(conf_mat)
+#
+#
 
 
 
@@ -251,274 +372,281 @@ classified_as_sz_list_predicted = []
 #model_2 = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\gru_checkpoint.h5')
 
 
-for p in range(1, 51):
-    sz_num = countNumberOfSeizuresPerPerson(p)
-
-    for i in range(1, sz_num + 1):
-        for ch in range(1, 5):
-            file_path = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_{ch}.npy")
-            data = np.load(file_path)
-            file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{i}_labels.npy")
-
-            label = np.load(file_path_labels)
-
-            # file_path_1 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_1.npy")
-            # file_path_2 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_2.npy")
-            # file_path_3 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_3.npy")
-            # file_path_4 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_4.npy")
-            #
-            # data_1 = np.load(file_path_1)
-            # data_2 = np.load(file_path_2)
-            # data_3 = np.load(file_path_3)
-            # data_4 = np.load(file_path_4)
-            #
-            # data_1, data_2, data_3, data_4 = normalize_ch_data(data_1, data_2, data_3, data_4)
-            #
-            # data = np.empty_like(data_1)
-            # if (ch == 1):
-            #     data = data_1
-            # elif (ch == 2):
-            #     data = data_2
-            # elif (ch == 3):
-            #     data = data_3
-            # elif (ch == 4):
-            #     data = data_4
-
-            mean_val = np.mean(data)
-            std_val = np.std(data)
-            # Normalize the data to the range [-1, 1]
-            new_normalized_data = (data - mean_val) / std_val
-            new_normalized_data = (new_normalized_data) / (np.max(new_normalized_data) - np.min(new_normalized_data))
+no_p_no_sz = 362
 
 
+model_list = ["ae", "GRU", "CNN"]
 
-            #num_zeros = (0, 12)
+model_outcomes_new = []
+model_outcomes_old = []
+model_outcomes_bandpass = []
+for model in model_list:
+    if model == "ae":
+        predicted_data_folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
+    elif model == "GRU":
+        predicted_data_folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby"
+    elif model == "CNN":
+        predicted_data_folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\CNN\result_cnn"
 
-            # Pad the array with zeros
-            #padded_data = np.pad(data, ((0, 0), num_zeros), mode='constant')
+    all_channels_output_new = []
+    all_channels_output_old = []
 
-            # predicted_data = model_2.predict(new_normalized_data)
-            # predicted_data = predicted_data.squeeze(-1)
-            # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method", f"pat_{p}_sz_{i}_ch_{ch}.npy"), predicted_data)
-            #np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\CNN\result_cnn", f"pat_{p}_sz_{i}_ch_{ch}.npy"), predicted_data)
-            #np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby", f"pat_{p}_sz_{i}_ch_{ch}.npy"), predicted_data)
-            #predicted_data = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\CNN\result_cnn", f"pat_{p}_sz_{i}_ch_{ch}.npy"))
-            #predicted_data = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby", f"pat_{p}_sz_{i}_ch_{ch}.npy"))
-            #predicted_data = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method", f"pat_{p}_sz_{i}_ch_{ch}.npy"))
-            predicted_data = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby", f"pat_{p}_sz_{i}_ch_{ch}.npy"))
-            # predicted_data = model_2.predict(padded_data)
-            # predicted_data = predicted_data.squeeze(-1)
-            #predicted_data = sharpenSignal(predicted_data)
+    for p in range(10,11):
+        sz_num = countNumberOfSeizuresPerPerson(p)
+        #no_p_no_sz += sz_num
+        for i in range(1, sz_num + 1):
+            all_ch_labels_new = []
+            all_ch_labels_old = []
+            data_appended = []
+            for ch in range(1, 5):
+                file_path = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_{ch}.npy")
+                data = np.load(file_path)
+                file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{i}_labels.npy")
 
-            filteredSignal_45 = nk.signal_filter(data, sampling_rate=250, highcut=40,
-                                               method='butterworth', order=4)
-            # filteredSignal_70 = nk.signal_filter(data, sampling_rate=250, lowcut=0.1, highcut=70,
-            #                                      method='butterworth', order=4)
-            # filteredSignal_30 = nk.signal_filter(data, sampling_rate=250, lowcut=0.1, highcut=30,
-            #                                      method='butterworth', order=4)
+                label = np.load(file_path_labels)
+
+                # file_path_1 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_1.npy")
+                # file_path_2 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_2.npy")
+                # file_path_3 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_3.npy")
+                # file_path_4 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_4.npy")
+                #
+                # data_1 = np.load(file_path_1)
+                # data_2 = np.load(file_path_2)
+                # data_3 = np.load(file_path_3)
+                # data_4 = np.load(file_path_4)
+                #
+                # data_1, data_2, data_3, data_4 = normalize_ch_data(data_1, data_2, data_3, data_4)
+                #
+                # data = np.empty_like(data_1)
+                # if (ch == 1):
+                #     data = data_1
+                # elif (ch == 2):
+                #     data = data_2
+                # elif (ch == 3):
+                #     data = data_3
+                # elif (ch == 4):
+                #     data = data_4
+
+                mean_val = np.mean(data)
+                std_val = np.std(data)
+                # Normalize the data to the range [-1, 1]
+                new_normalized_data = (data - mean_val) / std_val
+                new_normalized_data = (new_normalized_data) / (np.max(new_normalized_data) - np.min(new_normalized_data))
+
+                data_appended.append(new_normalized_data)
+
+                #num_zeros = (0, 12)
+
+                # Pad the array with zeros
+                #padded_data = np.pad(data, ((0, 0), num_zeros), mode='constant')
+
+                # predicted_data = model_2.predict(new_normalized_data)
+                # predicted_data = predicted_data.squeeze(-1)
+                # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method", f"pat_{p}_sz_{i}_ch_{ch}.npy"), predicted_data)
+                #np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\CNN\result_cnn", f"pat_{p}_sz_{i}_ch_{ch}.npy"), predicted_data)
+                #np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby", f"pat_{p}_sz_{i}_ch_{ch}.npy"), predicted_data)
+                #predicted_data = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\CNN\result_cnn", f"pat_{p}_sz_{i}_ch_{ch}.npy"))
+                #predicted_data = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby", f"pat_{p}_sz_{i}_ch_{ch}.npy"))
+                predicted_data = np.load(os.path.join(predicted_data_folder_path, f"pat_{p}_sz_{i}_ch_{ch}.npy"))
+                #predicted_data = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\GRU_cheby", f"pat_{p}_sz_{i}_ch_{ch}.npy"))
+                # predicted_data = model_2.predict(padded_data)
+                # predicted_data = predicted_data.squeeze(-1)
+                #predicted_data = sharpenSignal(predicted_data)
+
+                filteredSignal_45 = nk.signal_filter(data, sampling_rate=250, highcut=40,
+                                                   method='butterworth', order=4)
+                # filteredSignal_70 = nk.signal_filter(data, sampling_rate=250, lowcut=0.1, highcut=70,
+                #                                      method='butterworth', order=4)
+                # filteredSignal_30 = nk.signal_filter(data, sampling_rate=250, lowcut=0.1, highcut=30,
+                #                                      method='butterworth', order=4)
 
 
-            new_ll = thetaBandPower(predicted_data)
-            old_ll = thetaBandPower(data)
-            # ll_30 = linelength(filteredSignal_30)
-            ll_45 = thetaBandPower(filteredSignal_45)
-            # ll_70 = linelength(filteredSignal_70)
+                new_ll = linelength(predicted_data)
+                old_ll = linelength(data)
+                # ll_30 = linelength(filteredSignal_30)
+                ll_45 = linelength(filteredSignal_45)
+                # ll_70 = linelength(filteredSignal_70)
 
-            # new_ll = thetaBandPower(predicted_data)
-            # old_ll = thetaBandPower(data)
-            # # ll_30 = thetaBandPower(filteredSignal_30)
-            # ll_45 = thetaBandPower(filteredSignal_45)
-            # ll_70 = thetaBandPower(filteredSignal_70)
-
-
-
-            # avg_30 = np.average(ll_30)
-            # std_30 = np.std(ll_30)
-            # thresholds_30 = [avg_30 - 3 * std_30, avg_30 - 2 * std_30, avg_30 - std_30, avg_30, avg_30 + std_30, avg_30 + 2 * std_30, avg_30 + 3 * std_30]
-            #
-            #
-            # sens_30 = []
-            # spec_30 = []
-            # for th in thresholds_30:
-            #     new_ll_label = (ll_30 > th).astype(int)
-            #     sens1 = sensitivity(new_ll_label, label)
-            #     spec1 = specificity(new_ll_label, label)
-            #     sens_30.append(sens1["sens"])
-            #     spec_30.append(1 - spec1["spec"])
-
-            avg_45 = np.average(ll_45)
-            std_45 = np.std(ll_45)
-            thresholds_45 = [avg_45 - 3 * std_45, avg_45 - 2 * std_45, avg_45 - std_45, avg_45, avg_45 + std_45, avg_45 + 2 * std_45, avg_45 + 3 * std_45]
-
-            sens_45 = []
-            spec_45 = []
-            cm_45 = []  # confusion matrix
-            classification_list_45 = []
-            for th in thresholds_45:
-                tn, fp, fn, tp = confusion_matrix(label, (ll_45 > th).astype(int)).ravel()
-                cm_45.append([tn, fp, fn, tp])
-                new_ll_label = (ll_45 > th).astype(int)
-                classification_list_45.append(classifiedAtLeastOnce(label, new_ll_label))
-                sens1 = sensitivity(new_ll_label, label)
-                spec1 = specificity(new_ll_label, label)
-                sens_45.append(sens1["TP"])
-                spec_45.append(spec1["FP"])
-
-            TP_list_lowpass.append(mean(sens_45))
-            FP_list_lowpass.append(mean(spec_45))
-            cm_45_list.append(cm_45)
-            classified_as_sz_list_45.append(classification_list_45)
-
-            # avg_70 = np.average(ll_70)
-            # std_70 = np.std(ll_70)
-            # thresholds_70 = [avg_70 - 3 * std_70, avg_70 - 2 * std_70, avg_70 - std_70, avg_70, avg_70 + std_70, avg_70 + 2 * std_70, avg_70 + 3 * std_70]
-            #
-            # sens_70 = []
-            # spec_70 = []
-            # for th in thresholds_70:
-            #     new_ll_label = (ll_70 > th).astype(int)
-            #     sens1 = sensitivity(new_ll_label, label)
-            #     spec1 = specificity(new_ll_label, label)
-            #     sens_70.append(sens1["sens"])
-            #     spec_70.append(1 - spec1["spec"])
-            #
-            #
-
-            old_avg = np.average(old_ll)
-            old_std = np.std(old_ll)
-            thresholds_old = [old_avg - 3 * old_std, old_avg - 2 * old_std, old_avg - old_std, old_avg,
-                              old_avg + old_std, old_avg + 2 * old_std, old_avg + 3 * old_std]
-
-            avg = np.average(new_ll)
-            std = np.std(new_ll)
-            thresholds = [avg - 3 * std, avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std]
-
-            sens_new = []
-            spec_new = []
-            cm_new = []  # confusion matrix
-            classification_list_new = []
-            for th in thresholds:
-                tn, fp, fn, tp = confusion_matrix(label, (new_ll > th).astype(int)).ravel()
-                cm_new.append([tn, fp, fn, tp])
-                new_ll_label = (new_ll > th).astype(int)
-                classification_list_new.append(classifiedAtLeastOnce(label, new_ll_label))
-                sens1 = sensitivity(new_ll_label, label)
-                spec1 = specificity(new_ll_label, label)
-                sens_new.append(sens1["TP"])
-                spec_new.append(spec1["FP"])
-
-            TP_list_new.append(mean(sens_new))
-            FP_list_new.append(mean(spec_new))
-            cm_predicted_list.append(cm_new)
-            classified_as_sz_list_predicted.append(classification_list_new)
-
-            sens_old = []
-            spec_old = []
-            cm_old = []  # confusion matrix
-            classification_list_raw = []
-            for th in thresholds_old:
-                tn, fp, fn, tp = confusion_matrix(label, (old_ll > th).astype(int)).ravel()
-                cm_old.append([tn, fp, fn, tp])
-                old_ll_label = (old_ll > th).astype(int)
-                classification_list_raw.append(classifiedAtLeastOnce(label, old_ll_label))
-                sens2 = sensitivity(old_ll_label, label)
-                spec2 = specificity(old_ll_label, label)
-                sens_old.append(sens2["TP"])
-                spec_old.append(spec2["FP"])
-
-            TP_list_old.append(mean(sens_old))
-            FP_list_old.append(mean(spec_old))
-            cm_raw_list.append(cm_old)
-            classified_as_sz_list_raw.append(classification_list_raw)
-
-            # print("false positive")
-            # print(spec_new)
-            # print("average FP new", mean(spec_new))
-            # print(spec_old)
-            # print("average FP old", mean(spec_old))
-            #
-            #
-            # print("true positive")
-            # print(sens_new)
-            # print("average TP new", mean(sens_new))
-            # print(sens_old)
-            # print("average TP old", mean(sens_old))
+                # new_ll = thetaBandPower(predicted_data)
+                # old_ll = thetaBandPower(data)
+                # # ll_30 = thetaBandPower(filteredSignal_30)
+                # ll_45 = thetaBandPower(filteredSignal_45)
+                # ll_70 = thetaBandPower(filteredSignal_70)
 
 
 
-#             auc_new = auc(spec_new, sens_new)
-#             auc_old = auc(spec_old, sens_old)
-#             # auc_30 = auc(spec_30, sens_30)
-#             #auc_45 = auc(spec_45, sens_45)
-#             # auc_70 = auc(spec_70, sens_70)
-#
-#             auc_list_new.append(auc_new)
-#             auc_list_old.append(auc_old)
-#             # auc_list_30.append(auc_30)
-#             #auc_list_45.append(auc_45)
-#             # auc_list_70.append(auc_70)
-#
-#
-#             print(f"patient {p}, seizure {i}, channel {ch}, auc_new {auc_new}, auc_old {auc_old}")
-#
+                # avg_30 = np.average(ll_30)
+                # std_30 = np.std(ll_30)
+                # thresholds_30 = [avg_30 - 3 * std_30, avg_30 - 2 * std_30, avg_30 - std_30, avg_30, avg_30 + std_30, avg_30 + 2 * std_30, avg_30 + 3 * std_30]
+                #
+                #
+                # sens_30 = []
+                # spec_30 = []
+                # for th in thresholds_30:
+                #     new_ll_label = (ll_30 > th).astype(int)
+                #     sens1 = sensitivity(new_ll_label, label)
+                #     spec1 = specificity(new_ll_label, label)
+                #     sens_30.append(sens1["sens"])
+                #     spec_30.append(1 - spec1["spec"])
+
+                avg_45 = np.average(ll_45)
+                std_45 = np.std(ll_45)
+                thresholds_45 = [avg_45 - 3 * std_45, avg_45 - 2 * std_45, avg_45 - std_45, avg_45, avg_45 + std_45, avg_45 + 2 * std_45, avg_45 + 3 * std_45]
+
+                sens_45 = []
+                spec_45 = []
+                cm_45 = []  # confusion matrix
+                classification_list_45 = []
+                for th in thresholds_45:
+                    tn, fp, fn, tp = confusion_matrix(label, (ll_45 > th).astype(int)).ravel()
+                    cm_45.append([tn, fp, fn, tp])
+                    new_ll_label = (ll_45 > th).astype(int)
+                    classification_list_45.append(classifiedAtLeastOnce(label, new_ll_label))
+                    sens1 = sensitivity(new_ll_label, label)
+                    spec1 = specificity(new_ll_label, label)
+                    sens_45.append(sens1["TP"])
+                    spec_45.append(spec1["FP"])
+
+                TP_list_lowpass.append(mean(sens_45))
+                FP_list_lowpass.append(mean(spec_45))
+                cm_45_list.append(cm_45)
+                classified_as_sz_list_45.append(classification_list_45)
+
+                # avg_70 = np.average(ll_70)
+                # std_70 = np.std(ll_70)
+                # thresholds_70 = [avg_70 - 3 * std_70, avg_70 - 2 * std_70, avg_70 - std_70, avg_70, avg_70 + std_70, avg_70 + 2 * std_70, avg_70 + 3 * std_70]
+                #
+                # sens_70 = []
+                # spec_70 = []
+                # for th in thresholds_70:
+                #     new_ll_label = (ll_70 > th).astype(int)
+                #     sens1 = sensitivity(new_ll_label, label)
+                #     spec1 = specificity(new_ll_label, label)
+                #     sens_70.append(sens1["sens"])
+                #     spec_70.append(1 - spec1["spec"])
+                #
+                #
+
+                old_avg = np.average(old_ll)
+                old_std = np.std(old_ll)
+                thresholds_old = [old_avg - 3 * old_std, old_avg - 2 * old_std, old_avg - old_std, old_avg,
+                                  old_avg + old_std, old_avg + 2 * old_std, old_avg + 3 * old_std]
+
+                avg = np.average(new_ll)
+                std = np.std(new_ll)
+                thresholds = [avg - 3 * std, avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std]
+
+                sens_new = []
+                spec_new = []
+                cm_new = []  # confusion matrix
+                classification_list_new = []
+                for th in thresholds:
+                    tn, fp, fn, tp = confusion_matrix(label, (new_ll > th).astype(int)).ravel()
+                    cm_new.append([tn, fp, fn, tp])
+                    new_ll_label = (new_ll > th).astype(int)
+                    classification_list_new.append(classifiedAtLeastOnce(label, new_ll_label))
+                    sens1 = sensitivity(new_ll_label, label)
+                    spec1 = specificity(new_ll_label, label)
+                    sens_new.append(sens1["TP"])
+                    spec_new.append(spec1["FP"])
+                    all_ch_labels_new.append(new_ll_label)
+
+                TP_list_new.append(mean(sens_new))
+                FP_list_new.append(mean(spec_new))
+                cm_predicted_list.append(cm_new)
+                classified_as_sz_list_predicted.append(classification_list_new)
+
+                sens_old = []
+                spec_old = []
+                cm_old = []  # confusion matrix
+                classification_list_raw = []
+                for th in thresholds_old:
+                    tn, fp, fn, tp = confusion_matrix(label, (old_ll > th).astype(int)).ravel()
+                    cm_old.append([tn, fp, fn, tp])
+                    old_ll_label = (old_ll > th).astype(int)
+                    classification_list_raw.append(classifiedAtLeastOnce(label, old_ll_label))
+                    sens2 = sensitivity(old_ll_label, label)
+                    spec2 = specificity(old_ll_label, label)
+                    sens_old.append(sens2["TP"])
+                    spec_old.append(spec2["FP"])
+                    all_ch_labels_old.append(old_ll_label)
+
+                TP_list_old.append(mean(sens_old))
+                FP_list_old.append(mean(spec_old))
+                cm_raw_list.append(cm_old)
+                classified_as_sz_list_raw.append(classification_list_raw)
+                all_channels_output_new.append(all_ch_labels_new)
+                all_channels_output_old.append(all_ch_labels_old)
+
+                # print("false positive")
+                # print(spec_new)
+                # print("average FP new", mean(spec_new))
+                # print(spec_old)
+                # print("average FP old", mean(spec_old))
+                #
+                #
+                # print("true positive")
+                # print(sens_new)
+                # print("average TP new", mean(sens_new))
+                # print(sens_old)
+                # print("average TP old", mean(sens_old))
+
+    model_outcomes_new.append(all_channels_output_new)
+    model_outcomes_old.append(all_channels_output_old)
+    #model_outcomes_bandpass.append(all_channels_45)
+
+    #             auc_new = auc(spec_new, sens_new)
+    #             auc_old = auc(spec_old, sens_old)
+    #             # auc_30 = auc(spec_30, sens_30)
+    #             #auc_45 = auc(spec_45, sens_45)
+    #             # auc_70 = auc(spec_70, sens_70)
+    #
+    #             auc_list_new.append(auc_new)
+    #             auc_list_old.append(auc_old)
+    #             # auc_list_30.append(auc_30)
+    #             #auc_list_45.append(auc_45)
+    #             # auc_list_70.append(auc_70)
+    #
+    #
+    #             print(f"patient {p}, seizure {i}, channel {ch}, auc_new {auc_new}, auc_old {auc_old}")
+    #
 #
 # print(f"mean auc_new {np.mean(auc_list_new)}, mean auc_old {np.mean(auc_list_old)}")
 #print(f"std auc_new {np.std(auc_list_new)}, std auc_old {np.std(auc_list_old)}")
 #print(f"mean auc_30 {np.mean(auc_list_30)}, mean auc_45 {np.mean(auc_list_45)}, mean auc_70 {np.mean(auc_list_70)}")
 
+print(len(model_outcomes_new))
+print(len(model_outcomes_old))
+
+ch1_list_new = all_channels_output_new[0::4]
+ch2_list_new = all_channels_output_new[1::4]
+ch3_list_new = all_channels_output_new[2::4]
+ch4_list_new = all_channels_output_new[3::4]
+
+ch1_list_old = all_channels_output_old[0::4]
+ch2_list_old = all_channels_output_old[1::4]
+ch3_list_old = all_channels_output_old[2::4]
+ch4_list_old = all_channels_output_old[3::4]
+
+for i in range(0,10):
+    if np.equal(ch1_list_new[i], ch2_list_new[i]).all():
+        print("ch1 and 2 is equal")   # all channels are equal
+
+    if np.equal(ch2_list_new[i], ch3_list_new[i]).all():
+        print("ch2 and 3 is equal")
+
+    if np.equal(ch3_list_new[i], ch4_list_new[i]).all():
+        print("ch3 and 4 is equal")
 
 
-classified_as_sz_list_45 = np.array(classified_as_sz_list_45)
-print(classified_as_sz_list_45.shape)
-classified_as_sz_list_predicted = np.array(classified_as_sz_list_predicted)
-classified_as_sz_list_raw = np.array(classified_as_sz_list_raw)
+    if np.equal(ch1_list_old[i], ch2_list_old[i]).all():
+        print("ch1 and 2 is equal old")  # all channels are equal
 
-average_values_45_list = np.mean(classified_as_sz_list_45, axis=0)
-average_values_predicted_list = np.mean(classified_as_sz_list_predicted, axis=0)
-average_values_raw_list = np.mean(classified_as_sz_list_raw, axis=0)
+    if np.equal(ch2_list_old[i], ch3_list_old[i]).all():
+        print("ch2 and 3 is equal old")
 
-print(average_values_45_list)
-print(average_values_predicted_list)
-print(average_values_raw_list)
-
-#
-# # Convert the list to a numpy array for easier calculations
-results_array_45 = np.array(cm_45_list)
-#
-# #results_array_45 = results_array_45.reshape(results_array_45.shape[0] * results_array_45.shape[1], 4)
-# print(results_array_45.shape)
-# # Calculate the average for each column (TN, FP, FN, TP)
-average_values = np.mean(results_array_45, axis=0)
-
-col_fp_45 = average_values[:, 1]
-#col_tp_45 = average_values[:, 3]
-# auc_45 = auc(col_fp_45, col_tp_45)
-auc_45 = auc(col_fp_45, average_values_45_list)
-#
-#
-results_array_new = np.array(cm_predicted_list)
-# #results_array_new = results_array_new.reshape(results_array_new.shape[0] * results_array_new.shape[1], 4)
-average_values_new = np.mean(results_array_new, axis=0)
-col_fp_new = average_values_new[:, 1]
-# col_tp_new = average_values_new[:, 3]
-auc_new = auc(col_fp_new, average_values_predicted_list)
-#
-#
-results_array_old = np.array(cm_raw_list)
-# #results_array_old = results_array_old.reshape(results_array_old.shape[0] * results_array_old.shape[1], 4)
-average_values_old = np.mean(results_array_old, axis=0)
-col_fp_old = average_values_old[:, 1]
-# col_tp_old = average_values_old[:, 3]
-auc_old = auc(col_fp_old, average_values_raw_list)
-
-plt.plot(col_fp_45, average_values_45_list, label='45')
-plt.plot(col_fp_new, average_values_predicted_list, label='new')
-plt.plot(col_fp_old, average_values_raw_list, label='old')
-plt.legend(labels=[f'auc_old: {auc_old:.2f}', f'auc_new: {auc_new:.2f}', f'auc_45: {auc_45:.2f}'], loc='lower right')
-plt.xlabel('FP')
-plt.ylabel('classified as seizure at least once')
-plt.show()
-
+    if np.equal(ch3_list_old[i], ch4_list_old[i]).all():
+        print("ch3 and 4 is equal old")
 
 
 #
