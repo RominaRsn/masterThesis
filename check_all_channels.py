@@ -663,17 +663,22 @@ def postProcessFP_ConsecValus(true_label, predicted_label):
             elif true_label[j] == 0 and predicted_label_col[j] == 0:
                 conf_mat_label.append("TN")
 
-        counter_number = len(true_label) //window_length
 
-        inner_counter = []
-        for k in range(0, counter_number):
-            epoched_conf_mat_label = conf_mat_label[k*window_length:(k+1)*window_length]
-            if epoched_conf_mat_label.count("FP") >= 1:
-                inner_counter.append(1)
-            else:
-                inner_counter.append(0)
-        total_FP_count = sum(inner_counter)
-        FP_list.append(total_FP_count)
+
+        cons_counter = 0
+        if(conf_mat_label[0] == "FP"):
+            cons_counter = 1
+        for j in range(1, len(conf_mat_label) - 1):
+            if conf_mat_label[j] == "FP" and conf_mat_label[j - 1] != "FP" and conf_mat_label[j + 1] != "FP":
+                cons_counter += 1
+
+        if(conf_mat_label[len(conf_mat_label) - 2] != "FP" and conf_mat_label[len(conf_mat_label) - 1] == "FP"):
+            cons_counter += 1
+
+
+
+        #total_FP_count = sum(inner_counter)
+        FP_list.append(cons_counter)
 
     return FP_list
 
@@ -883,7 +888,8 @@ for p in range(1, 51):
         # concat_result_raw = concatAllResults(label, labels_1, labels_2, labels_3, labels_4)
         label_raw_data = doLogicalOR(labels_1, labels_2, labels_3, labels_4)
 
-        innerFPWithPP_old = postProcessFP(label, label_raw_data)
+        #innerFPWithPP_old = postProcessFP(label, label_raw_data)
+        innerFPWithPP_old = postProcessFP_ConsecValus(label, label_raw_data)
         postProcessedFPList_old.append(innerFPWithPP_old)
 
 
@@ -899,7 +905,8 @@ for p in range(1, 51):
         # labels_45_data = np.logical_or(labels_45_data, labels_45_4)
         # labels_45_data = labels_45_data.astype(int)
 
-        innerFPWithPP_45 = postProcessFP(label, labels_45_data)
+        #innerFPWithPP_45 = postProcessFP(label, labels_45_data)
+        innerFPWithPP_45 = postProcessFP_ConsecValus(label, labels_45_data)
         postProcessedFPList_45.append(innerFPWithPP_45)
 
 
@@ -960,7 +967,8 @@ for p in range(1, 51):
         classified_at_least_once_new.append(classifiedAtLeastOnce(label, predicted_label))
         classified_at_least_once_10sec_new.append(classifiedAtLeastOnce_10sec(label, predicted_label))
 
-        innerFPWithPP_new = postProcessFP(label, predicted_label)
+        #innerFPWithPP_new = postProcessFP(label, predicted_label)
+        innerFPWithPP_new = postProcessFP_ConsecValus(label, predicted_label)
         postProcessedFPList_new.append(innerFPWithPP_new)
 
 
@@ -1084,10 +1092,10 @@ classified_at_least_once_10sec_45 = np.mean(classified_at_least_once_10sec_45, a
 
 
 
-plt.plot(ppofFP_new_array, classified_at_least_once_new)
+plt.plot(np.sort(ppofFP_new_array)[::-1], classified_at_least_once_new)
 plt.plot(ppofFP_old_array, classified_at_least_once_old)
 plt.plot(ppofFP_45_array, classified_at_least_once_45)
-auc_actual = auc(ppofFP_new_array, classified_at_least_once_new)
+auc_actual = auc(np.sort(ppofFP_new_array)[::-1], classified_at_least_once_new)
 auc_predicted = auc(ppofFP_old_array, classified_at_least_once_old)
 auc_45 = auc(ppofFP_45_array, classified_at_least_once_45)
 plt.xlabel("False Positive Rate")
@@ -1098,18 +1106,18 @@ legend_labels = ["new (AUC={:.2f})".format(auc_actual),
 
 plt.legend(legend_labels)
 plt.show()
-
-plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
-plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
-plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
-auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
-auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
-auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
-plt.xlabel("False Positive Rate")
-plt.ylabel("classified at least once as seizure")
-legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                 "old (AUC={:.2f})".format(auc_predicted),
-                 "45 (AUC={:.2f})".format(auc_45)]
+#
+# plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
+# plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
+# plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
+# auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
+# auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
+# auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
+# plt.xlabel("False Positive Rate")
+# plt.ylabel("classified at least once as seizure")
+# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+#                  "old (AUC={:.2f})".format(auc_predicted),
+#                  "45 (AUC={:.2f})".format(auc_45)]
 
 plt.legend(legend_labels)
 plt.show()
