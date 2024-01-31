@@ -53,6 +53,10 @@ def normalize_ch_data(data1, data2, data3, data4):
 def are_consecutive(lst):
     return all(lst[i] + 1 == lst[i + 1] for i in range(len(lst) - 1))
 
+model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_cheby_checkpoint.h5")
+model_eog = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
+
+
 for p in range(14, 51):
     sz_num = countNumberOfSeizuresPerPerson(p)
     for i in range(1, sz_num+1):
@@ -113,15 +117,51 @@ for p in range(14, 51):
             # result_cnn = model_cnn.predict(data)
             # result_cnn = result_cnn.reshape(result_cnn.shape[0], result_cnn.shape[1])
 
-            seizure = [];
-            seizure_filtered = [];
-            index = np.where(label ==1)
-            index_list = index[0].tolist()
+            #seeing the performance of the model on the EOG data
+            result_eog = model_eog.predict(new_normalized_data)
+            result_eog = result_eog.squeeze(-1)
 
-            a = are_consecutive(index_list)
+            result_ae = model.predict(new_normalized_data)
+            result_ae = result_ae.squeeze(-1)
 
-            if(a == False):
-                print(f"pat_{p}_sz_{i}_ch_{ch_num}")
+            index_list = np.where(label == 1)[0]
+
+            for i in index_list:
+
+                if (i > 10):
+                    # Create subplots with specified axes
+                    fig, axes = plt.subplots(3, 1, figsize=(20, 10), sharey='col')
+                    # Plot each subplot
+                    axes[0].plot(new_normalized_data[i - 5:i + 5, :].ravel(), label='Data')
+                    axes[0].set_title('Original data')
+                    axes[0].set_ylabel('Signal amplitude')
+                    axes[0].set_xlabel('Time')
+
+                    axes[1].plot(result_eog[i - 5:i + 5, :].ravel(), label='EOG and EMG noise removed')
+                    axes[1].set_title('EOG and EMG removed')
+                    axes[1].set_ylabel('Signal amplitude')
+                    axes[1].set_xlabel('Time')
+
+                    axes[2].plot(result_ae[i - 5:i + 5, :].ravel(), label='EMG noise removed')
+                    axes[2].set_title('EMG removed')
+                    axes[2].set_ylabel('Signal amplitude')
+                    axes[2].set_xlabel('Time')
+
+
+                    plt.tight_layout()  # Adjust layout to prevent overlapping
+                    plt.show()
+
+
+
+            # seizure = [];
+            # seizure_filtered = [];
+            # index = np.where(label ==1)
+            # index_list = index[0].tolist()
+            #
+            # a = are_consecutive(index_list)
+
+            # if(a == False):
+            #     print(f"pat_{p}_sz_{i}_ch_{ch_num}")
                 #seizure_filtered.append(result_2[j, :])
             # cnt = 0
             # for j in index_list:

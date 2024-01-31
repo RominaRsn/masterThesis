@@ -992,7 +992,7 @@ for p in range(1, 51):
             if(selected_threshold != 0 and selected_threshold != 1):
 
                 false_detections_predicted = getFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
-                #plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, concat_result_predicted, selected_threshold)
+                plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
 
                 improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
                 #plotFalsePositives(improved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
