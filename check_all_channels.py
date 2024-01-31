@@ -147,6 +147,31 @@ def getNoneDetections(true_labels, predicted_labels_1, predicted_labels_2, predi
 
     return all_not_pred_elements
 
+def getReducedFlaseDetections(true_label, predicted_label, label_from_raw_data, selected_threshold):
+
+    true_index = np.where(true_label == 0)[0] #######negated true index
+
+    # predicted_label = np.all(predicted_label, axis=1)
+    # label_from_raw_data = np.all(label_from_raw_data, axis=1)
+    # predicted_label = predicted_label.astype(int)
+    # label_from_raw_data = label_from_raw_data.astype(int)
+
+    predicted_label = predicted_label[:, selected_threshold]
+    label_from_raw_data = label_from_raw_data[:, selected_threshold]
+
+    predicted_index = np.where(predicted_label == 0)[0]
+    negative_label_from_raw_data_index = np.where(label_from_raw_data == 1)[0]
+
+    intersection = np.intersect1d(true_index, predicted_index)
+    intersection = np.intersect1d(intersection, negative_label_from_raw_data_index)
+
+    return intersection
+
+
+
+
+
+
 
 def getFlaseDetections(true_label, predicted_label, label_from_raw_data, selected_threshold):
     # #true_index = np.where(true_labels == 0)
@@ -858,6 +883,7 @@ for p in range(1, 51):
         #####when the predictions are not calculated yet
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\lstm_encoder_bigger.h5")
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_cheby_checkpoint.h5")
+        # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
         # predicted_data_1 = model.predict(new_normalized_data_1)
         # predicted_data_2 = model.predict(new_normalized_data_2)
         # predicted_data_3 = model.predict(new_normalized_data_3)
@@ -868,10 +894,10 @@ for p in range(1, 51):
         # predicted_data_3 = predicted_data_3.squeeze(-1)
         # predicted_data_4 = predicted_data_4.squeeze(-1)
         #
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
 
 
 
@@ -991,7 +1017,8 @@ for p in range(1, 51):
 
             if(selected_threshold != 0 and selected_threshold != 1):
 
-                false_detections_predicted = getFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
+                #false_detections_predicted = getFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
+                false_detections_predicted = getReducedFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
                 plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
 
                 improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
