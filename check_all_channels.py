@@ -485,7 +485,8 @@ def classifiedAtLeastOnce_10sec(true_labels, predicted_labels):
 def getOnlyLabels(data, true_labels, thresholds):
 
     ll = linelength(data)
-    # #ll = thetaBandPower(data)
+    # ll = thetaBandPower(data)
+    # ll = ll.squeeze(-1)
     #
     # avg = np.average(ll)
     # std = np.std(ll)
@@ -594,6 +595,9 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
         new_normalized_data_1 = (new_normalized_data_1) / (np.max(new_normalized_data_1) - np.min(new_normalized_data_1))
         ll = linelength(new_normalized_data_1)
 
+        # ll = thetaBandPower(new_normalized_data_1)
+        # ll = ll.squeeze(-1)
+
         avg = np.average(ll)
         std = np.std(ll)
 
@@ -622,6 +626,9 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
         predicted_data_1 = np.load(os.path.join(path, f"pat_{patient_number}_sz_{sz}_ch_{channel_number}.npy"))
 
         ll = linelength(predicted_data_1)
+
+        # ll = thetaBandPower(predicted_data_1)
+        # ll = ll.squeeze(-1)
 
         avg = np.average(ll)
         std = np.std(ll)
@@ -868,19 +875,32 @@ for p in range(1, 51):
 
 
         # #####when the predictions are already calculated
-        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # #predicted_data_1 = predicted_data_1.squeeze(-1)
+        #
+        # predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        # #predicted_data_2 = predicted_data_2.squeeze(-1)
+        #
+        # predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        # #predicted_data_3 = predicted_data_3.squeeze(-1)
+        #
+        # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        # ##predicted_data_4 = predicted_data_4.squeeze(-1)
+
+        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_1.npy"))
         #predicted_data_1 = predicted_data_1.squeeze(-1)
 
-        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_2.npy"))
         #predicted_data_2 = predicted_data_2.squeeze(-1)
 
-        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_3.npy"))
         #predicted_data_3 = predicted_data_3.squeeze(-1)
 
-        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
-        #predicted_data_4 = predicted_data_4.squeeze(-1)
+        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        ##predicted_data_4 = predicted_data_4.squeeze(-1)
 
-        #####when the predictions are not calculated yet
+
+        ####when the predictions are not calculated yet
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\lstm_encoder_bigger.h5")
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_cheby_checkpoint.h5")
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
@@ -914,8 +934,8 @@ for p in range(1, 51):
         # concat_result_raw = concatAllResults(label, labels_1, labels_2, labels_3, labels_4)
         label_raw_data = doLogicalOR(labels_1, labels_2, labels_3, labels_4)
 
-        #innerFPWithPP_old = postProcessFP(label, label_raw_data)
-        innerFPWithPP_old = postProcessFP_ConsecValus(label, label_raw_data)
+        innerFPWithPP_old = postProcessFP(label, label_raw_data)
+        #innerFPWithPP_old = postProcessFP_ConsecValus(label, label_raw_data)
         postProcessedFPList_old.append(innerFPWithPP_old)
 
 
@@ -931,8 +951,8 @@ for p in range(1, 51):
         # labels_45_data = np.logical_or(labels_45_data, labels_45_4)
         # labels_45_data = labels_45_data.astype(int)
 
+        innerFPWithPP_45 = postProcessFP(label, labels_45_data)
         #innerFPWithPP_45 = postProcessFP(label, labels_45_data)
-        innerFPWithPP_45 = postProcessFP_ConsecValus(label, labels_45_data)
         postProcessedFPList_45.append(innerFPWithPP_45)
 
 
@@ -993,8 +1013,8 @@ for p in range(1, 51):
         classified_at_least_once_new.append(classifiedAtLeastOnce(label, predicted_label))
         classified_at_least_once_10sec_new.append(classifiedAtLeastOnce_10sec(label, predicted_label))
 
-        #innerFPWithPP_new = postProcessFP(label, predicted_label)
-        innerFPWithPP_new = postProcessFP_ConsecValus(label, predicted_label)
+        innerFPWithPP_new = postProcessFP(label, predicted_label)
+        #innerFPWithPP_new = postProcessFP_ConsecValus(label, predicted_label)
         postProcessedFPList_new.append(innerFPWithPP_new)
 
 
@@ -1019,7 +1039,7 @@ for p in range(1, 51):
 
                 #false_detections_predicted = getFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
                 false_detections_predicted = getReducedFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
-                plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+                #plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
 
                 improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
                 #plotFalsePositives(improved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
@@ -1114,15 +1134,15 @@ classified_at_least_once_10sec_45 = np.mean(classified_at_least_once_10sec_45, a
 #
 # plt.legend(legend_labels)
 # plt.show()
+#
 
 
 
 
-
-plt.plot(np.sort(ppofFP_new_array)[::-1], classified_at_least_once_new)
+plt.plot(ppofFP_new_array, classified_at_least_once_new)
 plt.plot(ppofFP_old_array, classified_at_least_once_old)
 plt.plot(ppofFP_45_array, classified_at_least_once_45)
-auc_actual = auc(np.sort(ppofFP_new_array)[::-1], classified_at_least_once_new)
+auc_actual = auc(ppofFP_new_array, classified_at_least_once_new)
 auc_predicted = auc(ppofFP_old_array, classified_at_least_once_old)
 auc_45 = auc(ppofFP_45_array, classified_at_least_once_45)
 plt.xlabel("False Positive Rate")
@@ -1133,18 +1153,18 @@ legend_labels = ["new (AUC={:.2f})".format(auc_actual),
 
 plt.legend(legend_labels)
 plt.show()
-#
-# plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
-# plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
-# plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
-# auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
-# auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
-# auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
-# plt.xlabel("False Positive Rate")
-# plt.ylabel("classified at least once as seizure")
-# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-#                  "old (AUC={:.2f})".format(auc_predicted),
-#                  "45 (AUC={:.2f})".format(auc_45)]
+
+plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
+plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
+plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
+auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
+auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
+auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
+plt.xlabel("False Positive Rate")
+plt.ylabel("classified at least once as seizure")
+legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+                 "old (AUC={:.2f})".format(auc_predicted),
+                 "45 (AUC={:.2f})".format(auc_45)]
 
 plt.legend(legend_labels)
 plt.show()

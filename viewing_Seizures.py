@@ -57,7 +57,7 @@ model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThe
 model_eog = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
 
 
-for p in range(14, 51):
+for p in range(40, 51):
     sz_num = countNumberOfSeizuresPerPerson(p)
     for i in range(1, sz_num+1):
         for ch_num in range(1,5):

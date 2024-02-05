@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import os
 
 
-folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_filtered"
+#folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_filtered"
+folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering"
 label_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s"
 
 def label_to_binary(label, data):
@@ -33,15 +34,15 @@ def countNumberOfSeizuresPerPerson(patient_number):
     return cnt //4
 
 
-for p in range(2,51):
+for p in range(1,51):
     print(p)
     df_list = []
     a = countNumberOfSeizuresPerPerson(p)
     for sz_num in range(1, countNumberOfSeizuresPerPerson(p) + 1):
-        ch1_data = np.load(f"{folder_path}/result_pat_{p}_sz_{sz_num}_ch_{1}.npy")
-        ch2_data = np.load(f"{folder_path}/result_pat_{p}_sz_{sz_num}_ch_{2}.npy")
-        ch3_data = np.load(f"{folder_path}/result_pat_{p}_sz_{sz_num}_ch_{3}.npy")
-        ch4_data = np.load(f"{folder_path}/result_pat_{p}_sz_{sz_num}_ch_{4}.npy")
+        ch1_data = np.load(f"{folder_path}/pat_{p}_sz_{sz_num}_ch_{1}.npy")
+        ch2_data = np.load(f"{folder_path}/pat_{p}_sz_{sz_num}_ch_{2}.npy")
+        ch3_data = np.load(f"{folder_path}/pat_{p}_sz_{sz_num}_ch_{3}.npy")
+        ch4_data = np.load(f"{folder_path}/pat_{p}_sz_{sz_num}_ch_{4}.npy")
 
         ch1_data = ch1_data.reshape(ch1_data.shape[0], ch1_data.shape[1])
         ch2_data = ch2_data.reshape(ch2_data.shape[0], ch2_data.shape[1])
@@ -59,7 +60,7 @@ for p in range(2,51):
         seizure_block['label'] = labels
         df_list.append(seizure_block)
     file_name = f"pat_{p}_results.csv"
-    file_path_results = os.path.join(r"D:\RealData\export", file_name)
+    file_path_results = os.path.join(r"D:\RealData\export_eeg_emg", file_name)
     df = pd.concat(df_list, axis=0)
     df.to_csv(file_path_results)
 
