@@ -100,6 +100,20 @@ def doLogicalOR(predicted_label_1, predicted_labe_2, predicted_label_3, predicte
         result[:, i] = res
     return result
 
+def doTwoAndOneOr(predicted_label_1, predicted_labe_2, predicted_label_3, predicted_label_4):
+    result = np.empty_like(predicted_label_1)
+    for i in range(0, predicted_label_1.shape[1]):
+        col_predic_1 = predicted_label_1[:, i]
+        col_predic_2 = predicted_labe_2[:, i]
+        col_predic_3 = predicted_label_3[:, i]
+        col_predic_4 = predicted_label_4[:, i]
+        res1 = np.logical_and(col_predic_1, col_predic_2)
+        res2 = np.logical_and(col_predic_4, col_predic_3)
+        res = np.logical_or(res1, res2)
+        result[:, i] = res
+    return result
+
+
 
 def getTheBestThresholds(true_labels, predicted_label):
     threshold_list = []
@@ -952,14 +966,14 @@ for p in range(1, 51):
     thresholds_old_ch_2 = getThresholdsPerPatient(p, 2, sz_num)
     thresholds_old_ch_3 = getThresholdsPerPatient(p, 3, sz_num)
     thresholds_old_ch_4 = getThresholdsPerPatient(p, 4, sz_num)
-    print("clean data thresholds: ", thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4)
+    #print("clean data thresholds: ", thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4)
 
     path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
     thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
     thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
     thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
     thresholds_new_ch_4 = getThresholdsPerPatientAfterCleaning(path, p, 4, sz_num)
-    print("new data thresholds: ", thresholds_new_ch_1, thresholds_new_ch_2, thresholds_new_ch_3, thresholds_new_ch_4)
+    #print("new data thresholds: ", thresholds_new_ch_1, thresholds_new_ch_2, thresholds_new_ch_3, thresholds_new_ch_4)
 
 
     for sz in range(1, sz_num + 1):
@@ -1069,7 +1083,9 @@ for p in range(1, 51):
         # label_raw_data = np.logical_or(label_raw_data, labels_4)
         # label_raw_data = label_raw_data.astype(int)
         # concat_result_raw = concatAllResults(label, labels_1, labels_2, labels_3, labels_4)
-        label_raw_data = doLogicalOR(labels_1, labels_2, labels_3, labels_4)
+
+        #label_raw_data = doLogicalOR(labels_1, labels_2, labels_3, labels_4)
+        label_raw_data = doTwoAndOneOr(labels_1, labels_2, labels_3, labels_4)
 
         innerFPWithPP_old = postProcessFP(label, label_raw_data)
         #innerFPWithPP_old = postProcessFP_ConsecValus(label, label_raw_data)
@@ -1081,7 +1097,9 @@ for p in range(1, 51):
         labels_45_2 = getOnlyLabels(filteredSignal_2_45, label, thresholds_old_ch_2)
         labels_45_3 = getOnlyLabels(filteredSignal_3_45, label,  thresholds_old_ch_3)
         labels_45_4 = getOnlyLabels(filteredSignal_4_45, label, thresholds_old_ch_4)
-        labels_45_data = doLogicalOR(labels_45_1, labels_45_2, labels_45_3, labels_45_4)
+
+        #labels_45_data = doLogicalOR(labels_45_1, labels_45_2, labels_45_3, labels_45_4)
+        labels_45_data = doTwoAndOneOr(labels_45_1, labels_45_2, labels_45_3, labels_45_4)
 
         # labels_45_data = np.logical_or(labels_45_1, labels_45_2)
         # labels_45_data = np.logical_or(labels_45_data, labels_45_3)
@@ -1140,7 +1158,10 @@ for p in range(1, 51):
             print("all equal")
 
 
-        predicted_label = doLogicalOR(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+        #predicted_label = doLogicalOR(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+        predicted_label = doTwoAndOneOr(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+
+
         # predicted_label = np.logical_or(predicted_labels_1, predicted_labels_2)
         # predicted_label = np.logical_or(predicted_label, predicted_labels_3)
         # predicted_label = np.logical_or(predicted_label, predicted_labels_4)
@@ -1268,6 +1289,8 @@ specificity_list_old = averaged_list_actual_data[:, 0] / (averaged_list_actual_d
 recall_list_45 = averaged_list_45[:, 3] / (averaged_list_45[:, 3] + averaged_list_45[:, 2])
 specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + averaged_list_45[:, 1])
 
+
+
 plt.plot(1-specificity_list_new, recall_list_new)
 plt.plot(1-specificity_list_old, recall_list_old)
 plt.plot(1-specificity_list_45, recall_list_45)
@@ -1275,14 +1298,16 @@ auc_actual = auc(1-specificity_list_new, recall_list_new)
 auc_predicted = auc(1-specificity_list_old, recall_list_old)
 auc_45 = auc(1-specificity_list_45, recall_list_45)
 
-plt.xlabel("Recall")
-plt.ylabel("1-Specificity")
+plt.xlabel("1-Specificity")
+plt.ylabel("Recall")
 legend_labels = ["new (AUC={:.2f})".format(auc_actual),
                  "old (AUC={:.2f})".format(auc_predicted),
                  "45 (AUC={:.2f})".format(auc_45)]
 
 plt.legend(legend_labels)
 plt.show()
+
+
 
 plt.plot(averaged_list[:, 1], classified_at_least_once_new)
 plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_old)
