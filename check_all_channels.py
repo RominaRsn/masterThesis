@@ -536,6 +536,7 @@ def plotFalsePositives(index_list, data_1, data_2, data_3, data_4, predictions_1
 
 
     for i in index_list:
+        print("Patient: ", patient_number, "Seizure: ", seizure_number, "selected threshold: ", selected_threshold)
 
         if(i>10):
             whichChannelHasSeizure = [0, 0, 0, 0]
@@ -580,6 +581,67 @@ def plotFalsePositives(index_list, data_1, data_2, data_3, data_4, predictions_1
             plt.tight_layout()  # Adjust layout to prevent overlapping
             plt.show()
 
+def plotFalsePositives_new(index_list, data_1, data_2, data_3, data_4, predictions_1, predictions_2, predictions_3, predictions_4, patient_number, seizure_number, selected_threshold, predicted_label_1, predicted_label_2, predicted_label_3, predicted_label_4,
+                           raw_labels_1, raw_labels_2, raw_labels_3, raw_labels_4):
+
+    predicted_label_col_1 = raw_labels_1[:, selected_threshold]
+    predicted_label_col_2 = raw_labels_2[:, selected_threshold]
+    predicted_label_col_3 = raw_labels_3[:, selected_threshold]
+    predicted_label_col_4 = raw_labels_4[:, selected_threshold]
+
+    predicted_ones_1 = np.where(predicted_label_col_1 == 1)[0]
+    predicted_ones_2 = np.where(predicted_label_col_2 == 1)[0]
+    predicted_ones_3 = np.where(predicted_label_col_3 == 1)[0]
+    predicted_ones_4 = np.where(predicted_label_col_4 == 1)[0]
+
+
+    for i in index_list:
+
+        if(i>10):
+            whichChannelHasSeizure = [0, 0, 0, 0]
+            if(i in predicted_ones_1):
+                whichChannelHasSeizure[0] = 1
+            if(i in predicted_ones_2):
+                whichChannelHasSeizure[1] = 1
+            if(i in predicted_ones_3):
+                whichChannelHasSeizure[2] = 1
+            if(i in predicted_ones_4):
+                whichChannelHasSeizure[3] = 1
+
+
+            display_span = 3
+            # Create subplots with specified axes
+            fig, axes = plt.subplots(4, 1, figsize=(20, 10), sharey='col')
+            fig.suptitle(f'patient: {patient_number}, seizure: {seizure_number}, index: {i}')
+            # Plot each subplot
+            axes[0].plot(data_1[i - display_span:i + display_span, :].ravel(), label='Data 1')
+            axes[0].plot(predictions_1[i - display_span:i + display_span, :].ravel(), label='Predictions 1')
+            axes[0].legend()
+            if(whichChannelHasSeizure[0] == 1):
+                axes[0].set_title("Seizure in this channel")
+
+            axes[1].plot(data_2[i - display_span:i + display_span, :].ravel(), label='Data 2')
+            axes[1].plot(predictions_2[i - display_span:i + display_span, :].ravel(), label='Predictions 2')
+            axes[1].legend()
+            if (whichChannelHasSeizure[1] == 1):
+                axes[1].set_title("Seizure in this channel")
+
+            axes[2].plot(data_3[i - display_span:i + display_span, :].ravel(), label='Data 3')
+            axes[2].plot(predictions_3[i - display_span:i + display_span, :].ravel(), label='Predictions 3')
+            axes[2].legend()
+            if (whichChannelHasSeizure[2] == 1):
+                axes[2].set_title("Seizure in this channel")
+
+            axes[3].plot(data_4[i - display_span:i + display_span, :].ravel(), label='Data 4')
+            axes[3].plot(predictions_4[i - display_span:i + display_span, :].ravel(), label='Predictions 4')
+            axes[3].legend()
+            if (whichChannelHasSeizure[3] == 1):
+                axes[2].set_title("Seizure in this channel")
+
+            plt.tight_layout()  # Adjust layout to prevent overlapping
+            plt.show()
+
+
 def getThresholdsPerPatient(patient_number, channel_number, sz_num):
     #sz_num = countNumberOfSeizuresPerPerson(patient_number)
 
@@ -610,9 +672,79 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
     avg = np.average(avg_list)
     std = np.sqrt(np.sum(std_list ** 2)/sz_num)
 
-    thresholds = [avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    thresholds = [avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
 
     return thresholds
+
+def plotLineLengthValues(index_list, data_1, data_2, data_3, data_4, data_predicted_1, data_predicted_2, data_predicted_3, data_predicted_4, selected_threshold, selected_threshold_predicted, predicted_label_1, predicted_label_2, predicted_label_3, predicted_label_4, patient_number, seizure_number):
+    predicted_label_col_1 = predicted_label_1[:, selected_threshold]
+    predicted_label_col_2 = predicted_label_2[:, selected_threshold]
+    predicted_label_col_3 = predicted_label_3[:, selected_threshold]
+    predicted_label_col_4 = predicted_label_4[:, selected_threshold]
+
+    predicted_ones_1 = np.where(predicted_label_col_1 == 1)[0]
+    predicted_ones_2 = np.where(predicted_label_col_2 == 1)[0]
+    predicted_ones_3 = np.where(predicted_label_col_3 == 1)[0]
+    predicted_ones_4 = np.where(predicted_label_col_4 == 1)[0]
+
+    ll_raw_1 = linelength(data_1)
+    ll_raw_2 = linelength(data_2)
+    ll_raw_3 = linelength(data_3)
+    ll_raw_4 = linelength(data_4)
+
+    ll_predicted_1 = linelength(data_predicted_1)
+    ll_predicted_2 = linelength(data_predicted_2)
+    ll_predicted_3 = linelength(data_predicted_3)
+    ll_predicted_4 = linelength(data_predicted_4)
+
+
+    for i in index_list:
+        print("Patient: ", patient_number, "Seizure: ", seizure_number, "selected threshold: ", selected_threshold)
+
+        if (i > 10):
+            whichChannelHasSeizure = [0, 0, 0, 0]
+            if (i in predicted_ones_1):
+                whichChannelHasSeizure[0] = 1
+            if (i in predicted_ones_2):
+                whichChannelHasSeizure[1] = 1
+            if (i in predicted_ones_3):
+                whichChannelHasSeizure[2] = 1
+            if (i in predicted_ones_4):
+                whichChannelHasSeizure[3] = 1
+            for k in range(4):
+                if(whichChannelHasSeizure[k] == 1):
+                    ll_raw = []
+                    ll_predicted = []
+                    if (k == 0):
+                        ll_raw = ll_raw_1
+                        ll_predicted = ll_predicted_1
+                    elif (k == 1):
+                        ll_raw = ll_raw_2
+                        ll_predicted = ll_predicted_2
+                    elif (k == 2):
+                        ll_raw = ll_raw_3
+                        ll_predicted = ll_predicted_3
+                    elif (k == 3):
+                        ll_raw = ll_raw_4
+                        ll_predicted = ll_predicted_4
+
+                # Create subplots with specified axes
+                    fig, axes = plt.subplots(4, 1, figsize=(20, 10), sharey='col')
+                    fig.suptitle(f'patient: {patient_number}, seizure: {seizure_number}, index: {i}')
+                    # Plot each subplot
+                    axes[0].plot(ll_raw[i - 5:i + 5, :].ravel(), label='Data 1')
+                    axes[0].axhline(y=selected_threshold, color='r', linestyle='-')
+                    if (whichChannelHasSeizure[0] == 1):
+                        axes[0].set_title("Seizure in this channel")
+
+                    axes[1].plot(ll_predicted_1[i - 5:i + 5, :].ravel(), label='predicted')
+                    axes[1].axhline(y=selected_threshold_predicted, color='r', linestyle='-')
+                    if (whichChannelHasSeizure[0] == 1):
+                        axes[1].set_title("Seizure in this channel")
+
+                    plt.tight_layout()  # Adjust layout to prevent overlapping
+                    plt.show()
+
 
 
 def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, sz_num):
@@ -642,7 +774,7 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
     avg = np.average(avg_list)
     std = np.sqrt(np.sum(std_list ** 2) / sz_num)
 
-    thresholds = [avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    thresholds = [avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
 
     return thresholds
 
@@ -820,12 +952,15 @@ for p in range(1, 51):
     thresholds_old_ch_2 = getThresholdsPerPatient(p, 2, sz_num)
     thresholds_old_ch_3 = getThresholdsPerPatient(p, 3, sz_num)
     thresholds_old_ch_4 = getThresholdsPerPatient(p, 4, sz_num)
+    print("clean data thresholds: ", thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4)
 
     path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
     thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
     thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
     thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
     thresholds_new_ch_4 = getThresholdsPerPatientAfterCleaning(path, p, 4, sz_num)
+    print("new data thresholds: ", thresholds_new_ch_1, thresholds_new_ch_2, thresholds_new_ch_3, thresholds_new_ch_4)
+
 
     for sz in range(1, sz_num + 1):
         file_path_1 = os.path.join(folder_path, f"pat_{p}_sz_{sz}_ch_1.npy")
@@ -875,17 +1010,17 @@ for p in range(1, 51):
 
 
         # #####when the predictions are already calculated
-        # predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_1.npy"))
-        # #predicted_data_1 = predicted_data_1.squeeze(-1)
-        #
-        # predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_2.npy"))
-        # #predicted_data_2 = predicted_data_2.squeeze(-1)
-        #
-        # predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_3.npy"))
-        # #predicted_data_3 = predicted_data_3.squeeze(-1)
-        #
-        # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
-        # ##predicted_data_4 = predicted_data_4.squeeze(-1)
+        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        #predicted_data_1 = predicted_data_1.squeeze(-1)
+
+        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        #predicted_data_2 = predicted_data_2.squeeze(-1)
+
+        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        #predicted_data_3 = predicted_data_3.squeeze(-1)
+
+        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        ##predicted_data_4 = predicted_data_4.squeeze(-1)
 
         predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_1.npy"))
         #predicted_data_1 = predicted_data_1.squeeze(-1)
@@ -904,6 +1039,8 @@ for p in range(1, 51):
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\lstm_encoder_bigger.h5")
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_cheby_checkpoint.h5")
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
+        # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrainWithEOG_LSTM.h5")
+        #
         # predicted_data_1 = model.predict(new_normalized_data_1)
         # predicted_data_2 = model.predict(new_normalized_data_2)
         # predicted_data_3 = model.predict(new_normalized_data_3)
@@ -914,10 +1051,10 @@ for p in range(1, 51):
         # predicted_data_3 = predicted_data_3.squeeze(-1)
         # predicted_data_4 = predicted_data_4.squeeze(-1)
         #
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
 
 
 
@@ -1035,16 +1172,18 @@ for p in range(1, 51):
             selected_threshold = selected_threshold_list[-1]
             #print(selected_threshold)
 
-            if(selected_threshold != 0 and selected_threshold != 1):
+            #false_detections_predicted = getFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
+            false_detections_predicted = getReducedFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
+            #plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+            #plotFalsePositives_new(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4
+            #                      ,labels_1, labels_2, labels_3, labels_4)
+            improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
+            #print(f"channel thresholds new: channel 1: {thresholds_new_ch_1[selected_threshold]} channel 2: {thresholds_new_ch_2[selected_threshold]} channel 3: {thresholds_new_ch_3[selected_threshold]} channel 4: {thresholds_new_ch_4[selected_threshold]}")
+            #print(f"channel thresholds old: channel 1: {thresholds_old_ch_1[selected_threshold]} channel 2: {thresholds_old_ch_2[selected_threshold]} channel 3: {thresholds_old_ch_3[selected_threshold]} channel 4: {thresholds_old_ch_4[selected_threshold]} ")
 
-                #false_detections_predicted = getFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
-                false_detections_predicted = getReducedFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
-                #plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
-
-                improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
-                #plotFalsePositives(improved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
-
-            dismproved_result = getdisImprovement(label, label_raw_data, predicted_label, selected_threshold)
+            #plotFalsePositives(improved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, [thresholds_new_ch_1, thresholds_new_ch_2, thresholds_new_ch_3, thresholds_new_ch_4], [thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4], p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+            #plotLineLengthValues(improved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, labels_1, labels_2, labels_3, labels_4)
+            #dismproved_result = getdisImprovement(label, label_raw_data, predicted_label, selected_threshold)
             #plotFalsePositives(dismproved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3,new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3,predicted_data_4, p, sz, selected_threshold, labels_1, labels_2, labels_3, labels_4)
 
 
@@ -1120,12 +1259,56 @@ classified_at_least_once_10sec_old = np.sum(classified_at_least_once_10sec_old, 
 classified_at_least_once_10sec_45 = np.mean(classified_at_least_once_10sec_45, axis=0)
 
 
-# plt.plot(averaged_list[:, 1], classified_at_least_once_new)
-# plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_old)
-# plt.plot(averaged_list_45[:, 1], classified_at_least_once_45)
-# auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
-# auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
-# auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
+recall_list_new = averaged_list[:, 3] / (averaged_list[:, 3] + averaged_list[:, 2])
+specificity_list_new = averaged_list[:, 0] / (averaged_list[:, 0] + averaged_list[:, 1])
+
+recall_list_old = averaged_list_actual_data[:, 3] / (averaged_list_actual_data[:, 3] + averaged_list_actual_data[:, 2])
+specificity_list_old = averaged_list_actual_data[:, 0] / (averaged_list_actual_data[:, 0] + averaged_list_actual_data[:, 1])
+
+recall_list_45 = averaged_list_45[:, 3] / (averaged_list_45[:, 3] + averaged_list_45[:, 2])
+specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + averaged_list_45[:, 1])
+
+plt.plot(1-specificity_list_new, recall_list_new)
+plt.plot(1-specificity_list_old, recall_list_old)
+plt.plot(1-specificity_list_45, recall_list_45)
+auc_actual = auc(1-specificity_list_new, recall_list_new)
+auc_predicted = auc(1-specificity_list_old, recall_list_old)
+auc_45 = auc(1-specificity_list_45, recall_list_45)
+
+plt.xlabel("Recall")
+plt.ylabel("1-Specificity")
+legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+                 "old (AUC={:.2f})".format(auc_predicted),
+                 "45 (AUC={:.2f})".format(auc_45)]
+
+plt.legend(legend_labels)
+plt.show()
+
+plt.plot(averaged_list[:, 1], classified_at_least_once_new)
+plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_old)
+plt.plot(averaged_list_45[:, 1], classified_at_least_once_45)
+auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
+auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
+auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
+plt.xlabel("False Positive Rate")
+plt.ylabel("classified at least once as seizure")
+legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+                 "old (AUC={:.2f})".format(auc_predicted),
+                 "45 (AUC={:.2f})".format(auc_45)]
+
+plt.legend(legend_labels)
+plt.show()
+
+
+
+
+
+# plt.plot(ppofFP_new_array, classified_at_least_once_new)
+# plt.plot(ppofFP_old_array, classified_at_least_once_old)
+# plt.plot(ppofFP_45_array, classified_at_least_once_45)
+# auc_actual = auc(ppofFP_new_array, classified_at_least_once_new)
+# auc_predicted = auc(ppofFP_old_array, classified_at_least_once_old)
+# auc_45 = auc(ppofFP_45_array, classified_at_least_once_45)
 # plt.xlabel("False Positive Rate")
 # plt.ylabel("classified at least once as seizure")
 # legend_labels = ["new (AUC={:.2f})".format(auc_actual),
@@ -1135,39 +1318,20 @@ classified_at_least_once_10sec_45 = np.mean(classified_at_least_once_10sec_45, a
 # plt.legend(legend_labels)
 # plt.show()
 #
-
-
-
-
-plt.plot(ppofFP_new_array, classified_at_least_once_new)
-plt.plot(ppofFP_old_array, classified_at_least_once_old)
-plt.plot(ppofFP_45_array, classified_at_least_once_45)
-auc_actual = auc(ppofFP_new_array, classified_at_least_once_new)
-auc_predicted = auc(ppofFP_old_array, classified_at_least_once_old)
-auc_45 = auc(ppofFP_45_array, classified_at_least_once_45)
-plt.xlabel("False Positive Rate")
-plt.ylabel("classified at least once as seizure")
-legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                 "old (AUC={:.2f})".format(auc_predicted),
-                 "45 (AUC={:.2f})".format(auc_45)]
-
-plt.legend(legend_labels)
-plt.show()
-
-plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
-plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
-plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
-auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
-auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
-auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
-plt.xlabel("False Positive Rate")
-plt.ylabel("classified at least once as seizure")
-legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                 "old (AUC={:.2f})".format(auc_predicted),
-                 "45 (AUC={:.2f})".format(auc_45)]
-
-plt.legend(legend_labels)
-plt.show()
+# plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
+# plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
+# plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
+# auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
+# auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
+# auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
+# plt.xlabel("False Positive Rate")
+# plt.ylabel("classified at least once as seizure")
+# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+#                  "old (AUC={:.2f})".format(auc_predicted),
+#                  "45 (AUC={:.2f})".format(auc_45)]
+#
+# plt.legend(legend_labels)
+# plt.show()
 
 # plt.plot(averaged_list[:, 1], classified_at_least_once_10sec_new)
 # plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_10sec_old)
@@ -1184,14 +1348,14 @@ plt.show()
 # plt.show()
 
 
-# plt.plot(averaged_list[:, 1], averaged_list[:, 3])
-# plt.plot(averaged_list_actual_data[:, 1], averaged_list_actual_data[:, 3])
-# plt.xlabel("False Positive Rate")
-# plt.ylabel("True Positive Rate")
-#
-# plt.legend(["predicted", "actual data"])
-# plt.show()
-#
+plt.plot(averaged_list[:, 1], averaged_list[:, 3])
+plt.plot(averaged_list_actual_data[:, 1], averaged_list_actual_data[:, 3])
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+
+plt.legend(["predicted", "actual data"])
+plt.show()
+
 
 # # Iterate through each element in the original list
 # for element in conf_list_all:
