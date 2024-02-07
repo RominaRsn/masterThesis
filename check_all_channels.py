@@ -113,6 +113,19 @@ def doTwoAndOneOr(predicted_label_1, predicted_labe_2, predicted_label_3, predic
         result[:, i] = res
     return result
 
+def doAnds(predicted_label_1, predicted_labe_2, predicted_label_3, predicted_label_4):
+    result = np.empty_like(predicted_label_1)
+    for i in range(0, predicted_label_1.shape[1]):
+        col_predic_1 = predicted_label_1[:, i]
+        col_predic_2 = predicted_labe_2[:, i]
+        col_predic_3 = predicted_label_3[:, i]
+        col_predic_4 = predicted_label_4[:, i]
+        res = np.logical_and(col_predic_1, col_predic_2)
+        res = np.logical_and(res, col_predic_3)
+        res = np.logical_and(res, col_predic_4)
+        result[:, i] = res
+    return result
+
 
 
 def getTheBestThresholds(true_labels, predicted_label):
@@ -1085,7 +1098,8 @@ for p in range(1, 51):
         # concat_result_raw = concatAllResults(label, labels_1, labels_2, labels_3, labels_4)
 
         #label_raw_data = doLogicalOR(labels_1, labels_2, labels_3, labels_4)
-        label_raw_data = doTwoAndOneOr(labels_1, labels_2, labels_3, labels_4)
+        #label_raw_data = doTwoAndOneOr(labels_1, labels_2, labels_3, labels_4)
+        label_raw_data = doAnds(labels_1, labels_2, labels_3, labels_4)
 
         innerFPWithPP_old = postProcessFP(label, label_raw_data)
         #innerFPWithPP_old = postProcessFP_ConsecValus(label, label_raw_data)
@@ -1099,7 +1113,8 @@ for p in range(1, 51):
         labels_45_4 = getOnlyLabels(filteredSignal_4_45, label, thresholds_old_ch_4)
 
         #labels_45_data = doLogicalOR(labels_45_1, labels_45_2, labels_45_3, labels_45_4)
-        labels_45_data = doTwoAndOneOr(labels_45_1, labels_45_2, labels_45_3, labels_45_4)
+        #labels_45_data = doTwoAndOneOr(labels_45_1, labels_45_2, labels_45_3, labels_45_4)
+        labels_45_data = doAnds(labels_45_1, labels_45_2, labels_45_3, labels_45_4)
 
         # labels_45_data = np.logical_or(labels_45_1, labels_45_2)
         # labels_45_data = np.logical_or(labels_45_data, labels_45_3)
@@ -1159,7 +1174,8 @@ for p in range(1, 51):
 
 
         #predicted_label = doLogicalOR(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
-        predicted_label = doTwoAndOneOr(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+        #predicted_label = doTwoAndOneOr(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+        predicted_label = doAnds(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
 
 
         # predicted_label = np.logical_or(predicted_labels_1, predicted_labels_2)
