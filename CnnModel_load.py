@@ -15,47 +15,47 @@ import matplotlib.pyplot as plt
 from scipy.ndimage import convolve1d
 import masterThesis.metrics as metrics
 
-data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
-data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
+# data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
+# data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
 
-
-
+data_clean_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_cheby_normalized_smaller.npy")
+data_noisy_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_cheby_normalized_smaller.npy")
 
 # Step 1: Split into training and test sets
-noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
+noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_eog, data_clean_eog, test_size=0.2, random_state=42)
 #
 #
-smaller_noisy_train = noisy_train[0:1000]
-smaller_clean_train = clean_train[0:1000]
-#
+# smaller_noisy_train = noisy_train[0:1000]
+# smaller_clean_train = clean_train[0:1000]
+# #
 #
 # model = models.deep_CNN()
-model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN.h5")
-result = model.predict(noisy_test)
-np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\result_deep_CNN", result)
-#result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN.npy")
+# model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN.h5")
+# result = model.predict(noisy_test)
+# np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\result_deep_CNN", result)
+# #result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN.npy")
 #
-# callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=20)
-# # Define the checkpoint callback
-# checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\checkPoint_cnn.h5'
-# checkpoint = ModelCheckpoint(checkpoint_path,
-#                              monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
-#                              save_best_only=True,  # Save only if the validation performance improves
-#                              mode='min',  # 'min' for loss, 'max' for accuracy, 'auto' will infer automatically
-#                              verbose=1)  # Show messages about the checkpointing process
-#
-#
-#
-# model.optimizer.learning_rate = 1e-4
-# model.fit(
-#     noisy_train,
-#     clean_train,
-#     epochs=4,
-#     batch_size=16,
-#     validation_split=0.1,
-#     callbacks=[callback, checkpoint],
-#     shuffle=True
-# )
+model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN_bigger_kernel.h5")
+
+checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_CNN_checkPoint.h5'
+
+checkpoint = ModelCheckpoint(checkpoint_path,
+                             monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
+                             save_best_only=True,  # Save only if the validation performance improves
+                             mode='min',  # 'min' for loss, 'max' for accuracy, 'auto' will infer automatically
+                             verbose=1)
+
+
+model.optimizer.learning_rate = 1e-4
+model.fit(
+    noisy_train,
+    clean_train,
+    epochs=5,
+    batch_size=16,
+    validation_split=0.1,
+    callbacks=[checkpoint],
+    shuffle=True
+)
 #
 #
 # #result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\result_cnn_k1.npy")
@@ -94,7 +94,6 @@ np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained
 
 #
 # model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN_bigger_kernel.h5")
-# model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN_bigger_kernel.h5")
 # result = model.predict(noisy_test[0:100])
 # # np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\deep_CNN_bigger_kernel_result.npy", result)
 # model_cnn = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\deep_CNN.h5")

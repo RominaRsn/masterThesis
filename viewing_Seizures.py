@@ -56,9 +56,10 @@ def are_consecutive(lst):
 model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_cheby_checkpoint.h5")
 model_eog = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
 model_lstm = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrainWithEOG_LSTM.h5")
+model_cnn = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_CNN_checkPoint.h5')
 
 
-for p in range(22, 51):
+for p in range(1, 51):
     sz_num = countNumberOfSeizuresPerPerson(p)
     for i in range(1, sz_num+1):
         for ch_num in range(1,5):
@@ -130,43 +131,52 @@ for p in range(22, 51):
 
             result_lstm = model_lstm.predict(new_normalized_data)
 
+            result_cnn = model_cnn.predict(new_normalized_data)
+
             index_list = np.where(label == 1)[0]
 
-            for i in index_list:
+            #for i in index_list:
 
-                if (i > 10):
-                    # Create subplots with specified axes
-                    fig, axes = plt.subplots(5, 1, figsize=(20, 10), sharey='col')
-                    # Plot each subplot
-                    axes[0].plot(new_normalized_data[i - 5:i + 5, :].ravel(), label='Data')
-                    axes[0].set_title('Original data')
-                    axes[0].set_ylabel('Signal amplitude')
-                    axes[0].set_xlabel('Time')
+            i_ = index_list[0]
+            cnt_ = len(index_list) + 1
+            if (i_ > 15):
+                # Create subplots with specified axes
+                fig, axes = plt.subplots(6, 1, figsize=(20, 10), sharey='col')
+                # Plot each subplot
+                axes[0].plot(new_normalized_data[i_ - 15:i_ + cnt_, :].ravel(), label='Data')
+                axes[0].set_title('Original data')
+                axes[0].set_ylabel('Signal amplitude')
+                axes[0].set_xlabel('Time')
 
-                    axes[1].plot(result_eog[i - 5:i + 5, :].ravel(), label='EOG and EMG noise removed')
-                    axes[1].set_title('EOG and EMG removed')
-                    axes[1].set_ylabel('Signal amplitude')
-                    axes[1].set_xlabel('Time')
+                axes[1].plot(result_eog[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG noise removed with AE')
+                axes[1].set_title('EOG and EMG noise removed with AE')
+                axes[1].set_ylabel('Signal amplitude')
+                axes[1].set_xlabel('Time')
 
-                    axes[2].plot(result_ae[i - 5:i + 5, :].ravel(), label='EMG noise removed')
-                    axes[2].set_title('EMG noise removed')
-                    axes[2].set_ylabel('Signal amplitude')
-                    axes[2].set_xlabel('Time')
+                axes[2].plot(result_ae[i_ - 15:i_ + cnt_, :].ravel(), label='EMG noise removed with AE')
+                axes[2].set_title('EMG noise removed with AE')
+                axes[2].set_ylabel('Signal amplitude')
+                axes[2].set_xlabel('Time')
 
-                    axes[3].plot(result_45[i - 5:i + 5, :].ravel(), label='simple low pass filter')
-                    axes[3].set_title('EMG noise removed')
-                    axes[3].set_ylabel('Signal amplitude')
-                    axes[3].set_xlabel('Time')
+                axes[3].plot(result_45[i_ - 15:i_ + cnt_, :].ravel(), label='simple low pass filter')
+                axes[3].set_title('simple low pass filter')
+                axes[3].set_ylabel('Signal amplitude')
+                axes[3].set_xlabel('Time')
 
-                    axes[4].plot(result_lstm[i - 5:i + 5, :].ravel(), label='LSTM')
-                    axes[4].set_title('LSTM')
-                    axes[4].set_ylabel('Signal amplitude')
-                    axes[4].set_xlabel('Time')
+                axes[4].plot(result_lstm[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG removed using LSTM')
+                axes[4].set_title('EOG and EMG removed using LSTM')
+                axes[4].set_ylabel('Signal amplitude')
+                axes[4].set_xlabel('Time')
+
+                axes[5].plot(result_cnn[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG removed using CNN')
+                axes[5].set_title('EOG and EMG removed using CNN')
+                axes[5].set_ylabel('Signal amplitude')
+                axes[5].set_xlabel('Time')
 
 
 
-                    plt.tight_layout()  # Adjust layout to prevent overlapping
-                    plt.show()
+                plt.tight_layout()  # Adjust layout to prevent overlapping
+                plt.show()
 
 
 
