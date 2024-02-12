@@ -7,6 +7,8 @@ import keras
 from keras.models import load_model
 import neurokit2 as nk
 import peakutils
+from matplotlib.widgets import Slider
+
 
 
 folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data"
@@ -48,6 +50,11 @@ def normalize_ch_data(data1, data2, data3, data4):
     data4 = data4 - avg_val
 
     return data1, data2, data3, data4
+
+
+def labelExpander(label):
+    label1 = np.repeat(label, 500)
+    return label1
 
 
 def are_consecutive(lst):
@@ -102,6 +109,7 @@ for p in range(1, 51):
             new_normalized_data = (data - mean_val) / std_val
             new_normalized_data = (new_normalized_data) / (np.max(new_normalized_data) - np.min(new_normalized_data))
 
+            expanded_label = labelExpander(label)
 
             # num_zeros = (0, 12)
             # padded_data = np.pad(data, ((0, 0), num_zeros), mode='constant')
@@ -133,50 +141,90 @@ for p in range(1, 51):
 
             result_cnn = model_cnn.predict(new_normalized_data)
 
-            index_list = np.where(label == 1)[0]
+
+            # Create the plot
+
+            # Create the plot
+            fig, axs = plt.subplots(7, 1, figsize=(10, 8), sharex=True)
+            plt.subplots_adjust(bottom=0.25)  # Adjust layout to make room for slider
+
+            # Plot the initial portion of the signals in each subplot
+            initial_index = 0
+            portion_of_signal = 5000  # Adjust the portion size as needed
+            lines = []
+            for i, result_eog1 in enumerate([new_normalized_data, result_eog, result_ae, result_45, result_lstm, result_cnn, expanded_label]):
+                line, = axs[i].plot(result_eog1.ravel()[initial_index:initial_index + portion_of_signal])
+                lines.append(line)
+
+            # Add a slider for navigation
+            ax_slider = plt.axes([0.1, 0.1, 0.8, 0.03], facecolor='lightgoldenrodyellow')  # Slider position
+            slider = Slider(ax_slider, 'Index', 0, len(result_eog.ravel()) - portion_of_signal, valinit=initial_index,
+                            valstep=1)
+
+
+            # Define function to update plot when slider value changes
+            def update(val):
+                index = int(slider.val)
+                for i, result_eog1 in enumerate([new_normalized_data, result_eog, result_ae, result_45, result_lstm, result_cnn, expanded_label]):
+                    lines[i].set_ydata(
+                        result_eog1.ravel()[index:index + portion_of_signal])  # Update y-data based on slider value
+                fig.canvas.draw_idle()  # Redraw the plot
+
+
+            # Connect slider to update function
+            slider.on_changed(update)
+
+            for i in range(len(axs) - 1):
+                axs[i].get_shared_y_axes().joined(axs[i], axs[i + 1])
+            axs[6].set_ylim(-1, 2)
+
+            plt.show()
+
+
+            # index_list = np.where(label == 1)[0]
 
             #for i in index_list:
-
-            i_ = index_list[0]
-            cnt_ = len(index_list) + 1
-            if (i_ > 15):
-                # Create subplots with specified axes
-                fig, axes = plt.subplots(6, 1, figsize=(20, 10), sharey='col')
-                # Plot each subplot
-                axes[0].plot(new_normalized_data[i_ - 15:i_ + cnt_, :].ravel(), label='Data')
-                axes[0].set_title('Original data')
-                axes[0].set_ylabel('Signal amplitude')
-                axes[0].set_xlabel('Time')
-
-                axes[1].plot(result_eog[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG noise removed with AE')
-                axes[1].set_title('EOG and EMG noise removed with AE')
-                axes[1].set_ylabel('Signal amplitude')
-                axes[1].set_xlabel('Time')
-
-                axes[2].plot(result_ae[i_ - 15:i_ + cnt_, :].ravel(), label='EMG noise removed with AE')
-                axes[2].set_title('EMG noise removed with AE')
-                axes[2].set_ylabel('Signal amplitude')
-                axes[2].set_xlabel('Time')
-
-                axes[3].plot(result_45[i_ - 15:i_ + cnt_, :].ravel(), label='simple low pass filter')
-                axes[3].set_title('simple low pass filter')
-                axes[3].set_ylabel('Signal amplitude')
-                axes[3].set_xlabel('Time')
-
-                axes[4].plot(result_lstm[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG removed using LSTM')
-                axes[4].set_title('EOG and EMG removed using LSTM')
-                axes[4].set_ylabel('Signal amplitude')
-                axes[4].set_xlabel('Time')
-
-                axes[5].plot(result_cnn[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG removed using CNN')
-                axes[5].set_title('EOG and EMG removed using CNN')
-                axes[5].set_ylabel('Signal amplitude')
-                axes[5].set_xlabel('Time')
-
-
-
-                plt.tight_layout()  # Adjust layout to prevent overlapping
-                plt.show()
+            #
+            # i_ = index_list[0]
+            # cnt_ = len(index_list) + 1
+            # if (i_ > 15):
+            #     # Create subplots with specified axes
+            #     fig, axes = plt.subplots(6, 1, figsize=(20, 10), sharey='col')
+            #     # Plot each subplot
+            #     axes[0].plot(new_normalized_data[i_ - 15:i_ + cnt_, :].ravel(), label='Data')
+            #     axes[0].set_title('Original data')
+            #     axes[0].set_ylabel('Signal amplitude')
+            #     axes[0].set_xlabel('Time')
+            #
+            #     axes[1].plot(result_eog[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG noise removed with AE')
+            #     axes[1].set_title('EOG and EMG noise removed with AE')
+            #     axes[1].set_ylabel('Signal amplitude')
+            #     axes[1].set_xlabel('Time')
+            #
+            #     axes[2].plot(result_ae[i_ - 15:i_ + cnt_, :].ravel(), label='EMG noise removed with AE')
+            #     axes[2].set_title('EMG noise removed with AE')
+            #     axes[2].set_ylabel('Signal amplitude')
+            #     axes[2].set_xlabel('Time')
+            #
+            #     axes[3].plot(result_45[i_ - 15:i_ + cnt_, :].ravel(), label='simple low pass filter')
+            #     axes[3].set_title('simple low pass filter')
+            #     axes[3].set_ylabel('Signal amplitude')
+            #     axes[3].set_xlabel('Time')
+            #
+            #     axes[4].plot(result_lstm[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG removed using LSTM')
+            #     axes[4].set_title('EOG and EMG removed using LSTM')
+            #     axes[4].set_ylabel('Signal amplitude')
+            #     axes[4].set_xlabel('Time')
+            #
+            #     axes[5].plot(result_cnn[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG removed using CNN')
+            #     axes[5].set_title('EOG and EMG removed using CNN')
+            #     axes[5].set_ylabel('Signal amplitude')
+            #     axes[5].set_xlabel('Time')
+            #
+            #
+            #
+            #     plt.tight_layout()  # Adjust layout to prevent overlapping
+            #     plt.show()
 
 
 

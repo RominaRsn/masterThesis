@@ -1120,17 +1120,17 @@ for p in range(1, 51):
         # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
         # ##predicted_data_4 = predicted_data_4.squeeze(-1)
         #
-        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_1.npy"))
-        #predicted_data_1 = predicted_data_1.squeeze(-1)
-
-        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_2.npy"))
-        #predicted_data_2 = predicted_data_2.squeeze(-1)
-
-        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_3.npy"))
-        #predicted_data_3 = predicted_data_3.squeeze(-1)
-
-        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_4.npy"))
-        ##predicted_data_4 = predicted_data_4.squeeze(-1)
+        # predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # #predicted_data_1 = predicted_data_1.squeeze(-1)
+        #
+        # predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        # #predicted_data_2 = predicted_data_2.squeeze(-1)
+        #
+        # predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        # #predicted_data_3 = predicted_data_3.squeeze(-1)
+        #
+        # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        # ##predicted_data_4 = predicted_data_4.squeeze(-1)
 
         # predicted_data_1 = np.load(
         #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
@@ -1178,23 +1178,23 @@ for p in range(1, 51):
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_cheby_checkpoint.h5")
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
         # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrainWithEOG_LSTM.h5")
-        # model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_CNN_checkPoint.h5')
-        #
-        # # #
-        # predicted_data_1 = model.predict(new_normalized_data_1)
-        # predicted_data_2 = model.predict(new_normalized_data_2)
-        # predicted_data_3 = model.predict(new_normalized_data_3)
-        # predicted_data_4 = model.predict(new_normalized_data_4)
-        #
-        # predicted_data_1 = predicted_data_1.squeeze(-1)
-        # predicted_data_2 = predicted_data_2.squeeze(-1)
-        # predicted_data_3 = predicted_data_3.squeeze(-1)
-        # predicted_data_4 = predicted_data_4.squeeze(-1)
-        #
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
+        model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_GRU_checkPoint.h5')
+
+        # #
+        predicted_data_1 = model.predict(new_normalized_data_1)
+        predicted_data_2 = model.predict(new_normalized_data_2)
+        predicted_data_3 = model.predict(new_normalized_data_3)
+        predicted_data_4 = model.predict(new_normalized_data_4)
+
+        predicted_data_1 = predicted_data_1.squeeze(-1)
+        predicted_data_2 = predicted_data_2.squeeze(-1)
+        predicted_data_3 = predicted_data_3.squeeze(-1)
+        predicted_data_4 = predicted_data_4.squeeze(-1)
+
+        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
+        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
+        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
+        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
 
 
 
@@ -1437,7 +1437,7 @@ legend_labels = ["new (AUC={:.2f})".format(auc_actual),
                  "45 (AUC={:.2f})".format(auc_45)]
 
 plt.legend(legend_labels)
-plt.show()
+#plt.show()
 
 #
 #
@@ -1454,7 +1454,7 @@ legend_labels = ["new (AUC={:.2f})".format(auc_actual),
                  "45 (AUC={:.2f})".format(auc_45)]
 
 plt.legend(legend_labels)
-plt.show()
+#plt.show()
 #
 
 
@@ -1473,7 +1473,7 @@ legend_labels = ["new (AUC={:.2f})".format(auc_actual),
                  "45 (AUC={:.2f})".format(auc_45)]
 
 plt.legend(legend_labels)
-plt.show()
+#plt.show()
 
 plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
 plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
@@ -1488,7 +1488,7 @@ legend_labels = ["new (AUC={:.2f})".format(auc_actual),
                  "45 (AUC={:.2f})".format(auc_45)]
 
 plt.legend(legend_labels)
-plt.show()
+#plt.show()
 
 # plt.plot(averaged_list[:, 1], classified_at_least_once_10sec_new)
 # plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_10sec_old)
