@@ -22,70 +22,144 @@ from keras import layers, models, optimizers
 import neurokit2 as nk
 import cProfile
 from memory_profiler import profile
+from matplotlib.widgets import Slider
+
+
+def labelExpander(label):
+    label1 = np.repeat(label, 500)
+    return label1
+
+def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
+    folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data"
+    path_extension_labels = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s"
+
+    file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{i}_labels.npy")
+    ##df = pd.read_csv(file_path_labels)
+    ##condition = df.iloc[:, 0] == 1
+    ##label = df[condition]
+    file_path = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_{ch_num}.npy")
+    data = np.load(file_path)
+
+    label = np.load(file_path_labels)
+
+    # file_path_1 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_1.npy")
+    # file_path_2 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_2.npy")
+    # file_path_3 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_3.npy")
+    # file_path_4 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_4.npy")
+    #
+    # data_1 = np.load(file_path_1)
+    # data_2 = np.load(file_path_2)
+    # data_3 = np.load(file_path_3)
+    # data_4 = np.load(file_path_4)
+
+    # data_1, data_2, data_3, data_4 = normalize_ch_data(data_1, data_2, data_3, data_4)
+    #
+    # data = np.empty_like(data_1)
+    # if(ch_num == 1):
+    #     data = data_1
+    # elif(ch_num == 2):
+    #     data = data_2
+    # elif(ch_num == 3):
+    #     data = data_3
+    # elif(ch_num == 4):
+    #     data = data_4
+
+    mean_val = np.mean(data)
+    std_val = np.std(data)
+
+    # Normalize the data to the range [-1, 1]
+    new_normalized_data = (data - mean_val) / std_val
+    new_normalized_data = (new_normalized_data) / (
+                np.max(new_normalized_data) - np.min(new_normalized_data))
+
+    expanded_label = labelExpander(label)
+
+    predicted_label_eog = predicted_label[:, selected_threshold]
+
+    # seeing the performance of the model on the EOG data
+    # result_eog = model_eog.predict(new_normalized_data)
+    # result_eog = result_eog.squeeze(-1)
+    #
+    # result_ae = model.predict(new_normalized_data)
+    # result_ae = result_ae.squeeze(-1)
+
+    sz_num = countNumberOfSeizuresPerPerson(p)
+
+    threshold_raw_data = getThresholdsPerPatient(p, ch_num, sz_num)
+
+    thresholds_gru = getThresholdsPerPatientAfterCleaning(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", p, ch_num, sz_num)
+    thresholds_eog = getThresholdsPerPatientAfterCleaning(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", p, ch_num, sz_num)
+    thresholds_cnn = getThresholdsPerPatientAfterCleaning(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", p, ch_num, sz_num)
+    thresholds_lstm = getThresholdsPerPatientAfterCleaning(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", p, ch_num, sz_num)
+
+    result_gru = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru",f"pat_{p}_sz_{i}_ch_{ch_num}.npy"))
+    result_eog = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering",f"pat_{p}_sz_{i}_ch_{ch_num}.npy"))
+    result_cnn = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn",f"pat_{p}_sz_{i}_ch_{ch_num}.npy"))
+    result_lstm = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",f"pat_{p}_sz_{i}_ch_{ch_num}.npy"))
+    result_45 = filteredSignal_1_45 = nk.signal_filter(new_normalized_data, sampling_rate=250, highcut=40,
+                                                       method='butterworth', order=4)
+
+    labels_gru = getOnlyLabels(result_gru, label, thresholds_gru)
+    labels_eog = getOnlyLabels(result_eog, label, thresholds_eog)
+    labels_cnn = getOnlyLabels(result_cnn, label, thresholds_cnn)
+    labels_lstm = getOnlyLabels(result_lstm, label, thresholds_lstm)
+    labels_raw = getOnlyLabels(new_normalized_data, label, threshold_raw_data)
+
+    labels_gru = labels_gru[:, selected_threshold] /2
+    labels_eog = labels_eog[:, selected_threshold] /2
+    labels_cnn = labels_cnn[:, selected_threshold] /2
+    labels_lstm = labels_lstm[:, selected_threshold] /2
+    labels_raw = labels_raw[:, selected_threshold] /2
+
+    labels_gru = labelExpander(labels_gru)
+    labels_eog = labelExpander(labels_eog)
+    labels_cnn = labelExpander(labels_cnn)
+    labels_lstm = labelExpander(labels_lstm)
+    labels_raw = labelExpander(labels_raw)
+
+    #labels_45 = getOnlyLabels(result_45, label, selected_threshold)
 
 
 
-#
-# combo_model_result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cnn_combo\result\result_pat_14_sz_2_ch_1.npy")
-# combo_model_result = combo_model_result.squeeze(-1)
-#
-# data = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\pat_14_sz_2_ch_1.npy")
-# max_clean = np.max(data)
-# min_clean = np.min(data)
-# data_clean_normalized = (data - min_clean) / (max_clean - min_clean)
-# data_clean_normalized = data_clean_normalized - np.average(data_clean_normalized)
-#
-# fig, axes = plt.subplots(nrows=2, ncols=1, sharey='col')
-# i = 1000
-# #row_index = np.random.randint(0, a)
-# #col_index = np.random.randint(0, 11520000/500)
-#
-# axes[0].plot(data_clean_normalized[i, :], label = 'Real Data')
-# axes[0].set_title('Real data')
-# axes[0].set_ylabel('Signal amplitude')
-# axes[0].set_xlabel('Time')
-#
-# #print(smaller_reshaped_data_clean_test[row_index, :].shape)
-#
-#
-# axes[1].plot(combo_model_result[i, :], label = 'cleaned Data')
-# axes[1].set_title('cleaned data')
-# axes[1].set_ylabel('Signal amplitude')
-# axes[1].set_xlabel('Time')
-#
-# plt.legend()
-# plt.show()
+    # Create the plot
+    fig, axs = plt.subplots(7, 1, figsize=(10, 8), sharex=True)
+    plt.subplots_adjust(bottom=0.25)  # Adjust layout to make room for slider
 
+    # Plot the initial portion of the signals and labels in each subplot
+    initial_index = 0
+    portion_of_signal = 5000  # Adjust the portion size as needed
+    lines = []
+    labels = ['real data', 'result_ae', 'result_gru', 'result_45', 'result_lstm', 'result_cnn',
+              'real labels']
+    results = [new_normalized_data, result_eog, result_gru, result_45, result_lstm, result_cnn, expanded_label]
+    label_results = [labels_raw, labels_eog, labels_gru, labels_raw,  labels_lstm, labels_cnn, expanded_label]
+    for i, (result, label) in enumerate(zip(results, label_results)):
+        line, = axs[i].plot(result.ravel()[initial_index:initial_index + portion_of_signal])
+        lines.append(line)
+        axs[i].plot(label.ravel()[initial_index:initial_index + portion_of_signal], color='red',
+                    linestyle='--')  # Plot labels
+        axs[i].set_ylabel(labels[i])  # Set subplot label
 
-# def classifiedAtLeastOnce(true_labels, predicted_labels):
-#     true_index = np.where(true_labels == 1)
-#     predicted_index = np.where(predicted_labels == 1)
-#
-#     # print(np.intersect1d(true_index, predicted_index))
-#     # print("****************************************************************************************************")
-#
-#     if np.intersect1d(true_index, predicted_index).size > 0:
-#         return 1
-#     else:
-#         return 0
-#
+    # Add a slider for navigation
+    ax_slider = plt.axes([0.1, 0.1, 0.8, 0.03], facecolor='lightgoldenrodyellow')  # Slider position
+    slider = Slider(ax_slider, 'Index', 0, len(result_eog.ravel()) - portion_of_signal, valinit=initial_index,
+                    valstep=1)
 
-# def getTheChannelNumberThatDetectsTheSeizure(true_labels, predicted_label_1, predicted_labe_2, predicted_label_3, predicted_label_4):
-#     for i in range(0, predicted_label_1.shape[1]):
-#         col_predic_1 = predicted_label_1[:, i]
-#         col_predic_2 = predicted_labe_2[:, i]
-#         col_predic_3 = predicted_label_3[:, i]
-#         col_predic_4 = predicted_label_4[:, i]
-#
-#         concat_predic = np.concatenate([col_predic_1, col_predic_2, col_predic_3, col_predic_4])
-#
-#         res = np.logical_or(col_predic_1, col_predic_2)
-#         res = np.logical_or(res, col_predic_3)
-#         res = np.logical_or(res, col_predic_4)
-#
-#         index = np.where(res == 1)
-#
-#         for
+    # Define function to update plot when slider value changes
+    def update(val):
+        index = int(slider.val)
+        for i, (result, label) in enumerate(zip(results, label_results)):
+            lines[i].set_ydata(result.ravel()[index:index + portion_of_signal])  # Update y-data based on slider value
+            axs[i].lines[1].set_ydata(label.ravel()[index:index + portion_of_signal])  # Update label plot
+        fig.canvas.draw_idle()  # Redraw the plot
+
+    axs[6].set_ylim(-1, 2)
+
+    # Connect slider to update function
+    slider.on_changed(update)
+
+    plt.show()
+
 
 def doLogicalOR(predicted_label_1, predicted_labe_2, predicted_label_3, predicted_label_4):
     result = np.empty_like(predicted_label_1)
@@ -1331,6 +1405,8 @@ for p in range(1, 51):
             #plotFalsePositives_new(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4
             #                      ,labels_1, labels_2, labels_3, labels_4)
             improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
+
+            plottingWholeSeizurePeriods(p, i, 1,selected_threshold)
             #print(f"channel thresholds new: channel 1: {thresholds_new_ch_1[selected_threshold]} channel 2: {thresholds_new_ch_2[selected_threshold]} channel 3: {thresholds_new_ch_3[selected_threshold]} channel 4: {thresholds_new_ch_4[selected_threshold]}")
             #print(f"channel thresholds old: channel 1: {thresholds_old_ch_1[selected_threshold]} channel 2: {thresholds_old_ch_2[selected_threshold]} channel 3: {thresholds_old_ch_3[selected_threshold]} channel 4: {thresholds_old_ch_4[selected_threshold]} ")
 
