@@ -6,7 +6,7 @@ from sklearn.metrics import roc_curve, auc
 from scipy.ndimage import convolve1d
 import neurokit2 as nk
 import scipy
-from sklearn.metrics import confusion_matrix, recall_score
+from sklearn.metrics import confusion_matrix, recall_score, roc_curve
 from collections import Counter
 import keras
 from keras.models import load_model
@@ -802,6 +802,8 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
     avg = np.average(avg_list)
     std = np.sqrt(np.sum(std_list ** 2)/sz_num)
 
+
+
     thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
 
     return thresholds
@@ -877,6 +879,44 @@ def plotLineLengthValues(index_list, data_1, data_2, data_3, data_4, data_predic
 
 
 
+def getThresholdsPerPatientAfterCleaning_newThresholdMethod(path, patient_number, channel_number, sz_num):
+    #sz_num = countNumberOfSeizuresPerPerson(patient_number)
+
+    avg_list = []
+    std_list = []
+
+    ll_list = []
+    label_list = []
+
+    for sz in range(1, sz_num + 1):
+
+        predicted_data_1 = np.load(os.path.join(path, f"pat_{patient_number}_sz_{sz}_ch_{channel_number}.npy"))
+
+        path_extension_labels = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s"
+        file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{sz}_labels.npy")
+        labels = np.load(file_path_labels)
+
+        ll = linelength(predicted_data_1)
+
+        ll_list.append(ll)
+        label_list.append(labels)
+
+        # ll = thetaBandPower(predicted_data_1)
+        # ll = ll.squeeze(-1)
+
+    concatenated_ll = np.concatenate(ll_list)
+    concatenated_labels = np.concatenate(label_list)
+
+
+    fpr, tpr, thresholds = roc_curve(concatenated_labels, concatenated_ll)
+
+    plt.plot(fpr, tpr)
+    plt.show()
+
+    return thresholds
+
+
+
 def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, sz_num):
     #sz_num = countNumberOfSeizuresPerPerson(patient_number)
 
@@ -904,9 +944,15 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
     avg = np.average(avg_list)
     std = np.sqrt(np.sum(std_list ** 2) / sz_num)
 
-    thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    fpr, tpr, thresholds = roc_curve(true_label, ll)
+
+    #thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
 
     return thresholds
+
+
+
+
 
 
 def getImprovedResult(true_label, label_from_raw_data, predicted_label, selected_threshold):
@@ -1155,11 +1201,19 @@ for p in range(1, 51):
     thresholds_old_ch_4 = getThresholdsPerPatient(p, 4, sz_num)
     #print("clean data thresholds: ", thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4)
 
-    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
-    thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
-    thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
-    thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
-    thresholds_new_ch_4 = getThresholdsPerPatientAfterCleaning(path, p, 4, sz_num)
+    path_raw = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
+    # thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
+    # thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
+    # thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
+    # thresholds_new_ch_4 = getThresholdsPerPatientAfterCleaning(path, p, 4, sz_num)
+
+    thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning_newThresholdMethod(path, p, 1, sz_num)
+    thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning_newThresholdMethod(path, p, 2, sz_num)
+    thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning_newThresholdMethod(path, p, 3, sz_num)
+    thresholds_new_ch_4 = getThresholdsPerPatientAfterCleaning_newThresholdMethod(path, p, 4, sz_num)
+
+
+
     #print("new data thresholds: ", thresholds_new_ch_1, thresholds_new_ch_2, thresholds_new_ch_3, thresholds_new_ch_4)
 
 

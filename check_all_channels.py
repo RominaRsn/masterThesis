@@ -975,7 +975,7 @@ def postProcessFP_firingMethod(true_label, predicted_label):
         inner_counter = []
         for k in range(0, counter_number):
             epoched_conf_mat_label = conf_mat_label[k*window_length:(k+1)*window_length]
-            if epoched_conf_mat_label.count("FP") >= 15:
+            if epoched_conf_mat_label.count("FP") >= 1:
                 inner_counter.append(1)
             else:
                 inner_counter.append(0)
@@ -1052,7 +1052,8 @@ for p in range(1, 51):
     thresholds_old_ch_4 = getThresholdsPerPatient(p, 4, sz_num)
     #print("clean data thresholds: ", thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4)
 
-    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
+    #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
+    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering"
     thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
     thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
     thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
@@ -1120,16 +1121,16 @@ for p in range(1, 51):
         # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
         # ##predicted_data_4 = predicted_data_4.squeeze(-1)
         #
-        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_1.npy"))
         #predicted_data_1 = predicted_data_1.squeeze(-1)
 
-        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_2.npy"))
         #predicted_data_2 = predicted_data_2.squeeze(-1)
 
-        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_3.npy"))
         #predicted_data_3 = predicted_data_3.squeeze(-1)
 
-        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_4.npy"))
         ##predicted_data_4 = predicted_data_4.squeeze(-1)
 
         # predicted_data_1 = np.load(
