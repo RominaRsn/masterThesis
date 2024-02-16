@@ -1030,7 +1030,6 @@ def postProcessFP_firingMethod(true_label, predicted_label):
                 k += 1
         FP_list.append(FP_count)
 
-
     return FP_list
 
 def concatAllResults(true_label, predicted_1, predicted_2, predicted_3, predicted_4):
@@ -1157,7 +1156,7 @@ for p in range(1, 51):
     #print("clean data thresholds: ", thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4)
 
     #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
-    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm"
+    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering"
     thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
     thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
     thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
@@ -1225,16 +1224,16 @@ for p in range(1, 51):
         # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
         # ##predicted_data_4 = predicted_data_4.squeeze(-1)
         #
-        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_1.npy"))
         #predicted_data_1 = predicted_data_1.squeeze(-1)
 
-        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_2.npy"))
         #predicted_data_2 = predicted_data_2.squeeze(-1)
 
-        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_3.npy"))
         #predicted_data_3 = predicted_data_3.squeeze(-1)
 
-        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_4.npy"))
         ##predicted_data_4 = predicted_data_4.squeeze(-1)
 
         # predicted_data_1 = np.load(
@@ -1531,31 +1530,42 @@ classified_at_least_once_10sec_old = np.sum(classified_at_least_once_10sec_old, 
 classified_at_least_once_10sec_45 = np.mean(classified_at_least_once_10sec_45, axis=0)
 
 
-recall_list_new = averaged_list[:, 3] / (averaged_list[:, 3] + averaged_list[:, 2])
-specificity_list_new = averaged_list[:, 0] / (averaged_list[:, 0] + averaged_list[:, 1])
+# recall_list_new = averaged_list[:, 3] / (averaged_list[:, 3] + averaged_list[:, 2])
+# specificity_list_new = averaged_list[:, 0] / (averaged_list[:, 0] + averaged_list[:, 1])
+#
+# recall_list_old = averaged_list_actual_data[:, 3] / (averaged_list_actual_data[:, 3] + averaged_list_actual_data[:, 2])
+# specificity_list_old = averaged_list_actual_data[:, 0] / (averaged_list_actual_data[:, 0] + averaged_list_actual_data[:, 1])
+#
+# recall_list_45 = averaged_list_45[:, 3] / (averaged_list_45[:, 3] + averaged_list_45[:, 2])
+# specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + averaged_list_45[:, 1])
 
-recall_list_old = averaged_list_actual_data[:, 3] / (averaged_list_actual_data[:, 3] + averaged_list_actual_data[:, 2])
-specificity_list_old = averaged_list_actual_data[:, 0] / (averaged_list_actual_data[:, 0] + averaged_list_actual_data[:, 1])
+recall_list_new = classified_at_least_once_new / (classified_at_least_once_new + averaged_list[:, 2])
+specificity_list_new = averaged_list[:, 0] / (averaged_list[:, 0] + ppofFP_new_array_new_post)
 
-recall_list_45 = averaged_list_45[:, 3] / (averaged_list_45[:, 3] + averaged_list_45[:, 2])
-specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + averaged_list_45[:, 1])
+recall_list_old = classified_at_least_once_old / (classified_at_least_once_old + averaged_list_actual_data[:, 2])
+specificity_list_old = averaged_list_actual_data[:, 0] / (averaged_list_actual_data[:, 0] + ppofFP_old_array_new_post)
+
+recall_list_45 = classified_at_least_once_45 / (classified_at_least_once_45 + averaged_list_45[:, 2])
+specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + ppofFP_45_array_new_post)
+
 
 
 #
-plt.plot(1-specificity_list_new, recall_list_new)
-plt.plot(1-specificity_list_old, recall_list_old)
-plt.plot(1-specificity_list_45, recall_list_45)
-auc_actual = auc(1-specificity_list_new, recall_list_new)
-auc_predicted = auc(1-specificity_list_old, recall_list_old)
-auc_45 = auc(1-specificity_list_45, recall_list_45)
-
-plt.xlabel("1-Specificity")
-plt.ylabel("Recall")
-legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                 "old (AUC={:.2f})".format(auc_predicted),
-                 "45 (AUC={:.2f})".format(auc_45)]
-
-plt.legend(legend_labels)
+plt.plot(1 - specificity_list_new, recall_list_new)
+plt.plot(1 - specificity_list_old, recall_list_old)
+plt.plot(1 - specificity_list_45, recall_list_45)
+plt.legend(["new", "old", "45"])
+# auc_actual = auc(1-specificity_list_new, recall_list_new)
+# auc_predicted = auc(1-specificity_list_old, recall_list_old)
+# auc_45 = auc(1-specificity_list_45, recall_list_45)
+#
+# plt.xlabel("1-Specificity")
+# plt.ylabel("Recall")
+# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+#                  "old (AUC={:.2f})".format(auc_predicted),
+#                  "45 (AUC={:.2f})".format(auc_45)]
+#
+# plt.legend(legend_labels)
 plt.show()
 
 #

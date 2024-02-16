@@ -30,6 +30,7 @@ def labelExpander(label):
     return label1
 
 def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
+
     folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data"
     path_extension_labels = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s"
 
@@ -188,6 +189,181 @@ def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
     plt.tight_layout()
 
     plt.show()
+
+
+def plottingWholeSeizurePeriods_all_channels(p, i, selected_threshold):
+    folder_path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data"
+    path_extension_labels = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s"
+
+    file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{i}_labels.npy")
+    ##df = pd.read_csv(file_path_labels)
+    ##condition = df.iloc[:, 0] == 1
+    ##label = df[condition]
+
+    for ch_num in range(1,5):
+        file_path = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_{ch_num}.npy")
+        data = np.load(file_path)
+
+        label = np.load(file_path_labels)
+
+        # file_path_1 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_1.npy")
+        # file_path_2 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_2.npy")
+        # file_path_3 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_3.npy")
+        # file_path_4 = os.path.join(folder_path, f"pat_{p}_sz_{i}_ch_4.npy")
+        #
+        # data_1 = np.load(file_path_1)
+        # data_2 = np.load(file_path_2)
+        # data_3 = np.load(file_path_3)
+        # data_4 = np.load(file_path_4)
+
+        # data_1, data_2, data_3, data_4 = normalize_ch_data(data_1, data_2, data_3, data_4)
+        #
+        # data = np.empty_like(data_1)
+        # if(ch_num == 1):
+        #     data = data_1
+        # elif(ch_num == 2):
+        #     data = data_2
+        # elif(ch_num == 3):
+        #     data = data_3
+        # elif(ch_num == 4):
+        #     data = data_4
+
+        mean_val = np.mean(data)
+        std_val = np.std(data)
+
+        # Normalize the data to the range [-1, 1]
+        new_normalized_data = (data - mean_val) / std_val
+        new_normalized_data = (new_normalized_data) / (
+                np.max(new_normalized_data) - np.min(new_normalized_data))
+
+        expanded_label = labelExpander(label)
+
+        predicted_label_eog = predicted_label[:, selected_threshold]
+
+        # seeing the performance of the model on the EOG data
+        # result_eog = model_eog.predict(new_normalized_data)
+        # result_eog = result_eog.squeeze(-1)
+        #
+        # result_ae = model.predict(new_normalized_data)
+        # result_ae = result_ae.squeeze(-1)
+
+        sz_num = countNumberOfSeizuresPerPerson(p)
+
+        threshold_raw_data = getThresholdsPerPatient(p, ch_num, sz_num)
+
+        thresholds_gru = getThresholdsPerPatientAfterCleaning(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", p,
+            ch_num, sz_num)
+        thresholds_eog = getThresholdsPerPatientAfterCleaning(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", p,
+            ch_num, sz_num)
+        thresholds_cnn = getThresholdsPerPatientAfterCleaning(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", p,
+            ch_num, sz_num)
+        thresholds_lstm = getThresholdsPerPatientAfterCleaning(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+            p, ch_num, sz_num)
+
+        result_gru = np.load(os.path.join(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru",
+            f"pat_{p}_sz_{i}_ch_{ch_num}.npy"))
+        result_eog = np.load(os.path.join(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering",
+            f"pat_{p}_sz_{i}_ch_{ch_num}.npy"))
+        result_cnn = np.load(os.path.join(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn",
+            f"pat_{p}_sz_{i}_ch_{ch_num}.npy"))
+        result_lstm = np.load(os.path.join(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+            f"pat_{p}_sz_{i}_ch_{ch_num}.npy"))
+        result_45 = filteredSignal_1_45 = nk.signal_filter(new_normalized_data, sampling_rate=250, highcut=40,
+                                                           method='butterworth', order=4)
+
+        # result_gru = result_gru.squeeze(-1)
+        # result_eog = result_eog.squeeze(-1)
+        # result_cnn = result_cnn.squeeze(-1)
+        # result_lstm = result_lstm.squeeze(-1)
+
+        labels_gru = getOnlyLabels(result_gru, label, thresholds_gru)
+        labels_eog = getOnlyLabels(result_eog, label, thresholds_eog)
+        labels_cnn = getOnlyLabels(result_cnn, label, thresholds_cnn)
+        labels_lstm = getOnlyLabels(result_lstm, label, thresholds_lstm)
+        labels_raw = getOnlyLabels(new_normalized_data, label, threshold_raw_data)
+        labels_45 = getOnlyLabels(result_45, label, threshold_raw_data)
+
+        labels_gru = labels_gru[:, selected_threshold]
+        labels_eog = labels_eog[:, selected_threshold]
+        labels_cnn = labels_cnn[:, selected_threshold]
+        labels_lstm = labels_lstm[:, selected_threshold]
+        labels_raw = labels_raw[:, selected_threshold]
+        labels_45 = labels_45[:, selected_threshold]
+
+        # labels_gru = labelExpander(labels_gru)
+        # labels_eog = labelExpander(labels_eog)
+        # labels_cnn = labelExpander(labels_cnn)
+        # labels_lstm = labelExpander(labels_lstm)
+        # labels_raw = labelExpander(labels_raw)
+        # labels_45 = labelExpander(labels_45)
+
+        # labels_45 = getOnlyLabels(result_45, label, selected_threshold)
+
+        # calculation linelength
+        ll_raw = linelength(new_normalized_data)
+        ll_eog = linelength(result_eog)
+        ll_gru = linelength(result_gru)
+        ll_cnn = linelength(result_cnn)
+        ll_lstm = linelength(result_lstm)
+        ll_45 = linelength(result_45)
+
+        # Create the plot
+        fig, axs = plt.subplots(2, 1, figsize=(16, 8), sharex=True, sharey='col')
+        fig.suptitle(f'Patient {p} - Seizure {i} - Channel {ch_num}')
+
+        scatter_range = range(len(ll_raw.ravel()))
+
+        axs[0].scatter(scatter_range, ll_raw.ravel(), marker=".")
+        axs[0].set_title('Raw Data')
+        # axs[0].plot(labels_raw, 'r')
+        axs[0].plot(label, 'orange')
+        axs[0].set_ylabel('Amplitude')
+        axs[0].set_xlabel('Time')
+
+        axs[1].scatter(scatter_range, ll_eog.ravel(), marker=".")
+        axs[1].set_title('AE')
+        # axs[1].plot(labels_eog, 'r')
+        axs[1].plot(label * max(ll_eog), 'orange')
+        axs[1].set_ylabel('Amplitude')
+        axs[1].set_xlabel('Time')
+
+        # axs[2].scatter(scatter_range, ll_gru.ravel())
+        # axs[2].set_title('GRU')
+        # axs[2].plot(labels_gru, 'r')
+        # axs[2].set_ylabel('Amplitude')
+        # axs[2].set_xlabel('Time')
+        #
+        # axs[3].scatter(scatter_range, ll_cnn.ravel())
+        # axs[3].set_title('CNN')
+        # axs[3].plot(labels_cnn, 'r')
+        # axs[3].set_ylabel('Amplitude')
+        # axs[3].set_xlabel('Time')
+        #
+        # axs[4].scatter(scatter_range, ll_lstm.ravel())
+        # axs[4].set_title('LSTM')
+        # axs[4].plot(labels_lstm, 'r')
+        # axs[4].set_ylabel('Amplitude')
+        # axs[4].set_xlabel('Time')
+
+        # axs[5].scatter(scatter_range, ll_45.ravel(), marker='.')
+        # axs[5].set_title('45Hz')
+        # axs[5].plot(labels_45, 'r')
+        # axs[5].set_ylabel('Amplitude')
+        # axs[5].set_xlabel('Time')
+        #
+        # axs[6].plot(label)
+
+        plt.tight_layout()
+
+        plt.show()
 
 
 def doLogicalOR(predicted_label_1, predicted_labe_2, predicted_label_3, predicted_label_4):
