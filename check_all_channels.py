@@ -674,6 +674,7 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
 
     avg_list = []
     std_list = []
+    max_list = []
 
     for sz in range(1, sz_num + 1):
         file_path_1 = os.path.join(folder_path, f"pat_{patient_number}_sz_{sz}_ch_{channel_number}.npy")
@@ -693,14 +694,18 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
         avg_list.append(avg)
         std_list.append(std)
 
+        max_list.append(np.max(ll))
+
     avg_list = np.array(avg_list)
     std_list = np.array(std_list)
 
     avg = np.average(avg_list)
     std = np.sqrt(np.sum(std_list ** 2)/sz_num)
 
-    thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    max_ll = max(max_list)
 
+    #thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    thresholds = [max_ll * 0.5, max_ll * 0.6, max_ll * 0.7, max_ll * 0.8, max_ll * 0.9]
     return thresholds
 
 
@@ -828,6 +833,7 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
 
     avg_list = []
     std_list = []
+    max_list = []
 
     for sz in range(1, sz_num + 1):
 
@@ -843,6 +849,7 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
 
         avg_list.append(avg)
         std_list.append(std)
+        max_list.append(np.max(ll))
 
     avg_list = np.array(avg_list)
     std_list = np.array(std_list)
@@ -850,8 +857,10 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
     avg = np.average(avg_list)
     std = np.sqrt(np.sum(std_list ** 2) / sz_num)
 
-    thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    max_ll = np.max(max_list)
 
+    #thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    thresholds = [max_ll * 0.5, max_ll * 0.6, max_ll * 0.7, max_ll * 0.8, max_ll * 0.9]
     return thresholds
 
 
