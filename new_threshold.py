@@ -657,7 +657,7 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
     max_ll = max(max_list)
 
     #thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
-    thresholds = [max_ll * 0.5, max_ll * 0.55, max_ll * 0.6, max_ll * 0.65, max_ll * 0.7, max_ll * 0.75, max_ll * 0.8, max_ll * 0.85, max_ll * 0.9, max_ll * 0.95, max_ll * 0.99]
+    thresholds = [max_ll * 0.4, max_ll * 0.45, max_ll * 0.5, max_ll * 0.55, max_ll * 0.6, max_ll * 0.65, max_ll * 0.7, max_ll * 0.75, max_ll * 0.8, max_ll * 0.85, max_ll * 0.9, max_ll * 0.95, max_ll * 0.99]
     return thresholds
 
 
@@ -814,7 +814,7 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
     max_ll = np.max(max_list)
 
     #thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
-    thresholds = [max_ll * 0.5, max_ll * 0.55, max_ll * 0.6, max_ll * 0.65, max_ll * 0.7, max_ll * 0.75, max_ll * 0.8, max_ll * 0.85, max_ll * 0.9, max_ll * 0.95, max_ll * 0.99]
+    thresholds = [max_ll * 0.4, max_ll * 0.45, max_ll * 0.5, max_ll * 0.55, max_ll * 0.6, max_ll * 0.65, max_ll * 0.7, max_ll * 0.75, max_ll * 0.8, max_ll * 0.85, max_ll * 0.9, max_ll * 0.95, max_ll * 0.99]
     return thresholds
 
 
@@ -1352,10 +1352,10 @@ for p in range(1, 51):
         predicted_labels_3 = getOnlyLabels(predicted_data_3, label, thresholds_new_ch_3)
         predicted_labels_4 = getOnlyLabels(predicted_data_4, label, thresholds_new_ch_4)
 
-        if (np.array_equal(predicted_labels_1, predicted_labels_2) or np.array_equal(predicted_labels_2,
-                                                                                      predicted_labels_3) or np.array_equal(
-                predicted_labels_3, predicted_labels_4)):
-            print("all equal")
+        # if (np.array_equal(predicted_labels_1, predicted_labels_2) or np.array_equal(predicted_labels_2,
+        #                                                                               predicted_labels_3) or np.array_equal(
+        #         predicted_labels_3, predicted_labels_4)):
+        #     print("all equal")
 
 
         predicted_label = doLogicalOR(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)

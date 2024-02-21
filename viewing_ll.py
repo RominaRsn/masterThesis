@@ -24,6 +24,15 @@ import cProfile
 from memory_profiler import profile
 from matplotlib.widgets import Slider
 
+def moving_average_consecutive(data):
+    moving_avg = []
+    prev_avg = data[0]  # Initialize previous average with the first sample
+    for i in range(1, len(data)):  # Start from the second sample
+        avg = (prev_avg + data[i]) / 2.0  # Compute the average of the previous average and the current sample
+        moving_avg.append(avg)  # Append the average to the moving_avg list
+        prev_avg = avg  # Update the previous average for the next iteration
+    return moving_avg
+
 
 def labelExpander(label):
     label1 = np.repeat(label, 500)
@@ -182,14 +191,16 @@ def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
     ll_45 = linelength(result_45)
     ll_eog_avg = linelength(avg_signal)
 
-    # Define the window size for the moving average
-    window_size = 10
+    ll_eog_ma = moving_average_consecutive(ll_eog)
 
-    # Create a moving average window as a simple boxcar window
-    window = np.ones(window_size) / window_size
-
-    # Apply the moving average using convolution
-    moving_avg = np.convolve(ll_raw.ravel(), window, mode='valid')
+    # # Define the window size for the moving average
+    # window_size = 2
+    #
+    # # Create a moving average window as a simple boxcar window
+    # window = np.ones(window_size) / window_size
+    #
+    # # Apply the moving average using convolution
+    # moving_avg = np.convolve(ll_raw.ravel(), window, mode='valid')
 
     # Create the plot , sharex=True
     fig, axs = plt.subplots(4, 1, figsize=(16, 8), sharey='col')
@@ -216,10 +227,10 @@ def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
     axs[2].plot(label * max(ll_eog_avg), 'orange')
     axs[2].set_ylabel('Amplitude')
 
-    axs[3].scatter(range(len(moving_avg)), moving_avg, marker=".")
+    axs[3].scatter(range(len(ll_eog_ma)), ll_eog_ma, marker=".")
     axs[3].set_title('Moving Average')
-    axs[3].plot(label * max(moving_avg), 'orange')
-    axs[3].axhline(y=0.7 * max(moving_avg), color='r', linestyle='--')
+    # axs[3].plot(label * max(ll_eog_ma), 'orange')
+    # axs[3].axhline(y=0.7 * max(ll_eog_ma), color='r', linestyle='--')
     axs[3].set_ylabel('Amplitude')
     axs[3].set_xlabel('Time')
 

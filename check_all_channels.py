@@ -704,8 +704,8 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
 
     max_ll = max(max_list)
 
-    #thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
-    thresholds = [max_ll * 0.5, max_ll * 0.6, max_ll * 0.7, max_ll * 0.8, max_ll * 0.9]
+    thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    #thresholds = [max_ll * 0.5, max_ll * 0.6, max_ll * 0.7, max_ll * 0.8, max_ll * 0.9]
     return thresholds
 
 
@@ -859,8 +859,8 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
 
     max_ll = np.max(max_list)
 
-    #thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
-    thresholds = [max_ll * 0.5, max_ll * 0.6, max_ll * 0.7, max_ll * 0.8, max_ll * 0.9]
+    thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    #thresholds = [max_ll * 0.5, max_ll * 0.6, max_ll * 0.7, max_ll * 0.8, max_ll * 0.9]
     return thresholds
 
 
@@ -1142,6 +1142,16 @@ postProcessedFPList_old_new_post = []
 postProcessedFPList_45_new_post = []
 
 
+def moving_average_consecutive(data):
+    moving_avg = []
+    prev_avg = data[0]  # Initialize previous average with the first sample
+    for i in range(1, len(data)):  # Start from the second sample
+        avg = (prev_avg + data[i]) / 2.0  # Compute the average of the previous average and the current sample
+        moving_avg.append(avg)  # Append the average to the moving_avg list
+        prev_avg = avg  # Update the previous average for the next iteration
+    return moving_avg
+
+
 for p in range(1, 51):
 
     #cProfile.run("countNumberOfSeizuresPerPerson(p)")
@@ -1165,7 +1175,7 @@ for p in range(1, 51):
     #print("clean data thresholds: ", thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4)
 
     #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
-    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering"
+    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru"
     thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
     thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
     thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
@@ -1233,16 +1243,24 @@ for p in range(1, 51):
         # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
         # ##predicted_data_4 = predicted_data_4.squeeze(-1)
         #
-        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_1.npy"))
         #predicted_data_1 = predicted_data_1.squeeze(-1)
 
-        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_2.npy"))
         #predicted_data_2 = predicted_data_2.squeeze(-1)
 
-        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_3.npy"))
         #predicted_data_3 = predicted_data_3.squeeze(-1)
 
-        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_4.npy"))
+
+
+        predicted_data_1 = moving_average_consecutive(predicted_data_1)
+        predicted_data_2 = moving_average_consecutive(predicted_data_2)
+        predicted_data_3 = moving_average_consecutive(predicted_data_3)
+        predicted_data_4 = moving_average_consecutive(predicted_data_4)
+
+
         ##predicted_data_4 = predicted_data_4.squeeze(-1)
 
         # predicted_data_1 = np.load(
@@ -1418,9 +1436,15 @@ for p in range(1, 51):
         classified_at_least_once_new.append(classifiedAtLeastOnce(label, predicted_label))
         classified_at_least_once_10sec_new.append(classifiedAtLeastOnce_10sec(label, predicted_label))
 
-        innerFPWithPP_new = postProcessFP(label, predicted_label)
+        moving_average_label = moving_average_consecutive(label)
+        moving_average_label = np.array(moving_average_label)
+        moving_average_label = (moving_average_label > 0).astype(int)
+
+
+        innerFPWithPP_new = postProcessFP(moving_average_label, predicted_label)
         #innerFPWithPP_new = postProcessFP_firingMethod(label, predicted_label)
-        postProcessedFPList_new_new_post.append(postProcessFP_firingMethod(label, predicted_label))
+        #postProcessedFPList_new_new_post.append(postProcessFP_firingMethod(label, predicted_label))
+        postProcessedFPList_new_new_post.append(postProcessFP_firingMethod(moving_average_label, predicted_label))
         postProcessedFPList_new.append(innerFPWithPP_new)
 
 
@@ -1432,21 +1456,23 @@ for p in range(1, 51):
             #for theta band power
             # predicted_label_col = predicted_label.squeeze(0)
             # predicted_label_col = predicted_label_col[:,i]
-            conf = confusion_matrix(label, predicted_label_col).ravel()
+            #conf = confusion_matrix(label, predicted_label_col).ravel()
+            conf = confusion_matrix(moving_average_label, predicted_label_col).ravel()
             conf_mat.append(conf)
 
-        selected_threshold_list = getTheBestThresholds(label, predicted_label)
+        #selected_threshold_list = getTheBestThresholds(label, predicted_label)
+        selected_threshold_list = getTheBestThresholds(moving_average_label, predicted_label)
 
         if(len(selected_threshold_list) != 0):
             selected_threshold = selected_threshold_list[-1]
             #print(selected_threshold)
 
             #false_detections_predicted = getFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
-            false_detections_predicted = getReducedFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
+            #false_detections_predicted = getReducedFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
             #plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
             #plotFalsePositives_new(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4
             #                      ,labels_1, labels_2, labels_3, labels_4)
-            improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
+            #improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
             #print(f"channel thresholds new: channel 1: {thresholds_new_ch_1[selected_threshold]} channel 2: {thresholds_new_ch_2[selected_threshold]} channel 3: {thresholds_new_ch_3[selected_threshold]} channel 4: {thresholds_new_ch_4[selected_threshold]}")
             #print(f"channel thresholds old: channel 1: {thresholds_old_ch_1[selected_threshold]} channel 2: {thresholds_old_ch_2[selected_threshold]} channel 3: {thresholds_old_ch_3[selected_threshold]} channel 4: {thresholds_old_ch_4[selected_threshold]} ")
 
@@ -1513,6 +1539,10 @@ averaged_list = np.array(averaged_list)
 averaged_list_actual_data = np.array(averaged_list_actual_data)
 averaged_list_45 = np.array(averaged_list_45)
 
+averaged_list_copy = np.array(averaged_list)
+averaged_list_actual_data_copy = np.array(averaged_list_actual_data)
+averaged_list_45_copy = np.array(averaged_list_45)
+
 averaged_list = np.mean(averaged_list, axis=0)
 averaged_list_actual_data = np.mean(averaged_list_actual_data, axis=0)
 averaged_list_45 = np.mean(averaged_list_45, axis=0)
@@ -1578,7 +1608,58 @@ plt.legend(["new", "old", "45"])
 plt.show()
 
 #
+
+plt.plot(averaged_list_copy[:, 1], averaged_list_copy[:, 3])
+plt.plot(averaged_list_actual_data_copy[:, 1], averaged_list_actual_data_copy[:, 3])
+plt.plot(averaged_list_45_copy[:, 1], averaged_list_45_copy[:, 3])
+plt.legend(["new", "old", "45"])
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.show()
+
+
 #
+
+
+plt.plot(ppofFP_new_array_new_post, classified_at_least_once_new)
+plt.plot(ppofFP_old_array_new_post, classified_at_least_once_old)
+plt.plot(ppofFP_45_array_new_post, classified_at_least_once_45)
+# auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
+# auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
+# auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
+plt.xlabel("False Positive Rate - new post processing method (discarding for 1 min)")
+plt.ylabel("classified at least once as seizure")
+# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+#                  "old (AUC={:.2f})".format(auc_predicted),
+#                  "45 (AUC={:.2f})".format(auc_45)]
+
+legend_labels = ["new", "old", "45"]
+
+plt.legend(legend_labels)
+plt.show()
+
+
+plt.plot(ppofFP_new_array_new_post, classified_at_least_once_10sec_new)
+plt.plot(ppofFP_old_array_new_post, classified_at_least_once_10sec_old)
+plt.plot(ppofFP_45_array_new_post, classified_at_least_once_10sec_45)
+# auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
+# auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
+# auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
+plt.xlabel("False Positive Rate - new post processing method (discarding for 1 min)- first 10 seconds")
+plt.ylabel("classified at least once as seizure")
+# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+#                  "old (AUC={:.2f})".format(auc_predicted),
+#                  "45 (AUC={:.2f})".format(auc_45)]
+
+legend_labels = ["new", "old", "45"]
+
+plt.legend(legend_labels)
+plt.show()
+
+
+
+
+
 plt.plot(averaged_list[:, 1], classified_at_least_once_new)
 plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_old)
 plt.plot(averaged_list_45[:, 1], classified_at_least_once_45)

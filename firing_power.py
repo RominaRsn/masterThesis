@@ -681,7 +681,7 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
         ll = linelength(new_normalized_data_1)
 
 
-        moving_avg = movingAverage(ll)
+        #moving_avg = movingAverage(ll)
         # ll = thetaBandPower(new_normalized_data_1)
         # ll = ll.squeeze(-1)
 
@@ -691,7 +691,7 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
         avg_list.append(avg)
         std_list.append(std)
 
-        max_list.append(np.max(moving_avg))
+        #max_list.append(np.max(moving_avg))
 
     avg_list = np.array(avg_list)
     std_list = np.array(std_list)
@@ -699,7 +699,7 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
     avg = np.average(avg_list)
     std = np.sqrt(np.sum(std_list ** 2)/sz_num)
 
-    max_ll = max(max_list)
+    #max_ll = max(max_list)
 
     thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
     #thresholds = [max_ll * 0.5, max_ll * 0.55, max_ll * 0.6, max_ll * 0.65, max_ll * 0.7, max_ll * 0.75, max_ll * 0.8, max_ll * 0.85, max_ll * 0.9, max_ll * 0.95, max_ll * 0.99]
@@ -847,8 +847,8 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
         avg_list.append(avg)
         std_list.append(std)
 
-        moving_average = movingAverage(ll)
-        max_list.append(np.max(moving_average))
+        #moving_average = movingAverage(ll)
+        #max_list.append(np.max(moving_average))
 
     avg_list = np.array(avg_list)
     std_list = np.array(std_list)
@@ -856,7 +856,7 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
     avg = np.average(avg_list)
     std = np.sqrt(np.sum(std_list ** 2) / sz_num)
 
-    max_ll = np.max(max_list)
+    #max_ll = np.max(max_list)
 
     thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
     #thresholds = [max_ll * 0.5, max_ll * 0.55, max_ll * 0.6, max_ll * 0.65, max_ll * 0.7, max_ll * 0.75, max_ll * 0.8, max_ll * 0.85, max_ll * 0.9, max_ll * 0.95, max_ll * 0.99]
@@ -1555,6 +1555,20 @@ ppofFP_old_array_new_post = np.array(postProcessedFPList_old_new_post)
 ppofFP_old_array_new_post = np.mean(ppofFP_old_array_new_post, axis=0)
 
 
+conf_firingPower_new = np.array(conf_firingPower_new)
+conf_firingPower_old = np.array(conf_firingPower_old)
+conf_firingPower_45 = np.array(conf_firingPower_45)
+
+conf_firingPower_new = np.mean(conf_firingPower_new, axis=0)
+conf_firingPower_old = np.mean(conf_firingPower_old, axis=0)
+conf_firingPower_45 = np.mean(conf_firingPower_45, axis=0)
+
+plt.plot(conf_firingPower_new[:, 1], conf_firingPower_new[:,3], label="new")
+plt.plot(conf_firingPower_old[:, 1], conf_firingPower_old[:,3], label="old")
+plt.plot(conf_firingPower_45[:, 1], conf_firingPower_45[:,3], label="45")
+plt.legend()
+plt.show()
+
 
 for patient in conf_list_all:
     patient_array = np.array(patient)
@@ -1627,18 +1641,17 @@ specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + average
 plt.plot(1 - specificity_list_new, recall_list_new)
 plt.plot(1 - specificity_list_old, recall_list_old)
 plt.plot(1 - specificity_list_45, recall_list_45)
-plt.legend(["new", "old", "45"])
-# auc_actual = auc(1-specificity_list_new, recall_list_new)
-# auc_predicted = auc(1-specificity_list_old, recall_list_old)
-# auc_45 = auc(1-specificity_list_45, recall_list_45)
-#
-# plt.xlabel("1-Specificity")
-# plt.ylabel("Recall")
-# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-#                  "old (AUC={:.2f})".format(auc_predicted),
-#                  "45 (AUC={:.2f})".format(auc_45)]
-#
-# plt.legend(legend_labels)
+auc_actual = auc(1-specificity_list_new, recall_list_new)
+auc_predicted = auc(1-specificity_list_old, recall_list_old)
+auc_45 = auc(1-specificity_list_45, recall_list_45)
+
+plt.xlabel("1-Specificity")
+plt.ylabel("Recall")
+legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+                 "old (AUC={:.2f})".format(auc_predicted),
+                 "45 (AUC={:.2f})".format(auc_45)]
+
+plt.legend(legend_labels)
 plt.show()
 
 #
