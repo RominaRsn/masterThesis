@@ -394,7 +394,10 @@ def thetaBandPower(epoched_data):
 
 def linelength(data):
     data_diff = np.diff(data)
-    return np.sum(np.absolute(data_diff), axis=1)
+
+    res = np.sum(np.absolute(data_diff), axis=1)
+
+    return moving_average_consecutive(res)
 
 path_extension_labels = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s"
 
@@ -1214,16 +1217,16 @@ for p in range(1, 51):
         new_normalized_data_4 = (data_4 - mean_val_4) / std_val_4
         new_normalized_data_4 = (new_normalized_data_4) / (np.max(new_normalized_data_4) - np.min(new_normalized_data_4))
 
-        new_normalized_data_1_copy = new_normalized_data_1
-        new_normalized_data_2_copy = new_normalized_data_2
-        new_normalized_data_3_copy = new_normalized_data_3
-        new_normalized_data_4_copy = new_normalized_data_4
-
-
-        new_normalized_data_1 = moving_average_consecutive(new_normalized_data_1)
-        new_normalized_data_2 = moving_average_consecutive(new_normalized_data_2)
-        new_normalized_data_3 = moving_average_consecutive(new_normalized_data_3)
-        new_normalized_data_4 = moving_average_consecutive(new_normalized_data_4)
+        # new_normalized_data_1_copy = new_normalized_data_1
+        # new_normalized_data_2_copy = new_normalized_data_2
+        # new_normalized_data_3_copy = new_normalized_data_3
+        # new_normalized_data_4_copy = new_normalized_data_4
+        #
+        #
+        # new_normalized_data_1 = moving_average_consecutive(new_normalized_data_1)
+        # new_normalized_data_2 = moving_average_consecutive(new_normalized_data_2)
+        # new_normalized_data_3 = moving_average_consecutive(new_normalized_data_3)
+        # new_normalized_data_4 = moving_average_consecutive(new_normalized_data_4)
 
 
         file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{sz}_labels.npy")
@@ -1231,24 +1234,28 @@ for p in range(1, 51):
 
         moving_average_label = moving_average_consecutive(label)
         moving_average_label = np.array(moving_average_label)
-        moving_average_label = (moving_average_label > 0).astype(int)
+        moving_average_label = (moving_average_label > 0.5).astype(int)
+
+        # plt.plot(label)
+        # plt.plot(moving_average_label)
+        # plt.show()
 
 
         ####filtering with lowpass filter
 
-        filteredSignal_1_45 = nk.signal_filter(new_normalized_data_1_copy, sampling_rate=250, highcut=40,
+        filteredSignal_1_45 = nk.signal_filter(new_normalized_data_1, sampling_rate=250, highcut=40,
                                              method='butterworth', order=4)
-        filteredSignal_2_45 = nk.signal_filter(new_normalized_data_2_copy, sampling_rate=250, highcut=40,
+        filteredSignal_2_45 = nk.signal_filter(new_normalized_data_2, sampling_rate=250, highcut=40,
                                                 method='butterworth', order=4)
-        filteredSignal_3_45 = nk.signal_filter(new_normalized_data_3_copy, sampling_rate=250, highcut=40,
+        filteredSignal_3_45 = nk.signal_filter(new_normalized_data_3, sampling_rate=250, highcut=40,
                                                 method='butterworth', order=4)
-        filteredSignal_4_45 = nk.signal_filter(new_normalized_data_4_copy, sampling_rate=250, highcut=40,
+        filteredSignal_4_45 = nk.signal_filter(new_normalized_data_4, sampling_rate=250, highcut=40,
                                                 method='butterworth', order=4)
 
-        filteredSignal_1_45 = moving_average_consecutive(filteredSignal_1_45)
-        filteredSignal_2_45 = moving_average_consecutive(filteredSignal_2_45)
-        filteredSignal_3_45 = moving_average_consecutive(filteredSignal_3_45)
-        filteredSignal_4_45 = moving_average_consecutive(filteredSignal_4_45)
+        # filteredSignal_1_45 = moving_average_consecutive(filteredSignal_1_45)
+        # filteredSignal_2_45 = moving_average_consecutive(filteredSignal_2_45)
+        # filteredSignal_3_45 = moving_average_consecutive(filteredSignal_3_45)
+        # filteredSignal_4_45 = moving_average_consecutive(filteredSignal_4_45)
 
 
 
@@ -1276,11 +1283,11 @@ for p in range(1, 51):
 
         predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_4.npy"))
 
-
-        predicted_data_1 = moving_average_consecutive(predicted_data_1)
-        predicted_data_2 = moving_average_consecutive(predicted_data_2)
-        predicted_data_3 = moving_average_consecutive(predicted_data_3)
-        predicted_data_4 = moving_average_consecutive(predicted_data_4)
+        #
+        # predicted_data_1 = moving_average_consecutive(predicted_data_1)
+        # predicted_data_2 = moving_average_consecutive(predicted_data_2)
+        # predicted_data_3 = moving_average_consecutive(predicted_data_3)
+        # predicted_data_4 = moving_average_consecutive(predicted_data_4)
 
 
         ##predicted_data_4 = predicted_data_4.squeeze(-1)
@@ -1602,22 +1609,22 @@ classified_at_least_once_10sec_45 = np.mean(classified_at_least_once_10sec_45, a
 # recall_list_45 = averaged_list_45[:, 3] / (averaged_list_45[:, 3] + averaged_list_45[:, 2])
 # specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + averaged_list_45[:, 1])
 
-recall_list_new = classified_at_least_once_new / (classified_at_least_once_new + averaged_list[:, 2])
-specificity_list_new = averaged_list[:, 0] / (averaged_list[:, 0] + ppofFP_new_array_new_post)
-
-recall_list_old = classified_at_least_once_old / (classified_at_least_once_old + averaged_list_actual_data[:, 2])
-specificity_list_old = averaged_list_actual_data[:, 0] / (averaged_list_actual_data[:, 0] + ppofFP_old_array_new_post)
-
-recall_list_45 = classified_at_least_once_45 / (classified_at_least_once_45 + averaged_list_45[:, 2])
-specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + ppofFP_45_array_new_post)
-
-
-
+# recall_list_new = classified_at_least_once_new / (classified_at_least_once_new + averaged_list[:, 2])
+# specificity_list_new = averaged_list[:, 0] / (averaged_list[:, 0] + ppofFP_new_array_new_post)
 #
-plt.plot(1 - specificity_list_new, recall_list_new)
-plt.plot(1 - specificity_list_old, recall_list_old)
-plt.plot(1 - specificity_list_45, recall_list_45)
-plt.legend(["new", "old", "45"])
+# recall_list_old = classified_at_least_once_old / (classified_at_least_once_old + averaged_list_actual_data[:, 2])
+# specificity_list_old = averaged_list_actual_data[:, 0] / (averaged_list_actual_data[:, 0] + ppofFP_old_array_new_post)
+#
+# recall_list_45 = classified_at_least_once_45 / (classified_at_least_once_45 + averaged_list_45[:, 2])
+# specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + ppofFP_45_array_new_post)
+#
+#
+#
+# #
+# plt.plot(1 - specificity_list_new, recall_list_new)
+# plt.plot(1 - specificity_list_old, recall_list_old)
+# plt.plot(1 - specificity_list_45, recall_list_45)
+# plt.legend(["new", "old", "45"])
 # auc_actual = auc(1-specificity_list_new, recall_list_new)
 # auc_predicted = auc(1-specificity_list_old, recall_list_old)
 # auc_45 = auc(1-specificity_list_45, recall_list_45)
@@ -1633,13 +1640,13 @@ plt.show()
 
 #
 
-plt.plot(averaged_list_copy[:, 1], averaged_list_copy[:, 3])
-plt.plot(averaged_list_actual_data_copy[:, 1], averaged_list_actual_data_copy[:, 3])
-plt.plot(averaged_list_45_copy[:, 1], averaged_list_45_copy[:, 3])
-plt.legend(["new", "old", "45"])
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.show()
+# plt.plot(averaged_list_copy[:, 1], averaged_list_copy[:, 3])
+# plt.plot(averaged_list_actual_data_copy[:, 1], averaged_list_actual_data_copy[:, 3])
+# plt.plot(averaged_list_45_copy[:, 1], averaged_list_45_copy[:, 3])
+# plt.legend(["new", "old", "45"])
+# plt.xlabel("False Positive Rate")
+# plt.ylabel("True Positive Rate")
+# plt.show()
 
 
 #
