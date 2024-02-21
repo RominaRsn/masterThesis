@@ -396,8 +396,8 @@ def linelength(data):
     data_diff = np.diff(data)
 
     res = np.sum(np.absolute(data_diff), axis=1)
-
-    return moving_average_consecutive(res)
+    #moving_average_consecutive(res)
+    return res
 
 path_extension_labels = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\labels_s"
 
@@ -1232,9 +1232,9 @@ for p in range(1, 51):
         file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{sz}_labels.npy")
         label = np.load(file_path_labels)
 
-        moving_average_label = moving_average_consecutive(label)
-        moving_average_label = np.array(moving_average_label)
-        moving_average_label = (moving_average_label > 0.5).astype(int)
+        # moving_average_label = moving_average_consecutive(label)
+        # moving_average_label = np.array(moving_average_label)
+        # moving_average_label = (moving_average_label > 0.5).astype(int)
 
         # plt.plot(label)
         # plt.plot(moving_average_label)
@@ -1377,9 +1377,9 @@ for p in range(1, 51):
         #label_raw_data = doTwoAndOneOr(labels_1, labels_2, labels_3, labels_4)
         #label_raw_data = doAnds(labels_1, labels_2, labels_3, labels_4)
 
-        innerFPWithPP_old = postProcessFP(moving_average_label, label_raw_data)
+        innerFPWithPP_old = postProcessFP(label, label_raw_data)
         #innerFPWithPP_old = postProcessFP_firingMethod(label, label_raw_data)
-        postProcessedFPList_old_new_post.append(postProcessFP_firingMethod(moving_average_label, label_raw_data))
+        postProcessedFPList_old_new_post.append(postProcessFP_firingMethod(label, label_raw_data))
         postProcessedFPList_old.append(innerFPWithPP_old)
 
 
@@ -1398,11 +1398,11 @@ for p in range(1, 51):
         # labels_45_data = np.logical_or(labels_45_data, labels_45_4)
         # labels_45_data = labels_45_data.astype(int)
 
-        innerFPWithPP_45 = postProcessFP(moving_average_label, labels_45_data)
+        innerFPWithPP_45 = postProcessFP(label, labels_45_data)
         #innerFPWithPP_45 = postProcessFP(label, labels_45_data)
         #innerFPWithPP_45 = postProcessFP_firingMethod(label, labels_45_data)
         #postProcessedFPList_45_new_post.append(postProcessFP_firingMethod(label, labels_45_data))
-        postProcessedFPList_45_new_post.append(postProcessFP_firingMethod(moving_average_label, labels_45_data))
+        postProcessedFPList_45_new_post.append(postProcessFP_firingMethod(label, labels_45_data))
         postProcessedFPList_45.append(innerFPWithPP_45)
 
 
@@ -1428,7 +1428,7 @@ for p in range(1, 51):
             # label_col = label_raw_data.squeeze(0)
             # label_col = label_col[:, i]
             #conf = confusion_matrix(label, label_col).ravel()
-            conf = confusion_matrix(moving_average_label, label_col).ravel()
+            conf = confusion_matrix(label, label_col).ravel()
             conf_mat_raw_data.append(conf)
 
         conf_mat_45 = []
@@ -1440,7 +1440,7 @@ for p in range(1, 51):
             #label_col = label_col[:, i]
 
             #conf = confusion_matrix(label, label_col).ravel()
-            conf = confusion_matrix(moving_average_label, label_col).ravel()
+            conf = confusion_matrix(label, label_col).ravel()
             conf_mat_45.append(conf)
 
 
@@ -1472,10 +1472,10 @@ for p in range(1, 51):
 
 
 
-        innerFPWithPP_new = postProcessFP(moving_average_label, predicted_label)
+        innerFPWithPP_new = postProcessFP(label, predicted_label)
         #innerFPWithPP_new = postProcessFP_firingMethod(label, predicted_label)
         #postProcessedFPList_new_new_post.append(postProcessFP_firingMethod(label, predicted_label))
-        postProcessedFPList_new_new_post.append(postProcessFP_firingMethod(moving_average_label, predicted_label))
+        postProcessedFPList_new_new_post.append(postProcessFP_firingMethod(label, predicted_label))
         postProcessedFPList_new.append(innerFPWithPP_new)
 
 
@@ -1488,11 +1488,11 @@ for p in range(1, 51):
             # predicted_label_col = predicted_label.squeeze(0)
             # predicted_label_col = predicted_label_col[:,i]
             #conf = confusion_matrix(label, predicted_label_col).ravel()
-            conf = confusion_matrix(moving_average_label, predicted_label_col).ravel()
+            conf = confusion_matrix(label, predicted_label_col).ravel()
             conf_mat.append(conf)
 
         #selected_threshold_list = getTheBestThresholds(label, predicted_label)
-        selected_threshold_list = getTheBestThresholds(moving_average_label, predicted_label)
+        selected_threshold_list = getTheBestThresholds(label, predicted_label)
 
         if(len(selected_threshold_list) != 0):
             selected_threshold = selected_threshold_list[-1]
