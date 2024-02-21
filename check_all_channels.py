@@ -1175,7 +1175,7 @@ for p in range(1, 51):
     #print("clean data thresholds: ", thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4)
 
     #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
-    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru"
+    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering"
     thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
     thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
     thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
@@ -1214,20 +1214,42 @@ for p in range(1, 51):
         new_normalized_data_4 = (data_4 - mean_val_4) / std_val_4
         new_normalized_data_4 = (new_normalized_data_4) / (np.max(new_normalized_data_4) - np.min(new_normalized_data_4))
 
+        new_normalized_data_1_copy = new_normalized_data_1
+        new_normalized_data_2_copy = new_normalized_data_2
+        new_normalized_data_3_copy = new_normalized_data_3
+        new_normalized_data_4_copy = new_normalized_data_4
+
+
+        new_normalized_data_1 = moving_average_consecutive(new_normalized_data_1)
+        new_normalized_data_2 = moving_average_consecutive(new_normalized_data_2)
+        new_normalized_data_3 = moving_average_consecutive(new_normalized_data_3)
+        new_normalized_data_4 = moving_average_consecutive(new_normalized_data_4)
+
+
         file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{sz}_labels.npy")
         label = np.load(file_path_labels)
+
+        moving_average_label = moving_average_consecutive(label)
+        moving_average_label = np.array(moving_average_label)
+        moving_average_label = (moving_average_label > 0).astype(int)
 
 
         ####filtering with lowpass filter
 
-        filteredSignal_1_45 = nk.signal_filter(new_normalized_data_1, sampling_rate=250, highcut=40,
+        filteredSignal_1_45 = nk.signal_filter(new_normalized_data_1_copy, sampling_rate=250, highcut=40,
                                              method='butterworth', order=4)
-        filteredSignal_2_45 = nk.signal_filter(new_normalized_data_2, sampling_rate=250, highcut=40,
+        filteredSignal_2_45 = nk.signal_filter(new_normalized_data_2_copy, sampling_rate=250, highcut=40,
                                                 method='butterworth', order=4)
-        filteredSignal_3_45 = nk.signal_filter(new_normalized_data_3, sampling_rate=250, highcut=40,
+        filteredSignal_3_45 = nk.signal_filter(new_normalized_data_3_copy, sampling_rate=250, highcut=40,
                                                 method='butterworth', order=4)
-        filteredSignal_4_45 = nk.signal_filter(new_normalized_data_4, sampling_rate=250, highcut=40,
+        filteredSignal_4_45 = nk.signal_filter(new_normalized_data_4_copy, sampling_rate=250, highcut=40,
                                                 method='butterworth', order=4)
+
+        filteredSignal_1_45 = moving_average_consecutive(filteredSignal_1_45)
+        filteredSignal_2_45 = moving_average_consecutive(filteredSignal_2_45)
+        filteredSignal_3_45 = moving_average_consecutive(filteredSignal_3_45)
+        filteredSignal_4_45 = moving_average_consecutive(filteredSignal_4_45)
+
 
 
         # #####when the predictions are already calculated
@@ -1243,16 +1265,16 @@ for p in range(1, 51):
         # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
         # ##predicted_data_4 = predicted_data_4.squeeze(-1)
         #
-        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_1.npy"))
         #predicted_data_1 = predicted_data_1.squeeze(-1)
 
-        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_2.npy"))
         #predicted_data_2 = predicted_data_2.squeeze(-1)
 
-        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_3.npy"))
         #predicted_data_3 = predicted_data_3.squeeze(-1)
 
-        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_4.npy"))
 
 
         predicted_data_1 = moving_average_consecutive(predicted_data_1)
@@ -1348,9 +1370,9 @@ for p in range(1, 51):
         #label_raw_data = doTwoAndOneOr(labels_1, labels_2, labels_3, labels_4)
         #label_raw_data = doAnds(labels_1, labels_2, labels_3, labels_4)
 
-        innerFPWithPP_old = postProcessFP(label, label_raw_data)
+        innerFPWithPP_old = postProcessFP(moving_average_label, label_raw_data)
         #innerFPWithPP_old = postProcessFP_firingMethod(label, label_raw_data)
-        postProcessedFPList_old_new_post.append(postProcessFP_firingMethod(label, label_raw_data))
+        postProcessedFPList_old_new_post.append(postProcessFP_firingMethod(moving_average_label, label_raw_data))
         postProcessedFPList_old.append(innerFPWithPP_old)
 
 
@@ -1369,9 +1391,11 @@ for p in range(1, 51):
         # labels_45_data = np.logical_or(labels_45_data, labels_45_4)
         # labels_45_data = labels_45_data.astype(int)
 
-        innerFPWithPP_45 = postProcessFP(label, labels_45_data)
+        innerFPWithPP_45 = postProcessFP(moving_average_label, labels_45_data)
+        #innerFPWithPP_45 = postProcessFP(label, labels_45_data)
         #innerFPWithPP_45 = postProcessFP_firingMethod(label, labels_45_data)
-        postProcessedFPList_45_new_post.append(postProcessFP_firingMethod(label, labels_45_data))
+        #postProcessedFPList_45_new_post.append(postProcessFP_firingMethod(label, labels_45_data))
+        postProcessedFPList_45_new_post.append(postProcessFP_firingMethod(moving_average_label, labels_45_data))
         postProcessedFPList_45.append(innerFPWithPP_45)
 
 
@@ -1396,7 +1420,8 @@ for p in range(1, 51):
             #for theta band power
             # label_col = label_raw_data.squeeze(0)
             # label_col = label_col[:, i]
-            conf = confusion_matrix(label, label_col).ravel()
+            #conf = confusion_matrix(label, label_col).ravel()
+            conf = confusion_matrix(moving_average_label, label_col).ravel()
             conf_mat_raw_data.append(conf)
 
         conf_mat_45 = []
@@ -1407,7 +1432,8 @@ for p in range(1, 51):
             #label_col = labels_45_data.squeeze(0)
             #label_col = label_col[:, i]
 
-            conf = confusion_matrix(label, label_col).ravel()
+            #conf = confusion_matrix(label, label_col).ravel()
+            conf = confusion_matrix(moving_average_label, label_col).ravel()
             conf_mat_45.append(conf)
 
 
@@ -1436,9 +1462,7 @@ for p in range(1, 51):
         classified_at_least_once_new.append(classifiedAtLeastOnce(label, predicted_label))
         classified_at_least_once_10sec_new.append(classifiedAtLeastOnce_10sec(label, predicted_label))
 
-        moving_average_label = moving_average_consecutive(label)
-        moving_average_label = np.array(moving_average_label)
-        moving_average_label = (moving_average_label > 0).astype(int)
+
 
 
         innerFPWithPP_new = postProcessFP(moving_average_label, predicted_label)
