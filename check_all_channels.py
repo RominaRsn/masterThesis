@@ -1548,7 +1548,6 @@ ppofFP_old_array_new_post = np.array(postProcessedFPList_old_new_post)
 ppofFP_old_array_new_post = np.mean(ppofFP_old_array_new_post, axis=0)
 
 
-
 for patient in conf_list_all:
     patient_array = np.array(patient)
     patient_array = np.mean(patient_array, axis=0)
@@ -1564,6 +1563,60 @@ for patient in conf_list_lowpass_all:
     patient_array = np.mean(patient_array, axis=0)
     averaged_list_45.append(patient_array)
 
+improved_situation = 0
+for p_i in range(0, len(averaged_list)):
+    new_list_item = averaged_list[p_i]
+    actual_list_item = averaged_list_actual_data[p_i]
+    lowpass_list_item = averaged_list_45[p_i]
+
+    new_list_item = np.array(new_list_item)
+    actual_list_item = np.array(actual_list_item)
+    lowpass_list_item = np.array(lowpass_list_item)
+
+    sens_new = new_list_item[:, 3] / (new_list_item[:, 3] + new_list_item[:, 2])
+    spec_new = new_list_item[:, 0] / (new_list_item[:, 0] + new_list_item[:, 1])
+
+    sens_actual = actual_list_item[:, 3] / (actual_list_item[:, 3] + actual_list_item[:, 2])
+    spec_actual = actual_list_item[:, 0] / (actual_list_item[:, 0] + actual_list_item[:, 1])
+
+    sens_45 = lowpass_list_item[:, 3] / (lowpass_list_item[:, 3] + lowpass_list_item[:, 2])
+    spec_45 = lowpass_list_item[:, 0] / (lowpass_list_item[:, 0] + lowpass_list_item[:, 1])
+
+
+    # plt.plot(new_list_item[:, 1], new_list_item[:, 3])
+    # plt.plot(actual_list_item[:, 1], actual_list_item[:, 3])
+    # plt.plot(lowpass_list_item[:, 1], lowpass_list_item[:, 3])
+
+    plt.figure()
+    plt.plot(1 - spec_new, sens_new)
+    plt.plot(1 - spec_actual, sens_actual)
+    plt.plot(1 - spec_45, sens_45)
+
+    auc_new = auc(1 - spec_new, sens_new)
+    auc_actual = auc(1 - spec_actual, sens_actual)
+    auc_45 = auc(1 - spec_45, sens_45)
+
+    if(auc_new > auc_actual):
+        improved_situation += 1
+
+    legend_labels = ["filtered data (AUC={:.2f})".format(auc_new),
+                     "unfiltered data (AUC={:.2f})".format(auc_actual),
+                     "filtered data with a simple lowpass filter (AUC={:.2f})".format(auc_45)]
+
+
+    plt.title("ROC curve for patient " + str(p_i + 1))
+
+    plt.legend(legend_labels, loc='lower right')
+
+    plt.xlabel("1 - specificity")
+    plt.ylabel("sensitivity")
+
+    plt.savefig("C:\\Users\\RominaRsn\\PycharmProjects\\MyMasterThesis\\masterThesis\\data_file\\ROC_Per_Patient\\ROC_curve_patient_" + str(p_i + 1) + ".png")
+    #plt.show()
+
+
+print("improved situation percentage: ", improved_situation/50)
+print("improved situation: ", improved_situation)
 
 
 averaged_list = np.array(averaged_list)
@@ -1577,6 +1630,8 @@ averaged_list_45_copy = np.array(averaged_list_45)
 averaged_list = np.mean(averaged_list, axis=0)
 averaged_list_actual_data = np.mean(averaged_list_actual_data, axis=0)
 averaged_list_45 = np.mean(averaged_list_45, axis=0)
+
+
 
 classified_at_least_once_new = np.array(classified_at_least_once_new)
 classified_at_least_once_old = np.array(classified_at_least_once_old)
