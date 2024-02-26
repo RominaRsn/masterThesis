@@ -24,6 +24,52 @@ import cProfile
 from memory_profiler import profile
 
 
+def compareSeizurePatterns(label, data, data_filtered):
+
+    #for patient in patient_list_improvements:
+    index_list = np.where(label == 1)[0]
+    #for i_ in index_list:
+    i_ = index_list[0]
+    cnt_ = len(index_list) + 1
+    if (i_ > 15):
+        # Create subplots with specified axes
+        fig, axes = plt.subplots(2, 1, figsize=(20, 10), sharey='col')
+        # Plot each subplot
+        axes[0].plot(data[i_ - 15:i_ + cnt_, :].ravel(), label='Data')
+        axes[0].set_title('Original data')
+        axes[0].set_ylabel('Signal amplitude')
+        axes[0].set_xlabel('Time')
+
+        axes[1].plot(data_filtered[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG noise removed with AE')
+        axes[1].set_title('EOG and EMG noise removed with AE')
+        axes[1].set_ylabel('Signal amplitude')
+        axes[1].set_xlabel('Time')
+
+        # axes[2].plot(result_ae[i_ - 15:i_ + cnt_, :].ravel(), label='EMG noise removed with AE')
+        # axes[2].set_title('EMG noise removed with AE')
+        # axes[2].set_ylabel('Signal amplitude')
+        # axes[2].set_xlabel('Time')
+        #
+        # axes[3].plot(result_45[i_ - 15:i_ + cnt_, :].ravel(), label='simple low pass filter')
+        # axes[3].set_title('simple low pass filter')
+        # axes[3].set_ylabel('Signal amplitude')
+        # axes[3].set_xlabel('Time')
+        #
+        # axes[4].plot(result_lstm[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG removed using LSTM')
+        # axes[4].set_title('EOG and EMG removed using LSTM')
+        # axes[4].set_ylabel('Signal amplitude')
+        # axes[4].set_xlabel('Time')
+        #
+        # axes[5].plot(result_cnn[i_ - 15:i_ + cnt_, :].ravel(), label='EOG and EMG removed using CNN')
+        # axes[5].set_title('EOG and EMG removed using CNN')
+        # axes[5].set_ylabel('Signal amplitude')
+        # axes[5].set_xlabel('Time')
+
+
+
+        plt.tight_layout()  # Adjust layout to prevent overlapping
+        plt.show()
+
 
 #
 # combo_model_result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cnn_combo\result\result_pat_14_sz_2_ch_1.npy")
@@ -1155,6 +1201,10 @@ def moving_average_consecutive(data):
     return moving_avg
 
 
+patient_list_improvements = [38, 41, 50, 17]
+patient_list_no_change = [43, 11, 12]
+patient_list_worsening = [42, 9, 10]
+
 for p in range(1, 51):
 
     #cProfile.run("countNumberOfSeizuresPerPerson(p)")
@@ -1289,7 +1339,7 @@ for p in range(1, 51):
         # predicted_data_3 = moving_average_consecutive(predicted_data_3)
         # predicted_data_4 = moving_average_consecutive(predicted_data_4)
 
-
+        #compareSeizurePatterns(label, new_normalized_data_1, predicted_data_1)
         ##predicted_data_4 = predicted_data_4.squeeze(-1)
 
         # predicted_data_1 = np.load(
@@ -1564,6 +1614,7 @@ for patient in conf_list_lowpass_all:
     averaged_list_45.append(patient_array)
 
 improved_situation = 0
+improved_situation_10_percent_and_more = 0
 for p_i in range(0, len(averaged_list)):
     new_list_item = averaged_list[p_i]
     actual_list_item = averaged_list_actual_data[p_i]
@@ -1587,7 +1638,7 @@ for p_i in range(0, len(averaged_list)):
     # plt.plot(actual_list_item[:, 1], actual_list_item[:, 3])
     # plt.plot(lowpass_list_item[:, 1], lowpass_list_item[:, 3])
 
-    plt.figure()
+    #plt.figure()
     plt.plot(1 - spec_new, sens_new)
     plt.plot(1 - spec_actual, sens_actual)
     plt.plot(1 - spec_45, sens_45)
@@ -1598,6 +1649,9 @@ for p_i in range(0, len(averaged_list)):
 
     if(auc_new > auc_actual):
         improved_situation += 1
+
+    if((auc_new - auc_actual) / auc_actual >= 0.1):
+        improved_situation_10_percent_and_more += 1
 
     legend_labels = ["filtered data (AUC={:.2f})".format(auc_new),
                      "unfiltered data (AUC={:.2f})".format(auc_actual),
@@ -1611,12 +1665,15 @@ for p_i in range(0, len(averaged_list)):
     plt.xlabel("1 - specificity")
     plt.ylabel("sensitivity")
 
-    plt.savefig("C:\\Users\\RominaRsn\\PycharmProjects\\MyMasterThesis\\masterThesis\\data_file\\ROC_Per_Patient\\ROC_curve_patient_" + str(p_i + 1) + ".png")
+    #plt.savefig("C:\\Users\\RominaRsn\\PycharmProjects\\MyMasterThesis\\masterThesis\\data_file\\ROC_Per_Patient\\ROC_curve_patient_" + str(p_i + 1) + ".png")
     #plt.show()
 
 
 print("improved situation percentage: ", improved_situation/50)
 print("improved situation: ", improved_situation)
+
+print("improved situation percentage- more than 10 percent: ", improved_situation_10_percent_and_more/50)
+print("improved situation: ", improved_situation_10_percent_and_more)
 
 
 averaged_list = np.array(averaged_list)

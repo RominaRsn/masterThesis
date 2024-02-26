@@ -729,3 +729,23 @@ def encoder_with_5_layers_tanhActivation(input_shape=(500,1)):
     autoencoder.summary()
     return autoencoder
 
+
+def paper_cnn():
+    model = Sequential()
+    model.add(Conv1D(32, 3, activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=(500, 1)))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(64, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(128, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(256, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(512, 3, activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(LeakyReLU(alpha=0.02))
+    model.add(Conv1D(1, 3, activation='tanh', kernel_initializer='he_uniform', padding='same'))
+
+    model.compile(optimizer='adam', loss='mean_squared_error')
+
+    return model
+
+    model.summary()
