@@ -1638,11 +1638,11 @@ for p_i in range(0, len(averaged_list)):
     # plt.plot(actual_list_item[:, 1], actual_list_item[:, 3])
     # plt.plot(lowpass_list_item[:, 1], lowpass_list_item[:, 3])
 
-    #plt.figure()
-    plt.plot(1 - spec_new, sens_new)
-    plt.plot(1 - spec_actual, sens_actual)
-    plt.plot(1 - spec_45, sens_45)
-
+    # plt.figure()
+    # plt.plot(1 - spec_new, sens_new)
+    # plt.plot(1 - spec_actual, sens_actual)
+    # #plt.plot(1 - spec_45, sens_45)
+    #
     auc_new = auc(1 - spec_new, sens_new)
     auc_actual = auc(1 - spec_actual, sens_actual)
     auc_45 = auc(1 - spec_45, sens_45)
@@ -1653,19 +1653,19 @@ for p_i in range(0, len(averaged_list)):
     if((auc_new - auc_actual) / auc_actual >= 0.1):
         improved_situation_10_percent_and_more += 1
 
-    legend_labels = ["filtered data (AUC={:.2f})".format(auc_new),
-                     "unfiltered data (AUC={:.2f})".format(auc_actual),
-                     "filtered data with a simple lowpass filter (AUC={:.2f})".format(auc_45)]
 
-
-    plt.title("ROC curve for patient " + str(p_i + 1))
-
-    plt.legend(legend_labels, loc='lower right')
-
-    plt.xlabel("1 - specificity")
-    plt.ylabel("sensitivity")
-
-    #plt.savefig("C:\\Users\\RominaRsn\\PycharmProjects\\MyMasterThesis\\masterThesis\\data_file\\ROC_Per_Patient\\ROC_curve_patient_" + str(p_i + 1) + ".png")
+    # legend_labels = ["Filtered data (AUC={:.2f})".format(auc_new),
+    #                  "Raw data (AUC={:.2f})".format(auc_actual)]
+    #
+    #
+    # plt.title("ROC curve for patient " + str(p_i + 1))
+    #
+    # plt.legend(legend_labels, loc='lower right')
+    #
+    # plt.xlabel("1 - specificity")
+    # plt.ylabel("sensitivity")
+    #
+    # plt.savefig("C:\\Users\\RominaRsn\\PycharmProjects\\MyMasterThesis\\masterThesis\\data_file\\ROC_Per_Patient\\ROC_curve_patient_" + str(p_i + 1) + ".png")
     #plt.show()
 
 

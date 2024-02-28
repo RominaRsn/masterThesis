@@ -23,6 +23,8 @@ import neurokit2 as nk
 import cProfile
 from memory_profiler import profile
 from matplotlib.widgets import Slider
+from scipy.signal import find_peaks, peak_prominences
+
 
 def moving_average_consecutive(data):
     moving_avg = []
@@ -193,6 +195,25 @@ def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
 
     ll_eog_ma = moving_average_consecutive(ll_eog)
 
+    peaks_raw, _ = find_peaks(ll_raw)
+    peaks_ae, _ = find_peaks(ll_eog)
+
+    prominences_raw = peak_prominences(ll_raw, peaks_raw)[0]
+    prominences_ae = peak_prominences(ll_eog, peaks_ae)[0]
+
+    amplitudes_raw = ll_raw[peaks_raw]
+    significance_raw = amplitudes_raw + prominences_raw
+
+    amplitudes_ae = ll_eog[peaks_ae]
+    significance_ae = amplitudes_ae + prominences_ae
+
+    sorted_indices_raw = np.argsort(significance_raw)[::-1]  # Sort in descending order
+    sorted_peaks_raw = peaks_raw[sorted_indices_raw]
+
+    sorted_indices_ae = np.argsort(significance_ae)[::-1]  # Sort in descending order
+    sorted_peaks_ae = peaks_ae[sorted_indices_ae]
+
+
     # # Define the window size for the moving average
     # window_size = 2
     #
@@ -210,6 +231,7 @@ def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
 
     axs[0].scatter(scatter_range,ll_raw.ravel(), marker=".")
     axs[0].set_title('Raw Data')
+    axs[0].scatter(sorted_peaks_raw[:1], ll_raw[sorted_peaks_raw[:1]], color='red', label='Most Significant Peaks')
     #axs[0].plot(labels_raw, 'r')
     axs[0].plot(label, 'orange')
     axs[0].set_ylabel('Amplitude')
@@ -218,7 +240,8 @@ def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
     axs[1].scatter(scatter_range, ll_eog.ravel(), marker=".")
     axs[1].set_title('AE')
     #axs[1].plot(labels_eog, 'r')
-    axs[1].plot(label * max(ll_eog), 'orange')
+    #axs[1].plot(label * max(ll_eog), 'orange')
+    axs[1].scatter(sorted_peaks_ae[:1], ll_eog[sorted_peaks_ae[:1]], color='red', label='Most Significant Peaks')
     axs[1].set_ylabel('Amplitude')
     axs[1].set_xlabel('Time')
 

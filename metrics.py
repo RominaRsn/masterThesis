@@ -21,6 +21,7 @@ class metrics:
         snr = 10 * np.log10(np.sum(secondSignal ** 2) / np.sum((firstSignal - secondSignal) ** 2))
         return snr
 
+
     def snrDiff(self, originalSignal, preprocessedSignal, predictedSignal):
         snrInput =  self.snr(originalSignal, preprocessedSignal)
         snrOutput = self.snr(predictedSignal, preprocessedSignal)
