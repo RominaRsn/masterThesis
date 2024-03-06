@@ -15,7 +15,8 @@ import neurokit2 as nk
 from keras.callbacks import ModelCheckpoint
 
 
-model = model.paper_cnn()
+#model = model.paper_cnn()
+model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\paper_cnn_checkpoint.h5')
 
 data_clean_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_cheby_filtered_new.npy")
 data_noisy_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_cheby_filtered_new.npy")
@@ -26,25 +27,25 @@ data_noisy_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMas
 noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized_cheby, data_clean_normalized_cheby, test_size=0.2, random_state=42)
 
 
-checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\paper_cnn_checkpoint.h5'
-
-checkpoint = ModelCheckpoint(checkpoint_path,
-                             monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
-                             save_best_only=True,  # Save only if the validation performance improves
-                             mode='min',  # 'min' for loss, 'max' for accuracy, 'auto' will infer automatically
-                             verbose=1)
-
-model.optimizer.learning_rate = 1e-6
-
-model.fit(
-    noisy_train,
-    clean_train,
-    epochs=5,
-    batch_size=16,
-    validation_split=0.1,
-    callbacks=[checkpoint],
-    shuffle=True
-)
+# checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\paper_cnn_checkpoint.h5'
+#
+# checkpoint = ModelCheckpoint(checkpoint_path,
+#                              monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
+#                              save_best_only=True,  # Save only if the validation performance improves
+#                              mode='min',  # 'min' for loss, 'max' for accuracy, 'auto' will infer automatically
+#                              verbose=1)
+#
+# model.optimizer.learning_rate = 1e-6
+#
+# model.fit(
+#     noisy_train,
+#     clean_train,
+#     epochs=3,
+#     batch_size=16,
+#     validation_split=0.1,
+#     callbacks=[checkpoint],
+#     shuffle=True
+# )
 
 
 

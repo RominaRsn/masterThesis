@@ -247,6 +247,9 @@ def evaluate_model(model_path, data_noisy, data_clean, filters, file_path):
     diffNoisyClean = data_noisy - data_clean
     rmsNoisy = np.sqrt(np.mean(diffNoisyClean ** 2))
 
+    Psnr_clean = 10 * np.log10(max(clean_input_test_vec) / rrmseNoisy ** 2)
+    Psnr_cleaned = 10 * np.log10(max(clean_input_test_vec) / rrmseCleaned ** 2)
+
     fm = open(file_path, 'a')
     fm.write("-----------------Results for model: {}---------------------\n".format(os.path.basename(model_path)))
     fm.write("SNRNoisy: {}\n".format(snrnoisy))
@@ -257,6 +260,8 @@ def evaluate_model(model_path, data_noisy, data_clean, filters, file_path):
     fm.write("RMSECleaned: {}\n".format(rrmseCleaned))
     fm.write("SNRNoisyNotDB: {}\n".format(snr_nosiy_not_db))
     fm.write("SNRCleanedNotDB: {}\n".format(snr_cleaned_not_db))
+    fm.write("PSNRClean: {}\n".format(Psnr_clean))
+    fm.write("PSNRFiltered: {}\n".format(Psnr_cleaned))
 
     for cutoff in filters:
         filtered_signal = nk.signal_filter(data_noisy, sampling_rate=250, highcut=cutoff, method='butterworth', order=4)
@@ -308,9 +313,10 @@ file_path = os.path.join(user_home, "Downloads", "EOG_With_Noise_All_models.txt"
 filters = [45, 30, 70]  # Define your list of filters here
 
 model_paths = [
-    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5",
-    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_LSTM_checkPoint.h5",
-    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_GRU_checkPoint.h5",
+    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5",
+    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_LSTM_checkPoint.h5",
+    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_GRU_checkPoint.h5",
+    r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\paper_CNN_retrainWithEOG_LSTM_checkPoint.h5'
 ]
 
 for model_path in model_paths:

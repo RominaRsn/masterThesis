@@ -32,15 +32,11 @@ noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_n
 #model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_LSTM_checkPoint.h5")
 
 #model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_cheby_checkpoint.h5")
-model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\ae_skip_layers_oisk.h5")
+model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_more_filters.h5")
 
 
-padding_needed = (0, 12)  # Add 12 columns of padding to the second dimension to make it 512
 
-# Pad the matrix
-padded_matrix = np.pad(noisy_test[0:1000], ((0, 0), (0, 12), (0, 0)), mode='constant', constant_values=0)
-
-result = model.predict(padded_matrix)
+result = model.predict(noisy_test)
 result = result.squeeze(-1)
 
 cornoisyclean_list = []

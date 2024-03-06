@@ -33,61 +33,62 @@ noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_n
 
 #model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
 
-model_paths = [
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5",
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_LSTM_checkPoint.h5",
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_GRU_checkPoint.h5",
+result_paths = [
+    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers.h5",
+    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers_more_filters.h5",
+    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_four_layers.h5",
+    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers.h5",
+    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_moreEpoch.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_more_filters.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_7_layer.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_512.h5",
+
     # Add more model paths as needed
-    r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\paper_CNN_retrainWithEOG_LSTM_checkPoint.h5'
 ]
 
 # Iterate over each model
-for model_path in model_paths:
-    # Load model
+for model_path in result_paths:
     model = load_model(model_path)
-
-    # Generate predictions
     result = model.predict(noisy_test)
 
     if(result.ndim == 3):
         result.squeeze(-1)
-
     # Filter signals
     # filteredSignal_45 = nk.signal_filter(noisy_test, sampling_rate=250, highcut=40, method='butterworth', order=4)
     # filteredSignal_30 = nk.signal_filter(noisy_test, sampling_rate=250, highcut=30, method='butterworth', order=4)
     # filteredSignal_70 = nk.signal_filter(noisy_test, sampling_rate=250, highcut=70, method='butterworth', order=4)
 
-    # Calculate metrics
     clean_input_test_vec = np.ravel(clean_test)
     noisy_input_test_vec = np.ravel(noisy_test)
     test_reconstructions_vec = np.ravel(result)
+
     cornoisyclean = np.corrcoef(clean_input_test_vec, noisy_input_test_vec)
     corcleaned = np.corrcoef(clean_input_test_vec, test_reconstructions_vec)
 
     snrnoisy = metrics.metrics.snr(clean_input_test_vec, noisy_input_test_vec)
     snrcleaned = metrics.metrics.snr(clean_input_test_vec, test_reconstructions_vec)
-
     snr_nosiy_not_db = dB_to_linear(snrnoisy)
     snr_cleaned_not_db = dB_to_linear(snrcleaned)
 
     rrmseNoisy = metrics.metrics.rrmseMetric(clean_input_test_vec, noisy_input_test_vec)
     rrmseCleaned = metrics.metrics.rrmseMetric(clean_input_test_vec, test_reconstructions_vec)
 
-    diffNoisyClean = noisy_test - clean_test
-    rmsNoisy = np.sqrt(np.mean(diffNoisyClean**2))
+    diffNoisyClean = clean_test - noisy_test
+    rmsNoisy = np.sqrt(np.mean(diffNoisyClean ** 2))
 
-    Psnr_clean = 10*np.log10(max(clean_input_test_vec)/rrmseNoisy **2)
+    Psnr_clean = 10 * np.log10(max(clean_input_test_vec) / rrmseNoisy ** 2)
+    Psnr_cleaned = 10 * np.log10(max(clean_input_test_vec) / rrmseCleaned ** 2)
 
     #diffCleanedClean = test_reconstructions_vec.reshape(test_reconstructions_vec.shape[0], -1) - clean_test
     diffCleanedClean = test_reconstructions_vec - clean_input_test_vec
+    rmsCleaned = np.sqrt(np.mean(diffCleanedClean ** 2))
+    Psnr_cleaned = 10 * np.log10(max(clean_input_test_vec) / rrmseCleaned ** 2)
 
-    rmsCleaned = np.sqrt(np.mean(diffCleanedClean**2))
-    Psnr_cleaned = 10*np.log10(max(clean_input_test_vec)/rrmseCleaned **2)
 
     # Get the user's home directory
     user_home = os.path.expanduser("~")
     # Specify the file path in the Downloads directory
-    file_path = os.path.join(user_home, "Downloads", "EMG_With_Noise_All_models.txt")
+    file_path = os.path.join(user_home, "Downloads", "AEs_Compare.txt")
 
     # Write results to file
     with open(file_path, 'a') as fm:

@@ -1424,6 +1424,7 @@ for p in range(1, 51):
         # concat_result_raw = concatAllResults(label, labels_1, labels_2, labels_3, labels_4)
 
         label_raw_data = doLogicalOR(labels_1, labels_2, labels_3, labels_4)
+
         #label_raw_data = doTwoAndOneOr(labels_1, labels_2, labels_3, labels_4)
         #label_raw_data = doAnds(labels_1, labels_2, labels_3, labels_4)
 
@@ -1545,7 +1546,9 @@ for p in range(1, 51):
         selected_threshold_list = getTheBestThresholds(label, predicted_label)
 
         if(len(selected_threshold_list) != 0):
+
             selected_threshold = selected_threshold_list[-1]
+
             #print(selected_threshold)
 
             #false_detections_predicted = getFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
@@ -1561,6 +1564,14 @@ for p in range(1, 51):
             #plotLineLengthValues(improved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, labels_1, labels_2, labels_3, labels_4)
             #dismproved_result = getdisImprovement(label, label_raw_data, predicted_label, selected_threshold)
             #plotFalsePositives(dismproved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3,new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3,predicted_data_4, p, sz, selected_threshold, labels_1, labels_2, labels_3, labels_4)
+
+        fpr_predicted, tpr_predicted, thresholds_predicted = roc_curve(label, linelength(predicted_data_1))
+        fpr_raw, tpr_raw, thresholds_raw = roc_curve(label, linelength(new_normalized_data_1))
+
+        plt.plot(fpr_predicted, tpr_predicted, label="predicted")
+        plt.plot(fpr_raw, tpr_raw, label="raw")
+        plt.legend()
+        plt.show()
 
 
 
