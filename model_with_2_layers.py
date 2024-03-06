@@ -30,13 +30,23 @@ import scipy
 # np.save(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\small_clean_normalized_new.npy', small_data_clean_normalized)
 # np.save(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\small_noisy_normalized_new.npy', small_data_noisy_normalized)
 
-data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\small_noisy_normalized_new.npy")
-data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\small_clean_normalized_new.npy")
-
+# data_clean_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_cheby_filtered_new.npy")
+# data_noisy_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_cheby_filtered_new.npy")
 #
+# #
+#
+# # Step 1: Split into training and test sets
+# noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized_cheby, data_clean_normalized_cheby, test_size=0.2, random_state=42)
+
+data_clean_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_cheby_normalized_smaller.npy")
+data_noisy_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_cheby_normalized_smaller.npy")
+
+
 
 # Step 1: Split into training and test sets
-noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
+#noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized_cheby, data_clean_normalized_cheby, test_size=0.2, random_state=42)
+
+noisy_train_eog, noisy_test_eog, clean_train_eog, clean_test_eog = train_test_split(data_noisy_eog, data_clean_eog, test_size=0.2, random_state=42)
 
 # Step 2: Split the training set into training and validation sets
 #noisy_train, noisy_val, clean_train, clean_val = train_test_split(noisy_train, clean_train, test_size=0.1, random_state=42)
@@ -54,11 +64,11 @@ noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_n
 # reshaped_data_noisy = nosiy_train_t.reshape(np.shape(noisy_train)[0], np.shape(noisy_train)[1], 1)
 # reshaped_data_clean = clean_train_t.reshape(np.shape(noisy_train)[0], np.shape(noisy_train)[1], 1)
 
-reshaped_noisy_train = noisy_train.reshape(noisy_train.shape[0], noisy_train.shape[1], 1)
-reshaped_clean_train = clean_train.reshape(clean_train.shape[0], clean_train.shape[1], 1)
-
-reshaped_noisy_test = noisy_test.reshape(noisy_test.shape[0], noisy_test.shape[1], 1)
-reshaped_clean_test = clean_test.reshape(clean_test.shape[0], clean_test.shape[1], 1)
+# reshaped_noisy_train = noisy_train.reshape(noisy_train.shape[0], noisy_train.shape[1], 1)
+# reshaped_clean_train = clean_train.reshape(clean_train.shape[0], clean_train.shape[1], 1)
+#
+# reshaped_noisy_test = noisy_test.reshape(noisy_test.shape[0], noisy_test.shape[1], 1)
+# reshaped_clean_test = clean_test.reshape(clean_test.shape[0], clean_test.shape[1], 1)
 #model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\my_model_simple.h5")
 #model = keras.models.load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\my_model_modified_simple_2.h5")
 # # Plot the model and save it to a file (optional)
@@ -93,9 +103,9 @@ result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesi
 #     filtered = scipy.signal.sosfilt(sos, signal)
 #     return filtered
 #filteredSignal = metrics.metrics.filtering_signals(noisy_test, 250, 45, 0.5, 50, 4)
-filteredSignal_45 = nk.signal_filter(noisy_test , sampling_rate=250, lowcut=0.1, highcut=45, method='butterworth', order=4)
-filteredSignal_70 = nk.signal_filter(noisy_test, sampling_rate=250, lowcut=0.1, highcut=70, method='butterworth', order=4)
-filteredSignal_30 = nk.signal_filter(noisy_test, sampling_rate=250, lowcut=0.1, highcut=30, method='butterworth', order=4)
+# filteredSignal_45 = nk.signal_filter(noisy_test , sampling_rate=250, lowcut=0.1, highcut=45, method='butterworth', order=4)
+# filteredSignal_70 = nk.signal_filter(noisy_test, sampling_rate=250, lowcut=0.1, highcut=70, method='butterworth', order=4)
+# filteredSignal_30 = nk.signal_filter(noisy_test, sampling_rate=250, lowcut=0.1, highcut=30, method='butterworth', order=4)
 # spicy.signal.butter(4, [0.1, 45], fs=250, output='sos')
 # filteredSignal_45 = metrics.metrics.filtering_signals(noisy_test, 250, 45, 0.5, 50, 4)
 # filteredSignal_70 = metrics.metrics.filtering_signals(noisy_test, 250, 70, 0.5, 50, 4)
@@ -117,35 +127,50 @@ filteredSignal_30 = nk.signal_filter(noisy_test, sampling_rate=250, lowcut=0.1, 
 #
 # #
 
-signalIndexVector = [0, 1, 3, 7, 11, 13, 14, 16, 17]
+signalIndexVector = range(0, 5)
 for i in signalIndexVector:
-    fig, axes = plt.subplots(nrows=3, ncols=1, sharey='col')
+    #fig, axes = plt.subplots(nrows=1, ncols=1, sharey='col')
 
-    row_index = i
-    max_range = np.max(noisy_test[row_index, :])
-    min_range = np.min(noisy_test[row_index, :])
-
+    x = np.linspace(0, 2, 500)
 
     #col_index = np.random.randint(0, 11520000/500)
 
-    axes[0].plot(noisy_test[row_index, :], label = 'Noisy Data')
-    axes[0].set_title('Noisy data')
-    axes[0].set_ylabel('Signal amplitude')
-    axes[0].set_xlabel('Time')
+    # axes[0].plot(noisy_test[row_index, :], label = 'Noisy Data')
+    # axes[0].set_title('Noisy data')
+    # axes[0].set_ylabel('Signal amplitude')
+    # axes[0].set_xlabel('Time')
+    # #plt.ylim(min_range, max_range)
+    #
+    #
+    # axes[1].plot(clean_test[row_index, :], label = 'clean Data')
+    # axes[1].set_title('clean data')
+    # axes[1].set_ylabel('Signal amplitude')
+    # axes[1].set_xlabel('Time')
+    # #plt.ylim(min_range, max_range)
+
+    plt.figure()
+    plt.plot(x, clean_test_eog[i, :], label = 'clean EEG Signal')
+    plt.suptitle('Clean EEG Signal')
+    plt.ylabel('Signal amplitude')
+    plt.xlabel('Time(s)')
+    plt.savefig(fr'C:\Users\RominaRsn\Desktop\figs\clean_EEG_Signal_EOG_{i}.png')
+    #plt.show()
     #plt.ylim(min_range, max_range)
 
+    plt.figure()
+    plt.plot(x, noisy_test_eog[i, :], label = 'EEG Signal Contaminated with EOG Noise')
+    plt.suptitle('EEG Signal Contaminated with EOG Noise')
+    plt.ylabel('Signal amplitude')
+    plt.xlabel('Time(s)')
+    plt.savefig(fr'C:\Users\RominaRsn\Desktop\figs\noisy_EEG_Signal_EOG_{i}.png')
+    #plt.show()
 
-    axes[1].plot(clean_test[row_index, :], label = 'clean Data')
-    axes[1].set_title('clean data')
-    axes[1].set_ylabel('Signal amplitude')
-    axes[1].set_xlabel('Time')
-    #plt.ylim(min_range, max_range)
+    # plt.plot(x, noisy_test_eog[i, :], label='EEG Signal Contaminated with EOG Noise')
+    # plt.set_title('EEG Signal Contaminated with EOG Noise')
+    # plt.set_ylabel('Signal amplitude')
+    # plt.set_xlabel('Time(s)')
+    # plt.show()
 
-    axes[2].plot(result[row_index, :], label = 'clean Data_ predicted')
-    axes[2].set_title('cleaned data')
-    axes[2].set_ylabel('Signal amplitude')
-    axes[2].set_xlabel('Time')
-    #plt.ylim(min_range, max_range)
 
 
     # axes[3].plot(filteredSignal_30[row_index, :] + .55, label ='filtered signal-30')
@@ -170,13 +195,8 @@ for i in signalIndexVector:
     #print(test_array.shape())
 
     # Add overall title
-    fig.suptitle('Comparison of clean and noisy data')
+    #fig.suptitle('Comparison of clean and noisy data')
 
-    # Adjust layout to prevent overlap
-    #plt.tight_layout()
-
-    # Show the plot
-    plt.show()
 # #
 # # Get the user's home directory
 # user_home = os.path.expanduser("~")

@@ -1152,44 +1152,6 @@ def getThresholdsPerPatientAfterCleaning_newThresholdMethod(path, patient_number
     return thresholds_at_desired_tpr
 
 
-conf_list_all = []
-conf_list_actual_data_all = []
-conf_list_lowpass_all = []
-
-classified_as_sz_ch_1_actual_data = []
-classified_as_sz_ch_2_actual_data = []
-classified_as_sz_ch_3_actual_data = []
-classified_as_sz_ch_4_actual_data = []
-
-classified_as_sz_ch_1_predicted = []
-classified_as_sz_ch_2_predicted = []
-classified_as_sz_ch_3_predicted = []
-classified_as_sz_ch_4_predicted = []
-
-classified_at_least_once_new = []
-classified_at_least_once_old = []
-classified_at_least_once_45 = []
-
-classified_at_least_once_10sec_new = []
-classified_at_least_once_10sec_old = []
-classified_at_least_once_10sec_45 = []
-
-# eventBasedFP =[]
-# eventBasedFP_old = []
-# eventBasedFP_45 = []
-
-conf_fp_new = []
-conf_fp_old = []
-conf_fp_45 = []
-
-postProcessedFPList_new = []
-postProcessedFPList_old = []
-postProcessedFPList_45 = []
-
-postProcessedFPList_new_new_post = []
-postProcessedFPList_old_new_post = []
-postProcessedFPList_45_new_post = []
-
 
 def moving_average_consecutive(data):
     moving_avg = []
@@ -1205,693 +1167,421 @@ patient_list_improvements = [38, 41, 50, 17]
 patient_list_no_change = [43, 11, 12]
 patient_list_worsening = [42, 9, 10]
 
-for p in range(1, 51):
-
-    #cProfile.run("countNumberOfSeizuresPerPerson(p)")
-    sz_num = countNumberOfSeizuresPerPerson(p)
+all_plots_roc = []
+all_plots_classified_at_least_once = []
+all_plots_classified_at_least_once_10s = []
+all_plots_pp = []
+all_plots_pp_10s = []
 
-    conf_list = []
-    conf_list_actual_data = []
-    conf_list_45 = []
-
-    # thresholds_old_ch_1 = getThresholdsPerPatient(p, 1, sz_num)
-    # thresholds_old_ch_2 = getThresholdsPerPatient(p, 2, sz_num)
-    # thresholds_old_ch_3 = getThresholdsPerPatient(p, 3, sz_num)
-    # thresholds_old_ch_4 = getThresholdsPerPatient(p, 4, sz_num)
-
-    thresholds_old_ch_1 = getThresholdsPerPatient(p, 1, sz_num)
-    thresholds_old_ch_2 = getThresholdsPerPatient(p, 2, sz_num)
-    thresholds_old_ch_3 = getThresholdsPerPatient(p, 3, sz_num)
-    thresholds_old_ch_4 = getThresholdsPerPatient(p, 4, sz_num)
-
-
-    #print("clean data thresholds: ", thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4)
-
-    #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
-    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering"
-    thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
-    thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
-    thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
-    thresholds_new_ch_4 = getThresholdsPerPatientAfterCleaning(path, p, 4, sz_num)
-    #print("new data thresholds: ", thresholds_new_ch_1, thresholds_new_ch_2, thresholds_new_ch_3, thresholds_new_ch_4)
-
-
-    for sz in range(1, sz_num + 1):
-        file_path_1 = os.path.join(folder_path, f"pat_{p}_sz_{sz}_ch_1.npy")
-        file_path_2 = os.path.join(folder_path, f"pat_{p}_sz_{sz}_ch_2.npy")
-        file_path_3 = os.path.join(folder_path, f"pat_{p}_sz_{sz}_ch_3.npy")
-        file_path_4 = os.path.join(folder_path, f"pat_{p}_sz_{sz}_ch_4.npy")
-
-        data_1 = np.load(file_path_1)
-        data_2 = np.load(file_path_2)
-        data_3 = np.load(file_path_3)
-        data_4 = np.load(file_path_4)
-
-        mean_val_1 = np.mean(data_1)
-        std_val_1 = np.std(data_1)
-        new_normalized_data_1 = (data_1 - mean_val_1) / std_val_1
-        new_normalized_data_1 = (new_normalized_data_1) / (np.max(new_normalized_data_1) - np.min(new_normalized_data_1))
-
-        mean_val_2 = np.mean(data_2)
-        std_val_2 = np.std(data_2)
-        new_normalized_data_2 = (data_2 - mean_val_2) / std_val_2
-        new_normalized_data_2 = (new_normalized_data_2) / (np.max(new_normalized_data_2) - np.min(new_normalized_data_2))
-
-        mean_val_3 = np.mean(data_3)
-        std_val_3 = np.std(data_3)
-        new_normalized_data_3 = (data_3 - mean_val_3) / std_val_3
-        new_normalized_data_3 = (new_normalized_data_3) / (np.max(new_normalized_data_3) - np.min(new_normalized_data_3))
-
-        mean_val_4 = np.mean(data_4)
-        std_val_4 = np.std(data_4)
-        new_normalized_data_4 = (data_4 - mean_val_4) / std_val_4
-        new_normalized_data_4 = (new_normalized_data_4) / (np.max(new_normalized_data_4) - np.min(new_normalized_data_4))
-
-        # new_normalized_data_1_copy = new_normalized_data_1
-        # new_normalized_data_2_copy = new_normalized_data_2
-        # new_normalized_data_3_copy = new_normalized_data_3
-        # new_normalized_data_4_copy = new_normalized_data_4
-        #
-        #
-        # new_normalized_data_1 = moving_average_consecutive(new_normalized_data_1)
-        # new_normalized_data_2 = moving_average_consecutive(new_normalized_data_2)
-        # new_normalized_data_3 = moving_average_consecutive(new_normalized_data_3)
-        # new_normalized_data_4 = moving_average_consecutive(new_normalized_data_4)
-
-
-        file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{sz}_labels.npy")
-        label = np.load(file_path_labels)
-
-        # moving_average_label = moving_average_consecutive(label)
-        # moving_average_label = np.array(moving_average_label)
-        # moving_average_label = (moving_average_label > 0.5).astype(int)
-
-        # plt.plot(label)
-        # plt.plot(moving_average_label)
-        # plt.show()
-
-
-        ####filtering with lowpass filter
-
-        filteredSignal_1_45 = nk.signal_filter(new_normalized_data_1, sampling_rate=250, highcut=40,
-                                             method='butterworth', order=4)
-        filteredSignal_2_45 = nk.signal_filter(new_normalized_data_2, sampling_rate=250, highcut=40,
-                                                method='butterworth', order=4)
-        filteredSignal_3_45 = nk.signal_filter(new_normalized_data_3, sampling_rate=250, highcut=40,
-                                                method='butterworth', order=4)
-        filteredSignal_4_45 = nk.signal_filter(new_normalized_data_4, sampling_rate=250, highcut=40,
-                                                method='butterworth', order=4)
-
-        # filteredSignal_1_45 = moving_average_consecutive(filteredSignal_1_45)
-        # filteredSignal_2_45 = moving_average_consecutive(filteredSignal_2_45)
-        # filteredSignal_3_45 = moving_average_consecutive(filteredSignal_3_45)
-        # filteredSignal_4_45 = moving_average_consecutive(filteredSignal_4_45)
-
-
-
-        # #####when the predictions are already calculated
-        # predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_1.npy"))
-        # #predicted_data_1 = predicted_data_1.squeeze(-1)
-        #
-        # predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_2.npy"))
-        # #predicted_data_2 = predicted_data_2.squeeze(-1)
-        #
-        # predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_3.npy"))
-        # #predicted_data_3 = predicted_data_3.squeeze(-1)
-        #
-        # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
-        # ##predicted_data_4 = predicted_data_4.squeeze(-1)
-        #
-        # predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_1.npy"))
-        # #predicted_data_1 = predicted_data_1.squeeze(-1)
-        #
-        # predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_2.npy"))
-        # #predicted_data_2 = predicted_data_2.squeeze(-1)
-        #
-        # predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_3.npy"))
-        # #predicted_data_3 = predicted_data_3.squeeze(-1)
-        #
-        # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering", f"pat_{p}_sz_{sz}_ch_4.npy"))
-
-        #
-        # predicted_data_1 = moving_average_consecutive(predicted_data_1)
-        # predicted_data_2 = moving_average_consecutive(predicted_data_2)
-        # predicted_data_3 = moving_average_consecutive(predicted_data_3)
-        # predicted_data_4 = moving_average_consecutive(predicted_data_4)
-
-        #compareSeizurePatterns(label, new_normalized_data_1, predicted_data_1)
-        ##predicted_data_4 = predicted_data_4.squeeze(-1)
-
-        # predicted_data_1 = np.load(
-        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-        #                  f"pat_{p}_sz_{sz}_ch_1.npy"))
-        # # predicted_data_1 = predicted_data_1.squeeze(-1)
-        #
-        # predicted_data_2 = np.load(
-        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-        #                  f"pat_{p}_sz_{sz}_ch_2.npy"))
-        # # predicted_data_2 = predicted_data_2.squeeze(-1)
-        #
-        # predicted_data_3 = np.load(
-        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-        #                  f"pat_{p}_sz_{sz}_ch_3.npy"))
-        # # predicted_data_3 = predicted_data_3.squeeze(-1)
-        #
-        # predicted_data_4 = np.load(
-        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-        #                  f"pat_{p}_sz_{sz}_ch_4.npy"))
-        ##predicted_data_4 = predicted_data_4.squeeze(-1)
-
-        # predicted_data_1 = np.load(os.path.join(
-        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-        #     f"pat_{p}_sz_{sz}_ch_1.npy"))
-        # # predicted_data_1 = predicted_data_1.squeeze(-1)
-        #
-        # predicted_data_2 = np.load(os.path.join(
-        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-        #     f"pat_{p}_sz_{sz}_ch_2.npy"))
-        # # predicted_data_2 = predicted_data_2.squeeze(-1)
-        #
-        # predicted_data_3 = np.load(os.path.join(
-        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-        #     f"pat_{p}_sz_{sz}_ch_3.npy"))
-        # # predicted_data_3 = predicted_data_3.squeeze(-1)
-        #
-        # predicted_data_4 = np.load(os.path.join(
-        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-        #     f"pat_{p}_sz_{sz}_ch_4.npy"))
-        # ##predicted_data_4 = predicted_data_4.squeeze(-1)
-
-
-        ####when the predictions are not calculated yet
-        # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\lstm_encoder_bigger.h5")
-        # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_cheby_checkpoint.h5")
-        # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
-        # model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrainWithEOG_LSTM.h5")
-        # model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_CNN_checkPoint.h5')
-        #
-        # # #
-        model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\paper_CNN_retrainWithEOG_LSTM_checkPoint.h5')
-        predicted_data_1 = model.predict(new_normalized_data_1)
-        predicted_data_2 = model.predict(new_normalized_data_2)
-        predicted_data_3 = model.predict(new_normalized_data_3)
-        predicted_data_4 = model.predict(new_normalized_data_4)
-
-        predicted_data_1 = predicted_data_1.squeeze(-1)
-        predicted_data_2 = predicted_data_2.squeeze(-1)
-        predicted_data_3 = predicted_data_3.squeeze(-1)
-        predicted_data_4 = predicted_data_4.squeeze(-1)
-
-        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_d ata_filtering_cnn", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
-        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
-        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
-        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
-
-
-
-
-
-
-
-        labels_1 = getOnlyLabels(new_normalized_data_1, label, thresholds_old_ch_1)
-        labels_2 = getOnlyLabels(new_normalized_data_2, label, thresholds_old_ch_2)
-        labels_3 = getOnlyLabels(new_normalized_data_3, label, thresholds_old_ch_3)
-        labels_4 = getOnlyLabels(new_normalized_data_4, label, thresholds_old_ch_4)
-
-        # label_raw_data = np.logical_or(labels_1, labels_2)
-        # label_raw_data = np.logical_or(label_raw_data, labels_3)
-        # label_raw_data = np.logical_or(label_raw_data, labels_4)
-        # label_raw_data = label_raw_data.astype(int)
-        # concat_result_raw = concatAllResults(label, labels_1, labels_2, labels_3, labels_4)
-
-        label_raw_data = doLogicalOR(labels_1, labels_2, labels_3, labels_4)
-
-        #label_raw_data = doTwoAndOneOr(labels_1, labels_2, labels_3, labels_4)
-        #label_raw_data = doAnds(labels_1, labels_2, labels_3, labels_4)
-
-        innerFPWithPP_old = postProcessFP(label, label_raw_data)
-        #innerFPWithPP_old = postProcessFP_firingMethod(label, label_raw_data)
-        postProcessedFPList_old_new_post.append(postProcessFP_firingMethod(label, label_raw_data))
-        postProcessedFPList_old.append(innerFPWithPP_old)
-
-
-
-        labels_45_1 = getOnlyLabels(filteredSignal_1_45, label, thresholds_old_ch_1)
-        labels_45_2 = getOnlyLabels(filteredSignal_2_45, label, thresholds_old_ch_2)
-        labels_45_3 = getOnlyLabels(filteredSignal_3_45, label,  thresholds_old_ch_3)
-        labels_45_4 = getOnlyLabels(filteredSignal_4_45, label, thresholds_old_ch_4)
-
-        labels_45_data = doLogicalOR(labels_45_1, labels_45_2, labels_45_3, labels_45_4)
-        #labels_45_data = doTwoAndOneOr(labels_45_1, labels_45_2, labels_45_3, labels_45_4)
-        #labels_45_data = doAnds(labels_45_1, labels_45_2, labels_45_3, labels_45_4)
-
-        # labels_45_data = np.logical_or(labels_45_1, labels_45_2)
-        # labels_45_data = np.logical_or(labels_45_data, labels_45_3)
-        # labels_45_data = np.logical_or(labels_45_data, labels_45_4)
-        # labels_45_data = labels_45_data.astype(int)
-
-        innerFPWithPP_45 = postProcessFP(label, labels_45_data)
-        #innerFPWithPP_45 = postProcessFP(label, labels_45_data)
-        #innerFPWithPP_45 = postProcessFP_firingMethod(label, labels_45_data)
-        #postProcessedFPList_45_new_post.append(postProcessFP_firingMethod(label, labels_45_data))
-        postProcessedFPList_45_new_post.append(postProcessFP_firingMethod(label, labels_45_data))
-        postProcessedFPList_45.append(innerFPWithPP_45)
-
-
-
-
-        classified_at_least_once_old.append(classifiedAtLeastOnce(label, label_raw_data))
-        classified_at_least_once_10sec_old.append(classifiedAtLeastOnce_10sec(label, label_raw_data))
-
-
-        classified_at_least_once_45.append(classifiedAtLeastOnce(label, labels_45_data))
-        classified_at_least_once_10sec_45.append(classifiedAtLeastOnce_10sec(label, labels_45_data))
-
-        #print(getNoneDetections(label, labels_1, labels_2, labels_3, labels_4))
-        #false_detections_raw = getFlaseDetections(label, label_raw_data)
-
-        #conf_mat_raw_data = confusion_matrix(label, label_raw_data)
-        conf_mat_raw_data = []
-        for i in range(0, label_raw_data.shape[1]):
-
-            #for line length
-            label_col = label_raw_data[:, i]
-            #for theta band power
-            # label_col = label_raw_data.squeeze(0)
-            # label_col = label_col[:, i]
-            #conf = confusion_matrix(label, label_col).ravel()
-            conf = confusion_matrix(label, label_col).ravel()
-            conf_mat_raw_data.append(conf)
-
-        conf_mat_45 = []
-        for i in range(0, label_raw_data.shape[1]):
-            # for line length
-            label_col = label_raw_data[:, i]
-            # for theta band power
-            #label_col = labels_45_data.squeeze(0)
-            #label_col = label_col[:, i]
-
-            #conf = confusion_matrix(label, label_col).ravel()
-            conf = confusion_matrix(label, label_col).ravel()
-            conf_mat_45.append(conf)
-
-
-        predicted_labels_1 = getOnlyLabels(predicted_data_1, label, thresholds_new_ch_1)
-        predicted_labels_2 = getOnlyLabels(predicted_data_2, label, thresholds_new_ch_2)
-        predicted_labels_3 = getOnlyLabels(predicted_data_3, label, thresholds_new_ch_3)
-        predicted_labels_4 = getOnlyLabels(predicted_data_4, label, thresholds_new_ch_4)
-
-        if (np.array_equal(predicted_labels_1, predicted_labels_2) or np.array_equal(predicted_labels_2,
-                                                                                      predicted_labels_3) or np.array_equal(
-                predicted_labels_3, predicted_labels_4)):
-            print("all equal")
-
-
-        predicted_label = doLogicalOR(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
-        #predicted_label = doTwoAndOneOr(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
-        #predicted_label = doAnds(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
-
-
-        # predicted_label = np.logical_or(predicted_labels_1, predicted_labels_2)
-        # predicted_label = np.logical_or(predicted_label, predicted_labels_3)
-        # predicted_label = np.logical_or(predicted_label, predicted_labels_4)
-        # predicted_label = predicted_label.astype(int)
-
-
-        classified_at_least_once_new.append(classifiedAtLeastOnce(label, predicted_label))
-        classified_at_least_once_10sec_new.append(classifiedAtLeastOnce_10sec(label, predicted_label))
-
-
-
-
-        innerFPWithPP_new = postProcessFP(label, predicted_label)
-        #innerFPWithPP_new = postProcessFP_firingMethod(label, predicted_label)
-        #postProcessedFPList_new_new_post.append(postProcessFP_firingMethod(label, predicted_label))
-        postProcessedFPList_new_new_post.append(postProcessFP_firingMethod(label, predicted_label))
-        postProcessedFPList_new.append(innerFPWithPP_new)
-
-
-        conf_mat = []
-        #conf_mat = confusion_matrix(label, predicted_label)
-        for i in range(0, predicted_label.shape[1]):
-            #for line length
-            predicted_label_col = predicted_label[:,i]
-            #for theta band power
-            # predicted_label_col = predicted_label.squeeze(0)
-            # predicted_label_col = predicted_label_col[:,i]
-            #conf = confusion_matrix(label, predicted_label_col).ravel()
-            conf = confusion_matrix(label, predicted_label_col).ravel()
-            conf_mat.append(conf)
-
-        #selected_threshold_list = getTheBestThresholds(label, predicted_label)
-        selected_threshold_list = getTheBestThresholds(label, predicted_label)
-
-        if(len(selected_threshold_list) != 0):
-
-            selected_threshold = selected_threshold_list[-1]
-
-            #print(selected_threshold)
-
-            #false_detections_predicted = getFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
-            #false_detections_predicted = getReducedFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
-            #plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
-            #plotFalsePositives_new(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4
-            #                      ,labels_1, labels_2, labels_3, labels_4)
-            #improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
-            #print(f"channel thresholds new: channel 1: {thresholds_new_ch_1[selected_threshold]} channel 2: {thresholds_new_ch_2[selected_threshold]} channel 3: {thresholds_new_ch_3[selected_threshold]} channel 4: {thresholds_new_ch_4[selected_threshold]}")
-            #print(f"channel thresholds old: channel 1: {thresholds_old_ch_1[selected_threshold]} channel 2: {thresholds_old_ch_2[selected_threshold]} channel 3: {thresholds_old_ch_3[selected_threshold]} channel 4: {thresholds_old_ch_4[selected_threshold]} ")
-
-            #plotFalsePositives(improved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, [thresholds_new_ch_1, thresholds_new_ch_2, thresholds_new_ch_3, thresholds_new_ch_4], [thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4], p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
-            #plotLineLengthValues(improved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, labels_1, labels_2, labels_3, labels_4)
-            #dismproved_result = getdisImprovement(label, label_raw_data, predicted_label, selected_threshold)
-            #plotFalsePositives(dismproved_result, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3,new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3,predicted_data_4, p, sz, selected_threshold, labels_1, labels_2, labels_3, labels_4)
-
-        # fpr_predicted, tpr_predicted, thresholds_predicted = roc_curve(label, linelength(predicted_data_1))
-        # fpr_raw, tpr_raw, thresholds_raw = roc_curve(label, linelength(new_normalized_data_1))
-        #
-        # plt.plot(fpr_predicted, tpr_predicted, label="predicted")
-        # plt.plot(fpr_raw, tpr_raw, label="raw")
-        # plt.legend()
-        # plt.show()
-
-
-
-        conf_list.append(conf_mat)
-        conf_list_actual_data.append(conf_mat_raw_data)
-        conf_list_45.append(conf_mat_45)
-
-
-    conf_list_all.append(conf_list)
-    conf_list_actual_data_all.append(conf_list_actual_data)
-    conf_list_lowpass_all.append(conf_list_45)
-
-    #print(len(conf_list_all))
-
-averaged_list = []
-averaged_list_actual_data = []
-averaged_list_45 = []
-
-ppofFP_new_array = np.array(postProcessedFPList_new)
-ppofFP_new_array = np.mean(ppofFP_new_array, axis=0)
-
-ppofFP_old_array = np.array(postProcessedFPList_old)
-ppofFP_old_array = np.mean(ppofFP_old_array, axis=0)
-
-ppofFP_45_array = np.array(postProcessedFPList_45)
-ppofFP_45_array = np.mean(ppofFP_45_array, axis=0)
-
-ppofFP_new_array_new_post = np.array(postProcessedFPList_new_new_post)
-ppofFP_new_array_new_post = np.mean(ppofFP_new_array_new_post, axis=0)
-
-ppofFP_45_array_new_post = np.array(postProcessedFPList_45_new_post)
-ppofFP_45_array_new_post = np.mean(ppofFP_45_array_new_post, axis=0)
-
-ppofFP_old_array_new_post = np.array(postProcessedFPList_old_new_post)
-ppofFP_old_array_new_post = np.mean(ppofFP_old_array_new_post, axis=0)
-
-
-for patient in conf_list_all:
-    patient_array = np.array(patient)
-    patient_array = np.mean(patient_array, axis=0)
-    averaged_list.append(patient_array)
-
-for patient in conf_list_actual_data_all:
-    patient_array = np.array(patient)
-    patient_array = np.mean(patient_array, axis=0)
-    averaged_list_actual_data.append(patient_array)
-
-for patient in conf_list_lowpass_all:
-    patient_array = np.array(patient)
-    patient_array = np.mean(patient_array, axis=0)
-    averaged_list_45.append(patient_array)
-
-improved_situation = 0
-improved_situation_10_percent_and_more = 0
-for p_i in range(0, len(averaged_list)):
-    new_list_item = averaged_list[p_i]
-    actual_list_item = averaged_list_actual_data[p_i]
-    lowpass_list_item = averaged_list_45[p_i]
-
-    new_list_item = np.array(new_list_item)
-    actual_list_item = np.array(actual_list_item)
-    lowpass_list_item = np.array(lowpass_list_item)
-
-    sens_new = new_list_item[:, 3] / (new_list_item[:, 3] + new_list_item[:, 2])
-    spec_new = new_list_item[:, 0] / (new_list_item[:, 0] + new_list_item[:, 1])
-
-    sens_actual = actual_list_item[:, 3] / (actual_list_item[:, 3] + actual_list_item[:, 2])
-    spec_actual = actual_list_item[:, 0] / (actual_list_item[:, 0] + actual_list_item[:, 1])
-
-    sens_45 = lowpass_list_item[:, 3] / (lowpass_list_item[:, 3] + lowpass_list_item[:, 2])
-    spec_45 = lowpass_list_item[:, 0] / (lowpass_list_item[:, 0] + lowpass_list_item[:, 1])
-
-
-    # plt.plot(new_list_item[:, 1], new_list_item[:, 3])
-    # plt.plot(actual_list_item[:, 1], actual_list_item[:, 3])
-    # plt.plot(lowpass_list_item[:, 1], lowpass_list_item[:, 3])
-
-    # plt.figure()
-    # plt.plot(1 - spec_new, sens_new)
-    # plt.plot(1 - spec_actual, sens_actual)
-    # #plt.plot(1 - spec_45, sens_45)
+
+
+paths = [
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+
+
+]
+
+for path in paths:
+
+    conf_list_all = []
+    conf_list_actual_data_all = []
+    conf_list_lowpass_all = []
+
+    classified_as_sz_ch_1_actual_data = []
+    classified_as_sz_ch_2_actual_data = []
+    classified_as_sz_ch_3_actual_data = []
+    classified_as_sz_ch_4_actual_data = []
+
+    classified_as_sz_ch_1_predicted = []
+    classified_as_sz_ch_2_predicted = []
+    classified_as_sz_ch_3_predicted = []
+    classified_as_sz_ch_4_predicted = []
+
+    classified_at_least_once_new = []
+    classified_at_least_once_old = []
+    classified_at_least_once_45 = []
+
+    classified_at_least_once_10sec_new = []
+    classified_at_least_once_10sec_old = []
+    classified_at_least_once_10sec_45 = []
+
+    # eventBasedFP =[]
+    # eventBasedFP_old = []
+    # eventBasedFP_45 = []
+
+    conf_fp_new = []
+    conf_fp_old = []
+    conf_fp_45 = []
+
+    postProcessedFPList_new = []
+    postProcessedFPList_old = []
+    postProcessedFPList_45 = []
+
+    postProcessedFPList_new_new_post = []
+    postProcessedFPList_old_new_post = []
+    postProcessedFPList_45_new_post = []
+
+    for p in range(1, 2):
+
+        sz_num = countNumberOfSeizuresPerPerson(p)
+
+        conf_list = []
+        conf_list_actual_data = []
+        conf_list_45 = []
+
+        thresholds_old_ch_1 = getThresholdsPerPatient(p, 1, sz_num)
+        thresholds_old_ch_2 = getThresholdsPerPatient(p, 2, sz_num)
+        thresholds_old_ch_3 = getThresholdsPerPatient(p, 3, sz_num)
+        thresholds_old_ch_4 = getThresholdsPerPatient(p, 4, sz_num)
+
+
+        #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering"
+        thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
+        thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
+        thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
+        thresholds_new_ch_4 = getThresholdsPerPatientAfterCleaning(path, p, 4, sz_num)
+
+        for sz in range(1, sz_num + 1):
+            file_path_1 = os.path.join(folder_path, f"pat_{p}_sz_{sz}_ch_1.npy")
+            file_path_2 = os.path.join(folder_path, f"pat_{p}_sz_{sz}_ch_2.npy")
+            file_path_3 = os.path.join(folder_path, f"pat_{p}_sz_{sz}_ch_3.npy")
+            file_path_4 = os.path.join(folder_path, f"pat_{p}_sz_{sz}_ch_4.npy")
+
+            data_1 = np.load(file_path_1)
+            data_2 = np.load(file_path_2)
+            data_3 = np.load(file_path_3)
+            data_4 = np.load(file_path_4)
+
+            mean_val_1 = np.mean(data_1)
+            std_val_1 = np.std(data_1)
+            new_normalized_data_1 = (data_1 - mean_val_1) / std_val_1
+            new_normalized_data_1 = (new_normalized_data_1) / (np.max(new_normalized_data_1) - np.min(new_normalized_data_1))
+
+            mean_val_2 = np.mean(data_2)
+            std_val_2 = np.std(data_2)
+            new_normalized_data_2 = (data_2 - mean_val_2) / std_val_2
+            new_normalized_data_2 = (new_normalized_data_2) / (np.max(new_normalized_data_2) - np.min(new_normalized_data_2))
+
+            mean_val_3 = np.mean(data_3)
+            std_val_3 = np.std(data_3)
+            new_normalized_data_3 = (data_3 - mean_val_3) / std_val_3
+            new_normalized_data_3 = (new_normalized_data_3) / (np.max(new_normalized_data_3) - np.min(new_normalized_data_3))
+
+            mean_val_4 = np.mean(data_4)
+            std_val_4 = np.std(data_4)
+            new_normalized_data_4 = (data_4 - mean_val_4) / std_val_4
+            new_normalized_data_4 = (new_normalized_data_4) / (np.max(new_normalized_data_4) - np.min(new_normalized_data_4))
+
+            file_path_labels = os.path.join(path_extension_labels, f"pat_{p}_sz_{sz}_labels.npy")
+            label = np.load(file_path_labels)
+
+            predicted_data_1 = np.load(os.path.join(path, f"pat_{p}_sz_{sz}_ch_1.npy"))
+            if(predicted_data_1.shape[0] == 1):
+                predicted_data_1 = predicted_data_1.squeeze(-1)
+
+            predicted_data_2 = np.load(os.path.join(path, f"pat_{p}_sz_{sz}_ch_2.npy"))
+            if(predicted_data_2.shape[0] == 1):
+                predicted_data_2 = predicted_data_2.squeeze(-1)
+
+            predicted_data_3 =np.load(os.path.join(path, f"pat_{p}_sz_{sz}_ch_3.npy"))
+            if(predicted_data_3.shape[0] == 1):
+                predicted_data_3 = predicted_data_3.squeeze(-1)
+
+
+            predicted_data_4 = np.load(os.path.join(path, f"pat_{p}_sz_{sz}_ch_4.npy"))
+            if(predicted_data_4.shape[0] == 1):
+                predicted_data_4 = predicted_data_4.squeeze(-1)
+
+
+            labels_1 = getOnlyLabels(new_normalized_data_1, label, thresholds_old_ch_1)
+            labels_2 = getOnlyLabels(new_normalized_data_2, label, thresholds_old_ch_2)
+            labels_3 = getOnlyLabels(new_normalized_data_3, label, thresholds_old_ch_3)
+            labels_4 = getOnlyLabels(new_normalized_data_4, label, thresholds_old_ch_4)
+
+            label_raw_data = doLogicalOR(labels_1, labels_2, labels_3, labels_4)
+
+            innerFPWithPP_old = postProcessFP(label, label_raw_data)
+            postProcessedFPList_old_new_post.append(postProcessFP_firingMethod(label, label_raw_data))
+            postProcessedFPList_old.append(innerFPWithPP_old)
+
+            conf_mat_raw_data = []
+            for i in range(0, label_raw_data.shape[1]):
+
+                #for line length
+                label_col = label_raw_data[:, i]
+                #for theta band power
+                # label_col = label_raw_data.squeeze(0)
+                # label_col = label_col[:, i]
+                #conf = confusion_matrix(label, label_col).ravel()
+                conf = confusion_matrix(label, label_col).ravel()
+                conf_mat_raw_data.append(conf)
+
+
+            predicted_labels_1 = getOnlyLabels(predicted_data_1, label, thresholds_new_ch_1)
+            predicted_labels_2 = getOnlyLabels(predicted_data_2, label, thresholds_new_ch_2)
+            predicted_labels_3 = getOnlyLabels(predicted_data_3, label, thresholds_new_ch_3)
+            predicted_labels_4 = getOnlyLabels(predicted_data_4, label, thresholds_new_ch_4)
+
+
+            predicted_label = doLogicalOR(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+
+
+            classified_at_least_once_new.append(classifiedAtLeastOnce(label, predicted_label))
+            classified_at_least_once_10sec_new.append(classifiedAtLeastOnce_10sec(label, predicted_label))
+
+            classified_at_least_once_old.append(classifiedAtLeastOnce(label, label_raw_data))
+            classified_at_least_once_10sec_old.append(classifiedAtLeastOnce_10sec(label, label_raw_data))
+
+
+
+
+            innerFPWithPP_new = postProcessFP(label, predicted_label)
+            #innerFPWithPP_new = postProcessFP_firingMethod(label, predicted_label)
+            #postProcessedFPList_new_new_post.append(postProcessFP_firingMethod(label, predicted_label))
+            postProcessedFPList_new_new_post.append(postProcessFP_firingMethod(label, predicted_label))
+            postProcessedFPList_new.append(innerFPWithPP_new)
+
+
+            conf_mat = []
+            #conf_mat = confusion_matrix(label, predicted_label)
+            for i in range(0, predicted_label.shape[1]):
+                #for line length
+                predicted_label_col = predicted_label[:,i]
+                #for theta band power
+                # predicted_label_col = predicted_label.squeeze(0)
+                # predicted_label_col = predicted_label_col[:,i]
+                #conf = confusion_matrix(label, predicted_label_col).ravel()
+                conf = confusion_matrix(label, predicted_label_col).ravel()
+                conf_mat.append(conf)
+
+
+
+            conf_list.append(conf_mat)
+            conf_list_actual_data.append(conf_mat_raw_data)
+
+
+        conf_list_all.append(conf_list)
+        conf_list_actual_data_all.append(conf_list_actual_data)
+        conf_list_lowpass_all.append(conf_list_45)
+
+        #print(len(conf_list_all))
+
+    averaged_list = []
+    averaged_list_actual_data = []
+    averaged_list_45 = []
+
+    ppofFP_new_array = np.array(postProcessedFPList_new)
+    ppofFP_new_array = np.mean(ppofFP_new_array, axis=0)
+
+    ppofFP_old_array = np.array(postProcessedFPList_old)
+    ppofFP_old_array = np.mean(ppofFP_old_array, axis=0)
+
+    ppofFP_45_array = np.array(postProcessedFPList_45)
+    ppofFP_45_array = np.mean(ppofFP_45_array, axis=0)
+
+    ppofFP_new_array_new_post = np.array(postProcessedFPList_new_new_post)
+    ppofFP_new_array_new_post = np.mean(ppofFP_new_array_new_post, axis=0)
+
+    ppofFP_45_array_new_post = np.array(postProcessedFPList_45_new_post)
+    ppofFP_45_array_new_post = np.mean(ppofFP_45_array_new_post, axis=0)
+
+    ppofFP_old_array_new_post = np.array(postProcessedFPList_old_new_post)
+    ppofFP_old_array_new_post = np.mean(ppofFP_old_array_new_post, axis=0)
+
+
+    for patient in conf_list_all:
+        patient_array = np.array(patient)
+        patient_array = np.mean(patient_array, axis=0)
+        averaged_list.append(patient_array)
+
+    for patient in conf_list_actual_data_all:
+        patient_array = np.array(patient)
+        patient_array = np.mean(patient_array, axis=0)
+        averaged_list_actual_data.append(patient_array)
+
+    for patient in conf_list_lowpass_all:
+        patient_array = np.array(patient)
+        patient_array = np.mean(patient_array, axis=0)
+        averaged_list_45.append(patient_array)
+
+    improved_situation = 0
+    improved_situation_10_percent_and_more = 0
+    for p_i in range(0, len(averaged_list)):
+        new_list_item = averaged_list[p_i]
+        actual_list_item = averaged_list_actual_data[p_i]
+        lowpass_list_item = averaged_list_45[p_i]
+
+        new_list_item = np.array(new_list_item)
+        actual_list_item = np.array(actual_list_item)
+        lowpass_list_item = np.array(lowpass_list_item)
+
+        sens_new = new_list_item[:, 3] / (new_list_item[:, 3] + new_list_item[:, 2])
+        spec_new = new_list_item[:, 0] / (new_list_item[:, 0] + new_list_item[:, 1])
+
+        sens_actual = actual_list_item[:, 3] / (actual_list_item[:, 3] + actual_list_item[:, 2])
+        spec_actual = actual_list_item[:, 0] / (actual_list_item[:, 0] + actual_list_item[:, 1])
+
+
+        auc_new = auc(1 - spec_new, sens_new)
+        auc_actual = auc(1 - spec_actual, sens_actual)
+
+        if(auc_new > auc_actual):
+            improved_situation += 1
+
+        if((auc_new - auc_actual) / auc_actual >= 0.1):
+            improved_situation_10_percent_and_more += 1
+
+    print("the model path:", path)
+    print("improved situation percentage: ", improved_situation/50)
+    print("improved situation: ", improved_situation)
+
+    print("improved situation percentage- more than 10 percent: ", improved_situation_10_percent_and_more/50)
+    print("improved situation: ", improved_situation_10_percent_and_more)
+
+
+    averaged_list = np.array(averaged_list)
+    averaged_list_actual_data = np.array(averaged_list_actual_data)
+    averaged_list_45 = np.array(averaged_list_45)
+
+    averaged_list_copy = np.array(averaged_list)
+    averaged_list_actual_data_copy = np.array(averaged_list_actual_data)
+    averaged_list_45_copy = np.array(averaged_list_45)
+
+    averaged_list = np.mean(averaged_list, axis=0)
+    averaged_list_actual_data = np.mean(averaged_list_actual_data, axis=0)
+    averaged_list_45 = np.mean(averaged_list_45, axis=0)
+
+
+
+    classified_at_least_once_new = np.array(classified_at_least_once_new)
+    classified_at_least_once_old = np.array(classified_at_least_once_old)
+    classified_at_least_once_45 = np.array(classified_at_least_once_45)
+
+
+    classified_at_least_once_new = np.sum(classified_at_least_once_new, axis=0)/362
+    classified_at_least_once_old = np.sum(classified_at_least_once_old, axis=0)/362
+    classified_at_least_once_45 = np.mean(classified_at_least_once_45, axis=0)
+
+    classified_at_least_once_10sec_new = np.array(classified_at_least_once_10sec_new)
+    classified_at_least_once_10sec_old = np.array(classified_at_least_once_10sec_old)
+    classified_at_least_once_10sec_45 = np.array(classified_at_least_once_10sec_45)
+
+    classified_at_least_once_10sec_new = np.sum(classified_at_least_once_10sec_new, axis=0)/362
+    classified_at_least_once_10sec_old = np.sum(classified_at_least_once_10sec_old, axis=0)/362
+    classified_at_least_once_10sec_45 = np.mean(classified_at_least_once_10sec_45, axis=0)
+
+    recall_list_new = averaged_list[:, 3] / (averaged_list[:, 3] + averaged_list[:, 2])
+    specificity_list_new = averaged_list[:, 0] / (averaged_list[:, 0] + averaged_list[:, 1])
+
+    recall_list_old = averaged_list_actual_data[:, 3] / (averaged_list_actual_data[:, 3] + averaged_list_actual_data[:, 2])
+    specificity_list_old = averaged_list_actual_data[:, 0] / (averaged_list_actual_data[:, 0] + averaged_list_actual_data[:, 1])
+
+    # recall_list_45 = averaged_list_45[:, 3] / (averaged_list_45[:, 3] + averaged_list_45[:, 2])
+    # specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + averaged_list_45[:, 1])
+
+
+
     #
-    auc_new = auc(1 - spec_new, sens_new)
-    auc_actual = auc(1 - spec_actual, sens_actual)
-    auc_45 = auc(1 - spec_45, sens_45)
+    plt.plot(1 - specificity_list_new, recall_list_new)
+    plt.plot(1 - specificity_list_old, recall_list_old)
+    #plt.plot(1 - specificity_list_45, recall_list_45)
+    plt.legend(["new", "old", "45"])
+    auc_actual = auc(1-specificity_list_new, recall_list_new)
+    auc_predicted = auc(1-specificity_list_old, recall_list_old)
+    #auc_45 = auc(1-specificity_list_45, recall_list_45)
 
-    if(auc_new > auc_actual):
-        improved_situation += 1
+    plt.xlabel("1-Specificity")
+    plt.ylabel("Recall")
+    legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+                     "old (AUC={:.2f})".format(auc_predicted)]
 
-    if((auc_new - auc_actual) / auc_actual >= 0.1):
-        improved_situation_10_percent_and_more += 1
-
-
-    # legend_labels = ["Filtered data (AUC={:.2f})".format(auc_new),
-    #                  "Raw data (AUC={:.2f})".format(auc_actual)]
-    #
-    #
-    # plt.title("ROC curve for patient " + str(p_i + 1))
-    #
-    # plt.legend(legend_labels, loc='lower right')
-    #
-    # plt.xlabel("1 - specificity")
-    # plt.ylabel("sensitivity")
-    #
-    # plt.savefig("C:\\Users\\RominaRsn\\PycharmProjects\\MyMasterThesis\\masterThesis\\data_file\\ROC_Per_Patient\\ROC_curve_patient_" + str(p_i + 1) + ".png")
-    #plt.show()
-
-
-print("improved situation percentage: ", improved_situation/50)
-print("improved situation: ", improved_situation)
-
-print("improved situation percentage- more than 10 percent: ", improved_situation_10_percent_and_more/50)
-print("improved situation: ", improved_situation_10_percent_and_more)
-
-
-averaged_list = np.array(averaged_list)
-averaged_list_actual_data = np.array(averaged_list_actual_data)
-averaged_list_45 = np.array(averaged_list_45)
-
-averaged_list_copy = np.array(averaged_list)
-averaged_list_actual_data_copy = np.array(averaged_list_actual_data)
-averaged_list_45_copy = np.array(averaged_list_45)
-
-averaged_list = np.mean(averaged_list, axis=0)
-averaged_list_actual_data = np.mean(averaged_list_actual_data, axis=0)
-averaged_list_45 = np.mean(averaged_list_45, axis=0)
+    plt.legend(legend_labels, loc='lower right')
+    all_plots_roc.append(plt.gcf())
+    # Clear the plot for the next iteration
+    plt.clf()
 
 
 
-classified_at_least_once_new = np.array(classified_at_least_once_new)
-classified_at_least_once_old = np.array(classified_at_least_once_old)
-classified_at_least_once_45 = np.array(classified_at_least_once_45)
 
 
-#classified_at_least_once_new = np.mean(classified_at_least_once_new, axis=0)
-classified_at_least_once_new = np.sum(classified_at_least_once_new, axis=0)/362
-#classified_at_least_once_old = np.mean(classified_at_least_once_old, axis=0)
-classified_at_least_once_old = np.sum(classified_at_least_once_old, axis=0)/362
-classified_at_least_once_45 = np.mean(classified_at_least_once_45, axis=0)
-
-classified_at_least_once_10sec_new = np.array(classified_at_least_once_10sec_new)
-classified_at_least_once_10sec_old = np.array(classified_at_least_once_10sec_old)
-classified_at_least_once_10sec_45 = np.array(classified_at_least_once_10sec_45)
-
-#classified_at_least_once_10sec_new = np.mean(classified_at_least_once_10sec_new, axis=0)
-classified_at_least_once_10sec_new = np.sum(classified_at_least_once_10sec_new, axis=0)/362
-#classified_at_least_once_10sec_old = np.mean(classified_at_least_once_10sec_old, axis=0)
-classified_at_least_once_10sec_old = np.sum(classified_at_least_once_10sec_old, axis=0)/362
-classified_at_least_once_10sec_45 = np.mean(classified_at_least_once_10sec_45, axis=0)
 
 
-# recall_list_new = averaged_list[:, 3] / (averaged_list[:, 3] + averaged_list[:, 2])
-# specificity_list_new = averaged_list[:, 0] / (averaged_list[:, 0] + averaged_list[:, 1])
-#
-# recall_list_old = averaged_list_actual_data[:, 3] / (averaged_list_actual_data[:, 3] + averaged_list_actual_data[:, 2])
-# specificity_list_old = averaged_list_actual_data[:, 0] / (averaged_list_actual_data[:, 0] + averaged_list_actual_data[:, 1])
-#
-# recall_list_45 = averaged_list_45[:, 3] / (averaged_list_45[:, 3] + averaged_list_45[:, 2])
-# specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + averaged_list_45[:, 1])
+    plt.plot(ppofFP_new_array_new_post, classified_at_least_once_new)
+    plt.plot(ppofFP_old_array_new_post, classified_at_least_once_old)
+    #plt.plot(ppofFP_45_array_new_post, classified_at_least_once_45)
+    auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
+    auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
+    # auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
+    plt.xlabel("False Positive Rate with post processing")
+    plt.ylabel("Classified as seizure at least once in the seizure period")
+    legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+                     "old (AUC={:.2f})".format(auc_predicted)]
 
-# recall_list_new = classified_at_least_once_new / (classified_at_least_once_new + averaged_list[:, 2])
-# specificity_list_new = averaged_list[:, 0] / (averaged_list[:, 0] + ppofFP_new_array_new_post)
-#
-# recall_list_old = classified_at_least_once_old / (classified_at_least_once_old + averaged_list_actual_data[:, 2])
-# specificity_list_old = averaged_list_actual_data[:, 0] / (averaged_list_actual_data[:, 0] + ppofFP_old_array_new_post)
-#
-# recall_list_45 = classified_at_least_once_45 / (classified_at_least_once_45 + averaged_list_45[:, 2])
-# specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + ppofFP_45_array_new_post)
-#
-#
-#
-# #
-# plt.plot(1 - specificity_list_new, recall_list_new)
-# plt.plot(1 - specificity_list_old, recall_list_old)
-# plt.plot(1 - specificity_list_45, recall_list_45)
-# plt.legend(["new", "old", "45"])
-# auc_actual = auc(1-specificity_list_new, recall_list_new)
-# auc_predicted = auc(1-specificity_list_old, recall_list_old)
-# auc_45 = auc(1-specificity_list_45, recall_list_45)
-#
-# plt.xlabel("1-Specificity")
-# plt.ylabel("Recall")
-# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-#                  "old (AUC={:.2f})".format(auc_predicted),
-#                  "45 (AUC={:.2f})".format(auc_45)]
-#
-# plt.legend(legend_labels)
+    plt.legend(legend_labels, loc='lower right')
+    all_plots_pp.append(plt.gcf())
+    # Clear the plot for the next iteration
+    plt.clf()
+
+
+
+
+
+    plt.plot(averaged_list[:, 1], classified_at_least_once_new)
+    plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_old)
+    #plt.plot(averaged_list_45[:, 1], classified_at_least_once_45)
+    auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
+    auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
+    #auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("Classified as seizure at least once in the seizure period")
+    legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+                     "old (AUC={:.2f})".format(auc_predicted)]
+
+    plt.legend(legend_labels, loc='lower right')
+    all_plots_classified_at_least_once.append(plt.gcf())
+    # Clear the plot for the next iteration
+    plt.clf()
+
+
+    plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
+    plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
+    #plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
+    auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
+    auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
+    #auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
+    plt.xlabel("False Positive Rate with post processing")
+    plt.ylabel("Classified as seizure at least once in the fist 10 seconds of the seizure period")
+    legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+                     "old (AUC={:.2f})".format(auc_predicted)]
+
+    plt.legend(legend_labels, loc='lower right')
+    all_plots_pp_10s.append(plt.gcf())
+    # Clear the plot for the next iteration
+    plt.clf()
+
+
+
+    plt.plot(averaged_list[:, 1], classified_at_least_once_10sec_new)
+    plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
+    #plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
+    auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
+    auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
+    #auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
+    plt.xlabel("False Positive Rate with post processing")
+    plt.ylabel("Classified as seizure at least once in the fist 10 seconds of the seizure period")
+    legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+                     "old (AUC={:.2f})".format(auc_predicted)]
+
+    plt.legend(legend_labels)
+    all_plots_classified_at_least_once_10s.append(plt.gcf())
+    # Clear the plot for the next iteration
+    plt.clf()
+
+# Plot each plot in the list
+for plot in all_plots_roc:
+    plot
+
 plt.show()
-
-#
-
-# plt.plot(averaged_list_copy[:, 1], averaged_list_copy[:, 3])
-# plt.plot(averaged_list_actual_data_copy[:, 1], averaged_list_actual_data_copy[:, 3])
-# plt.plot(averaged_list_45_copy[:, 1], averaged_list_45_copy[:, 3])
-# plt.legend(["new", "old", "45"])
-# plt.xlabel("False Positive Rate")
-# plt.ylabel("True Positive Rate")
-# plt.show()
-
-
-#
-
-
-plt.plot(ppofFP_new_array_new_post, classified_at_least_once_new)
-plt.plot(ppofFP_old_array_new_post, classified_at_least_once_old)
-plt.plot(ppofFP_45_array_new_post, classified_at_least_once_45)
-# auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
-# auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
-# auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
-plt.xlabel("False Positive Rate - new post processing method (discarding for 1 min)")
-plt.ylabel("classified at least once as seizure")
-# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-#                  "old (AUC={:.2f})".format(auc_predicted),
-#                  "45 (AUC={:.2f})".format(auc_45)]
-
-legend_labels = ["new", "old", "45"]
-
-plt.legend(legend_labels)
-plt.show()
-
-
-plt.plot(ppofFP_new_array_new_post, classified_at_least_once_10sec_new)
-plt.plot(ppofFP_old_array_new_post, classified_at_least_once_10sec_old)
-plt.plot(ppofFP_45_array_new_post, classified_at_least_once_10sec_45)
-# auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
-# auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
-# auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
-plt.xlabel("False Positive Rate - new post processing method (discarding for 1 min)- first 10 seconds")
-plt.ylabel("classified at least once as seizure")
-# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-#                  "old (AUC={:.2f})".format(auc_predicted),
-#                  "45 (AUC={:.2f})".format(auc_45)]
-
-legend_labels = ["new", "old", "45"]
-
-plt.legend(legend_labels)
-plt.show()
-
-
-
-
-
-plt.plot(averaged_list[:, 1], classified_at_least_once_new)
-plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_old)
-plt.plot(averaged_list_45[:, 1], classified_at_least_once_45)
-auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
-auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
-auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
-plt.xlabel("False Positive Rate")
-plt.ylabel("classified at least once as seizure")
-legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                 "old (AUC={:.2f})".format(auc_predicted),
-                 "45 (AUC={:.2f})".format(auc_45)]
-
-plt.legend(legend_labels)
-plt.show()
-#
-
-
-
-
-plt.plot(ppofFP_new_array, classified_at_least_once_new)
-plt.plot(ppofFP_new_array_new_post, classified_at_least_once_new)
-
-plt.plot(ppofFP_old_array, classified_at_least_once_old)
-plt.plot(ppofFP_old_array_new_post, classified_at_least_once_old)
-
-plt.plot(ppofFP_45_array, classified_at_least_once_45)
-plt.plot(ppofFP_45_array_new_post, classified_at_least_once_45)
-
-# auc_actual = auc(ppofFP_new_array, classified_at_least_once_new)
-# auc_predicted = auc(ppofFP_old_array, classified_at_least_once_old)
-# auc_45 = auc(ppofFP_45_array, classified_at_least_once_45)
-plt.xlabel("False Positive Rate")
-plt.ylabel("classified at least once as seizure- post processing")
-# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-#                  "old (AUC={:.2f})".format(auc_predicted),
-#                  "45 (AUC={:.2f})".format(auc_45)]
-#
-# plt.legend(legend_labels)
-plt.legend(["new", "new post", "old", "old post", "45", "45 post"])
-plt.show()
-
-plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
-plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
-plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
-auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
-auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
-auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
-plt.xlabel("False Positive Rate")
-plt.ylabel("classified at least once as seizure in the first 10 seconds - post processing")
-legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                 "old (AUC={:.2f})".format(auc_predicted),
-                 "45 (AUC={:.2f})".format(auc_45)]
-
-plt.legend(legend_labels)
-plt.show()
-
-# plt.plot(averaged_list[:, 1], classified_at_least_once_10sec_new)
-# plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_10sec_old)
-# plt.plot(averaged_list_45[:, 1], classified_at_least_once_10sec_45)
-# auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_10sec_new)
-# auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_10sec_old)
-# auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_10sec_45)
-# plt.xlabel("False Positive Rate")
-# plt.ylabel("classified at least once as seizure in the first 10 seconds")
-# legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-#                     "old (AUC={:.2f})".format(auc_predicted),
-#                     "45 (AUC={:.2f})".format(auc_45)]
-# plt.legend(legend_labels)
-# plt.show()
-#
-#
-# plt.plot(averaged_list[:, 1], averaged_list[:, 3])
-# plt.plot(averaged_list_actual_data[:, 1], averaged_list_actual_data[:, 3])
-# plt.xlabel("False Positive Rate")
-# plt.ylabel("True Positive Rate")
-#
-# plt.legend(["predicted", "actual data"])
-# plt.show()
-
-

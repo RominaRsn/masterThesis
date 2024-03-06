@@ -195,23 +195,23 @@ def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
 
     ll_eog_ma = moving_average_consecutive(ll_eog)
 
-    peaks_raw, _ = find_peaks(ll_raw)
-    peaks_ae, _ = find_peaks(ll_eog)
-
-    prominences_raw = peak_prominences(ll_raw, peaks_raw)[0]
-    prominences_ae = peak_prominences(ll_eog, peaks_ae)[0]
-
-    amplitudes_raw = ll_raw[peaks_raw]
-    significance_raw = amplitudes_raw + prominences_raw
-
-    amplitudes_ae = ll_eog[peaks_ae]
-    significance_ae = amplitudes_ae + prominences_ae
-
-    sorted_indices_raw = np.argsort(significance_raw)[::-1]  # Sort in descending order
-    sorted_peaks_raw = peaks_raw[sorted_indices_raw]
-
-    sorted_indices_ae = np.argsort(significance_ae)[::-1]  # Sort in descending order
-    sorted_peaks_ae = peaks_ae[sorted_indices_ae]
+    # peaks_raw, _ = find_peaks(ll_raw)
+    # peaks_ae, _ = find_peaks(ll_eog)
+    #
+    # prominences_raw = peak_prominences(ll_raw, peaks_raw)[0]
+    # prominences_ae = peak_prominences(ll_eog, peaks_ae)[0]
+    #
+    # amplitudes_raw = ll_raw[peaks_raw]
+    # significance_raw = amplitudes_raw + prominences_raw
+    #
+    # amplitudes_ae = ll_eog[peaks_ae]
+    # significance_ae = amplitudes_ae + prominences_ae
+    #
+    # sorted_indices_raw = np.argsort(significance_raw)[::-1]  # Sort in descending order
+    # sorted_peaks_raw = peaks_raw[sorted_indices_raw]
+    #
+    # sorted_indices_ae = np.argsort(significance_ae)[::-1]  # Sort in descending order
+    # sorted_peaks_ae = peaks_ae[sorted_indices_ae]
 
 
     # # Define the window size for the moving average
@@ -224,38 +224,60 @@ def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
     # moving_avg = np.convolve(ll_raw.ravel(), window, mode='valid')
 
     # Create the plot , sharex=True
-    fig, axs = plt.subplots(4, 1, figsize=(16, 8), sharey='col')
+    fig, axs = plt.subplots(4, 1, figsize=(16, 8))
     fig.suptitle(f'Patient {p} - Seizure {i} - Channel {ch_num}')
 
     scatter_range = range(len(ll_raw.ravel()))
 
-    axs[0].scatter(scatter_range,ll_raw.ravel(), marker=".")
+    # axs[0].scatter(scatter_range,ll_raw.ravel(), marker=".")
+    # axs[0].set_title('Raw Data')
+    # axs[0].scatter(sorted_peaks_raw[:1], ll_raw[sorted_peaks_raw[:1]], color='red', label='Most Significant Peaks')
+    # #axs[0].plot(labels_raw, 'r')
+    # axs[0].plot(label, 'orange')
+    # axs[0].set_ylabel('Amplitude')
+    # axs[0].set_xlabel('Time')
+    #
+    # axs[1].scatter(scatter_range, ll_eog.ravel(), marker=".")
+    # axs[1].set_title('AE')
+    # #axs[1].plot(labels_eog, 'r')
+    # #axs[1].plot(label * max(ll_eog), 'orange')
+    # axs[1].scatter(sorted_peaks_ae[:1], ll_eog[sorted_peaks_ae[:1]], color='red', label='Most Significant Peaks')
+    # axs[1].set_ylabel('Amplitude')
+    # axs[1].set_xlabel('Time')
+    #
+    # axs[2].scatter(scatter_range, ll_eog_avg.ravel(), marker=".")
+    # axs[2].set_title('ll_eog_avg')
+    # axs[2].plot(label * max(ll_eog_avg), 'orange')
+    # axs[2].set_ylabel('Amplitude')
+    #
+    # axs[3].scatter(range(len(ll_eog_ma)), ll_eog_ma, marker=".")
+    # axs[3].set_title('Moving Average')
+    # # axs[3].plot(label * max(ll_eog_ma), 'orange')
+    # # axs[3].axhline(y=0.7 * max(ll_eog_ma), color='r', linestyle='--')
+    # axs[3].set_ylabel('Amplitude')
+    # axs[3].set_xlabel('Time')
+
+    axs[0].scatter(scatter_range, ll_raw.ravel(), marker=".")
     axs[0].set_title('Raw Data')
-    axs[0].scatter(sorted_peaks_raw[:1], ll_raw[sorted_peaks_raw[:1]], color='red', label='Most Significant Peaks')
-    #axs[0].plot(labels_raw, 'r')
-    axs[0].plot(label, 'orange')
+    #axs[0].scatter(sorted_peaks_raw[:1], ll_raw[sorted_peaks_raw[:1]], color='red', label='Most Significant Peaks')
+    # axs[0].plot(labels_raw, 'r')
+    #axs[0].plot(label, 'orange')
     axs[0].set_ylabel('Amplitude')
     axs[0].set_xlabel('Time')
 
     axs[1].scatter(scatter_range, ll_eog.ravel(), marker=".")
     axs[1].set_title('AE')
-    #axs[1].plot(labels_eog, 'r')
-    #axs[1].plot(label * max(ll_eog), 'orange')
-    axs[1].scatter(sorted_peaks_ae[:1], ll_eog[sorted_peaks_ae[:1]], color='red', label='Most Significant Peaks')
+    axs[1].plot(label * max(ll_eog), 'orange')
+    # axs[1].plot(labels_eog, 'r')
+    # axs[1].plot(label * max(ll_eog), 'orange')
+    #axs[1].scatter(sorted_peaks_ae[:1], ll_eog[sorted_peaks_ae[:1]], color='red', label='Most Significant Peaks')
     axs[1].set_ylabel('Amplitude')
     axs[1].set_xlabel('Time')
 
-    axs[2].scatter(scatter_range, ll_eog_avg.ravel(), marker=".")
+    axs[2].scatter(scatter_range,actual_linelength(new_normalized_data), marker=".")
     axs[2].set_title('ll_eog_avg')
     axs[2].plot(label * max(ll_eog_avg), 'orange')
     axs[2].set_ylabel('Amplitude')
-
-    axs[3].scatter(range(len(ll_eog_ma)), ll_eog_ma, marker=".")
-    axs[3].set_title('Moving Average')
-    # axs[3].plot(label * max(ll_eog_ma), 'orange')
-    # axs[3].axhline(y=0.7 * max(ll_eog_ma), color='r', linestyle='--')
-    axs[3].set_ylabel('Amplitude')
-    axs[3].set_xlabel('Time')
 
     # axs[2].scatter(scatter_range, ll_gru.ravel())
     # axs[2].set_title('GRU')
@@ -263,11 +285,10 @@ def plottingWholeSeizurePeriods(p, i, ch_num, selected_threshold):
     # axs[2].set_ylabel('Amplitude')
     # axs[2].set_xlabel('Time')
     #
-    # axs[3].scatter(scatter_range, ll_cnn.ravel())
-    # axs[3].set_title('CNN')
-    # axs[3].plot(labels_cnn, 'r')
-    # axs[3].set_ylabel('Amplitude')
-    # axs[3].set_xlabel('Time')
+    axs[3].scatter(scatter_range, actual_linelength(result_eog), marker=".")
+    axs[3].set_title('AE')
+    axs[3].set_ylabel('Amplitude')
+    axs[3].set_xlabel('Time')
     #
     # axs[4].scatter(scatter_range, ll_lstm.ravel())
     # axs[4].set_title('LSTM')
@@ -595,7 +616,20 @@ def thetaBandPower(epoched_data):
     return thetaband_power
 
 
-def linelength(data):
+def linelength(epoched_data):
+    sampling_freq = 250
+    f, power_block = scipy.signal.welch(epoched_data, fs=sampling_freq, window='hann', axis=1,
+                                        scaling='spectrum')  # ----------------# ERROR source at 1sec window, non-overlaping -> nperseg=None
+    thetaband_st = find_nearest(f, 4)[0]
+    # thetaband_end = int((np.where(f == 8)[0])[0])
+    thetaband_end = find_nearest(f, 8)[0]
+    thetaband_power = power_block[:, thetaband_st:thetaband_end + 1].sum(axis=1)[:, None]
+    if thetaband_power.shape[0] == 1:
+        thetaband_power = thetaband_power.squeeze(0)
+
+    return thetaband_power
+
+def actual_linelength(data):
     data_diff = np.diff(data)
     return np.sum(np.absolute(data_diff), axis=1)
 
@@ -1307,9 +1341,9 @@ for p in range(1, 51):
         #label_raw_data = doTwoAndOneOr(labels_1, labels_2, labels_3, labels_4)
         #label_raw_data = doAnds(labels_1, labels_2, labels_3, labels_4)
 
-        #innerFPWithPP_old = postProcessFP(label, label_raw_data)
-        innerFPWithPP_old = postProcessFP_firingMethod(label, label_raw_data)
-        postProcessedFPList_old.append(innerFPWithPP_old)
+        # innerFPWithPP_old = postProcessFP(label, label_raw_data)
+        # #innerFPWithPP_old = postProcessFP_firingMethod(label, label_raw_data)
+        # postProcessedFPList_old.append(innerFPWithPP_old)
 
         predicted_labels_1 = getOnlyLabels(predicted_data_1, label, thresholds_new_ch_1)
         predicted_labels_2 = getOnlyLabels(predicted_data_2, label, thresholds_new_ch_2)
@@ -1318,8 +1352,11 @@ for p in range(1, 51):
 
 
         predicted_label = doLogicalOR(predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
+        #predicted_label = predicted_label.squeeze(0)
 
         classified_at_least_once_new.append(classifiedAtLeastOnce(label, predicted_label))
+
+        predicted_label = predicted_label.squeeze(0)
 
         selected_threshold_list = getTheBestThresholds(label, predicted_label)
 
@@ -1332,7 +1369,7 @@ for p in range(1, 51):
             #plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
             #plotFalsePositives_new(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4
             #                      ,labels_1, labels_2, labels_3, labels_4)
-            improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
+            #improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
 
             plottingWholeSeizurePeriods(p, sz, 1,selected_threshold)
             #print(f"channel thresholds new: channel 1: {thresholds_new_ch_1[selected_threshold]} channel 2: {thresholds_new_ch_2[selected_threshold]} channel 3: {thresholds_new_ch_3[selected_threshold]} channel 4: {thresholds_new_ch_4[selected_threshold]}")
