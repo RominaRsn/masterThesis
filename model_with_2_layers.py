@@ -150,7 +150,7 @@ for i in signalIndexVector:
 
     plt.figure()
     plt.plot(x, clean_test_eog[i, :], label = 'clean EEG Signal')
-    plt.suptitle('Clean EEG Signal')
+    plt.suptitle('Normalized Clean EEG Signal')
     plt.ylabel('Signal amplitude')
     plt.xlabel('Time(s)')
     plt.savefig(fr'C:\Users\RominaRsn\Desktop\figs\clean_EEG_Signal_EOG_{i}.png')
@@ -159,7 +159,7 @@ for i in signalIndexVector:
 
     plt.figure()
     plt.plot(x, noisy_test_eog[i, :], label = 'EEG Signal Contaminated with EOG Noise')
-    plt.suptitle('EEG Signal Contaminated with EOG Noise')
+    plt.suptitle('Normalized EEG Signal Contaminated with EOG Noise')
     plt.ylabel('Signal amplitude')
     plt.xlabel('Time(s)')
     plt.savefig(fr'C:\Users\RominaRsn\Desktop\figs\noisy_EEG_Signal_EOG_{i}.png')

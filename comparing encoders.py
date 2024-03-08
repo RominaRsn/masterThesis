@@ -22,10 +22,13 @@ def dB_to_linear(dB):
 # data_clean_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_cheby_filtered_new.npy")
 # data_noisy_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_cheby_filtered_new.npy")
 
-data_clean_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_cheby_filtered_new.npy")
-data_noisy_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_cheby_filtered_new.npy")
+# data_clean_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_cheby_filtered_new.npy")
+# data_noisy_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_cheby_filtered_new.npy")
 
-noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized_cheby, data_clean_normalized_cheby, test_size=0.2, random_state=42)
+data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
+data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
+
+noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
 
 #model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_GRU_checkPoint.h5")
 #model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_cheby_checkpoint.h5")
@@ -34,11 +37,11 @@ noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_n
 #model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
 
 result_paths = [
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers.h5",
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers_more_filters.h5",
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_four_layers.h5",
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers.h5",
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_moreEpoch.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_five_layers_more_filters.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_four_layers.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_moreEpoch.h5",
     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\model_with_three_layers_more_filters.h5",
     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_7_layer.h5",
     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_512.h5",
@@ -57,6 +60,10 @@ for model_path in result_paths:
     # filteredSignal_45 = nk.signal_filter(noisy_test, sampling_rate=250, highcut=40, method='butterworth', order=4)
     # filteredSignal_30 = nk.signal_filter(noisy_test, sampling_rate=250, highcut=30, method='butterworth', order=4)
     # filteredSignal_70 = nk.signal_filter(noisy_test, sampling_rate=250, highcut=70, method='butterworth', order=4)
+
+
+    np.save(
+        fr"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\nonChebyResults\AE_comparisons\result_{os.path.basename(model_path)[:-3]}.npy", result)
 
     clean_input_test_vec = np.ravel(clean_test)
     noisy_input_test_vec = np.ravel(noisy_test)
@@ -88,7 +95,7 @@ for model_path in result_paths:
     # Get the user's home directory
     user_home = os.path.expanduser("~")
     # Specify the file path in the Downloads directory
-    file_path = os.path.join(user_home, "Downloads", "AEs_Compare.txt")
+    file_path = os.path.join(user_home, "Downloads", "AEs_Compare_non_cheby_data.txt")
 
     # Write results to file
     with open(file_path, 'a') as fm:

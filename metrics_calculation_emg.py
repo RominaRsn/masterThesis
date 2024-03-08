@@ -22,10 +22,14 @@ def dB_to_linear(dB):
 # data_clean_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_cheby_filtered_new.npy")
 # data_noisy_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_cheby_filtered_new.npy")
 
-data_clean_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_cheby_filtered_new.npy")
-data_noisy_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_cheby_filtered_new.npy")
+# data_clean_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_cheby_filtered_new.npy")
+# data_noisy_normalized_cheby = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_cheby_filtered_new.npy")
 
-noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized_cheby, data_clean_normalized_cheby, test_size=0.2, random_state=42)
+
+data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
+data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
+
+noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
 
 #model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_GRU_checkPoint.h5")
 #model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\trained_models\ae_cheby_checkpoint.h5")
@@ -34,9 +38,9 @@ noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_n
 #model = load_model(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5")
 
 model_paths = [
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5",
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_LSTM_checkPoint.h5",
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_GRU_checkPoint.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_LSTM_checkPoint.h5",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_GRU_checkPoint.h5",
     # Add more model paths as needed
     r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\paper_CNN_retrainWithEOG_LSTM_checkPoint.h5'
 ]
@@ -49,9 +53,11 @@ for model_path in model_paths:
     # Generate predictions
     result = model.predict(noisy_test)
 
+
     if(result.ndim == 3):
         result.squeeze(-1)
 
+    np.save(fr"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\nonChebyResults\result_{os.path.basename(model_path)[:-3]}.npy", result)
     # Filter signals
     # filteredSignal_45 = nk.signal_filter(noisy_test, sampling_rate=250, highcut=40, method='butterworth', order=4)
     # filteredSignal_30 = nk.signal_filter(noisy_test, sampling_rate=250, highcut=30, method='butterworth', order=4)
@@ -87,7 +93,7 @@ for model_path in model_paths:
     # Get the user's home directory
     user_home = os.path.expanduser("~")
     # Specify the file path in the Downloads directory
-    file_path = os.path.join(user_home, "Downloads", "EMG_With_Noise_All_models.txt")
+    file_path = os.path.join(user_home, "Downloads", "EMG_With_Noise_All_models_non_cheby_data.txt")
 
     # Write results to file
     with open(file_path, 'a') as fm:

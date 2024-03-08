@@ -1482,106 +1482,179 @@ for path in paths:
     # recall_list_45 = averaged_list_45[:, 3] / (averaged_list_45[:, 3] + averaged_list_45[:, 2])
     # specificity_list_45 = averaged_list_45[:, 0] / (averaged_list_45[:, 0] + averaged_list_45[:, 1])
 
+    outer_temp_list = []
+    temp_list = []
+    inner_temp_list = []
 
+    inner_temp_list.append(1 - specificity_list_new)
+    inner_temp_list.append(recall_list_new)
+    temp_list.append(np.array(inner_temp_list))
+    outer_temp_list.append(temp_list)
 
+    temp_list = []
+    inner_temp_list = []
+    inner_temp_list.append(1 - specificity_list_old)
+    inner_temp_list.append(recall_list_old)
+    temp_list.append(np.array(inner_temp_list))
+    outer_temp_list.append(temp_list)
+    all_plots_roc.append(outer_temp_list)
+
+    #plt.plot(1 - specificity_list_new, recall_list_new)
+    # plt.plot(1 - specificity_list_old, recall_list_old)
+    # #plt.plot(1 - specificity_list_45, recall_list_45)
+    # plt.legend(["new", "old", "45"])
+    # auc_actual = auc(1-specificity_list_new, recall_list_new)
+    # auc_predicted = auc(1-specificity_list_old, recall_list_old)
+    # #auc_45 = auc(1-specificity_list_45, recall_list_45)
     #
-    plt.plot(1 - specificity_list_new, recall_list_new)
-    plt.plot(1 - specificity_list_old, recall_list_old)
-    #plt.plot(1 - specificity_list_45, recall_list_45)
-    plt.legend(["new", "old", "45"])
-    auc_actual = auc(1-specificity_list_new, recall_list_new)
-    auc_predicted = auc(1-specificity_list_old, recall_list_old)
-    #auc_45 = auc(1-specificity_list_45, recall_list_45)
+    # plt.xlabel("1-Specificity")
+    # plt.ylabel("Recall")
+    # legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+    #                  "old (AUC={:.2f})".format(auc_predicted)]
+    #
+    # plt.legend(legend_labels, loc='lower right')
+    # all_plots_roc.append(plt.gcf())
+    # # Clear the plot for the next iteration
+    # plt.clf()
 
-    plt.xlabel("1-Specificity")
-    plt.ylabel("Recall")
-    legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                     "old (AUC={:.2f})".format(auc_predicted)]
+    outer_temp_list = []
+    temp_list = []
+    inner_temp_list = []
 
-    plt.legend(legend_labels, loc='lower right')
-    all_plots_roc.append(plt.gcf())
-    # Clear the plot for the next iteration
-    plt.clf()
+    inner_temp_list.append(ppofFP_new_array_new_post)
+    inner_temp_list.append(classified_at_least_once_new)
+    temp_list.append(np.array(inner_temp_list))
+    outer_temp_list.append(temp_list)
 
+    temp_list = []
+    inner_temp_list = []
+    inner_temp_list.append(ppofFP_old_array_new_post)
+    inner_temp_list.append(classified_at_least_once_old)
+    temp_list.append(np.array(inner_temp_list))
+    outer_temp_list.append(temp_list)
+    all_plots_pp.append(outer_temp_list)
 
-
-
-
-
-
-    plt.plot(ppofFP_new_array_new_post, classified_at_least_once_new)
-    plt.plot(ppofFP_old_array_new_post, classified_at_least_once_old)
-    #plt.plot(ppofFP_45_array_new_post, classified_at_least_once_45)
-    auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
-    auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
-    # auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
-    plt.xlabel("False Positive Rate with post processing")
-    plt.ylabel("Classified as seizure at least once in the seizure period")
-    legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                     "old (AUC={:.2f})".format(auc_predicted)]
-
-    plt.legend(legend_labels, loc='lower right')
-    all_plots_pp.append(plt.gcf())
-    # Clear the plot for the next iteration
-    plt.clf()
-
-
-
-
-
-    plt.plot(averaged_list[:, 1], classified_at_least_once_new)
-    plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_old)
-    #plt.plot(averaged_list_45[:, 1], classified_at_least_once_45)
-    auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
-    auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
-    #auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("Classified as seizure at least once in the seizure period")
-    legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                     "old (AUC={:.2f})".format(auc_predicted)]
-
-    plt.legend(legend_labels, loc='lower right')
-    all_plots_classified_at_least_once.append(plt.gcf())
-    # Clear the plot for the next iteration
-    plt.clf()
+    # plt.plot(ppofFP_new_array_new_post, classified_at_least_once_new)
+    # plt.plot(ppofFP_old_array_new_post, classified_at_least_once_old)
+    # #plt.plot(ppofFP_45_array_new_post, classified_at_least_once_45)
+    # auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
+    # auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
+    # # auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
+    # plt.xlabel("False Positive Rate with post processing")
+    # plt.ylabel("Classified as seizure at least once in the seizure period")
+    # legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+    #                  "old (AUC={:.2f})".format(auc_predicted)]
+    #
+    # plt.legend(legend_labels, loc='lower right')
+    # all_plots_pp.append(plt.gcf())
+    # # Clear the plot for the next iteration
+    # plt.clf()
 
 
-    plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
-    plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
-    #plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
-    auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
-    auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
-    #auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
+    outer_temp_list = []
+    temp_list = []
+    inner_temp_list = []
+    inner_temp_list.append(averaged_list[:, 1])
+    inner_temp_list.append(classified_at_least_once_new)
+    temp_list.append(np.array(inner_temp_list))
+    outer_temp_list.append(temp_list)
+
+    temp_list = []
+    inner_temp_list = []
+    inner_temp_list.append(averaged_list_actual_data[:, 1])
+    inner_temp_list.append(classified_at_least_once_old)
+    temp_list.append(np.array(inner_temp_list))
+    outer_temp_list.append(temp_list)
+
+    all_plots_classified_at_least_once.append(temp_list)
+
+    # plt.plot(averaged_list[:, 1], classified_at_least_once_new)
+    # plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_old)
+    # #plt.plot(averaged_list_45[:, 1], classified_at_least_once_45)
+    # auc_actual = auc(averaged_list_actual_data[:, 1], classified_at_least_once_new)
+    # auc_predicted = auc(averaged_list[:, 1], classified_at_least_once_old)
+    # #auc_45 = auc(averaged_list_45[:, 1], classified_at_least_once_45)
+    # plt.xlabel("False Positive Rate")
+    # plt.ylabel("Classified as seizure at least once in the seizure period")
+    # legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+    #                  "old (AUC={:.2f})".format(auc_predicted)]
+    #
+    # plt.legend(legend_labels, loc='lower right')
+    # all_plots_classified_at_least_once.append(plt.gcf())
+    # # Clear the plot for the next iteration
+    # plt.clf()
+
+    outer_temp_list = []
+    temp_list = []
+    inner_temp_list = []
+    inner_temp_list.append(ppofFP_new_array)
+    inner_temp_list.append(classified_at_least_once_10sec_new)
+    temp_list.append(np.array(inner_temp_list))
+    outer_temp_list.append(temp_list)
+
+    temp_list = []
+    inner_temp_list = []
+    inner_temp_list.append(ppofFP_old_array)
+    inner_temp_list.append(classified_at_least_once_10sec_old)
+    temp_list.append(np.array(inner_temp_list))
+    outer_temp_list.append(temp_list)
+    all_plots_pp_10s.append(outer_temp_list)
+
+    # plt.plot(ppofFP_new_array, classified_at_least_once_10sec_new)
+    # plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
+    # #plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
+    # auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
+    # auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
+    # #auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
+    # plt.xlabel("False Positive Rate with post processing")
+    # plt.ylabel("Classified as seizure at least once in the fist 10 seconds of the seizure period")
+    # legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+    #                  "old (AUC={:.2f})".format(auc_predicted)]
+    #
+    # plt.legend(legend_labels, loc='lower right')
+    # all_plots_pp_10s.append(plt.gcf())
+    # # Clear the plot for the next iteration
+    # plt.clf()
+
+
+    outer_temp_list = []
+    temp_list = []
+    inner_temp_list = []
+    inner_temp_list.append(averaged_list[:, 1])
+    inner_temp_list.append(classified_at_least_once_10sec_new)
+    temp_list.append(np.array(inner_temp_list))
+    outer_temp_list.append(temp_list)
+
+    temp_list = []
+    inner_temp_list = []
+    inner_temp_list.append(averaged_list_actual_data[:, 1])
+    inner_temp_list.append(classified_at_least_once_10sec_old)
+    temp_list.append(np.array(inner_temp_list))
+    outer_temp_list.append(temp_list)
+    all_plots_classified_at_least_once_10s.append(outer_temp_list)
+
+    # plt.plot(averaged_list[:, 1], classified_at_least_once_10sec_new)
+    # plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_10sec_old)
+    # #plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
+    # auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
+    # auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
+    # #auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
+    # plt.xlabel("False Positive Rate with post processing")
+    # plt.ylabel("Classified as seizure at least once in the fist 10 seconds of the seizure period")
+    # legend_labels = ["new (AUC={:.2f})".format(auc_actual),
+    #                  "old (AUC={:.2f})".format(auc_predicted)]
+    #
+    # plt.legend(legend_labels)
+    # all_plots_classified_at_least_once_10s.append(plt.gcf())
+    # # Clear the plot for the next iteration
+    # plt.clf()
+
+for outer_item in all_plots_pp_10s:
+    for inner_item in outer_item:
+        plt.plot(inner_item[0], inner_item[1])
     plt.xlabel("False Positive Rate with post processing")
     plt.ylabel("Classified as seizure at least once in the fist 10 seconds of the seizure period")
-    legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                     "old (AUC={:.2f})".format(auc_predicted)]
-
+    legend_labels = ["new", "old"]
     plt.legend(legend_labels, loc='lower right')
     all_plots_pp_10s.append(plt.gcf())
-    # Clear the plot for the next iteration
     plt.clf()
-
-
-
-    plt.plot(averaged_list[:, 1], classified_at_least_once_10sec_new)
-    plt.plot(ppofFP_old_array, classified_at_least_once_10sec_old)
-    #plt.plot(ppofFP_45_array, classified_at_least_once_10sec_45)
-    auc_actual = auc(ppofFP_new_array, classified_at_least_once_10sec_new)
-    auc_predicted = auc(ppofFP_old_array, classified_at_least_once_10sec_old)
-    #auc_45 = auc(ppofFP_45_array, classified_at_least_once_10sec_45)
-    plt.xlabel("False Positive Rate with post processing")
-    plt.ylabel("Classified as seizure at least once in the fist 10 seconds of the seizure period")
-    legend_labels = ["new (AUC={:.2f})".format(auc_actual),
-                     "old (AUC={:.2f})".format(auc_predicted)]
-
-    plt.legend(legend_labels)
-    all_plots_classified_at_least_once_10s.append(plt.gcf())
-    # Clear the plot for the next iteration
-    plt.clf()
-
-# Plot each plot in the list
-for plot in all_plots_roc:
-    plot
-
-plt.show()
