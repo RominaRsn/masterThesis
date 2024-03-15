@@ -126,8 +126,8 @@ from keras.callbacks import ModelCheckpoint
 #
 # )
 # model.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG.h5")
-data_clean_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_cheby.npy")
-data_noisy_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_cheby.npy")
+data_clean_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog.npy")
+data_noisy_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog.npy")
 
 #normalize eog data
 max_clean = np.max(data_clean_eog)
@@ -144,11 +144,11 @@ avg = (np.mean(data_clean_normalized) + np.mean(data_noisy_normalized))/2
 data_clean_normalized_eog = data_clean_normalized - avg
 data_noisy_normalized_eog = data_noisy_normalized - avg
 
-np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_cheby_normalized.npy", data_clean_normalized_eog)
-np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_cheby_normalized.npy", data_noisy_normalized_eog)
+np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_normalized.npy", data_clean_normalized_eog)
+np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_normalized.npy", data_noisy_normalized_eog)
 
-smaller_clean = data_clean_normalized_eog[:, 0:1000]
-smaller_noisy = data_noisy_normalized_eog[:, 0:1000]
-
-np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_cheby_normalized_smaller.npy", smaller_clean)
-np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_cheby_normalized_smaller.npy", smaller_noisy)
+# smaller_clean = data_clean_normalized_eog[:, 0:1000]
+# smaller_noisy = data_noisy_normalized_eog[:, 0:1000]
+#
+# np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_cheby_normalized_smaller.npy", smaller_clean)
+# np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_cheby_normalized_smaller.npy", smaller_noisy)

@@ -561,6 +561,7 @@ def classifiedAtLeastOnce_10sec(true_labels, predicted_labels):
 def getOnlyLabels(data, true_labels, thresholds):
 
     ll = linelength(data)
+    detectWithLLValues(ll, true_labels)
     # ll = thetaBandPower(data)
     # ll = ll.squeeze(-1)
     #
@@ -1020,6 +1021,40 @@ def postProcessFP_ConsecValus_modified(true_label, predicted_label):
 
 
 
+def detectWithLLValues(ll, acutal_label):
+
+    label = np.empty_like(ll)
+    for j in range(0, len(ll) - 1):
+        # if ll[j + 1] >= 1.2 * ll[j] and ll[j + 2] >= 1.2 * ll[j + 1] and ll[j + 3] >= 1.2 * ll[j + 2]:
+        #     label[j] = 1
+        #     label[j + 1] = 1
+        #     label[j + 2] = 1
+        #     label[j + 3] = 1
+        #
+        # else:
+        #     label[j] = 0
+        #     label[j + 1] = 0
+        #     label[j + 2] = 0
+        #     label[j + 3] = 0
+        a = (ll[j + 1] - ll[j]) / ll[j + 1]
+        if (a >= 0.1) :
+            label[j] = 1
+            label[j + 1] = 1
+        else:
+            label[j] = 0
+            label[j + 1] = 0
+
+    label = label.reshape(label.shape[0], 1)
+    return label
+    # print(np.where(label == 1)[0])
+    #
+    # plt.plot(label)
+    # plt.plot(ll)
+    # plt.plot(acutal_label)
+    # plt.legend(['generated label', 'LL', 'Actual label'])
+    # plt.show()
+
+
 
 def postProcessFP(true_label, predicted_label):
 
@@ -1342,25 +1377,25 @@ for p in range(1, 51):
         #compareSeizurePatterns(label, new_normalized_data_1, predicted_data_1)
         ##predicted_data_4 = predicted_data_4.squeeze(-1)
 
-        # predicted_data_1 = np.load(
-        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-        #                  f"pat_{p}_sz_{sz}_ch_1.npy"))
-        # # predicted_data_1 = predicted_data_1.squeeze(-1)
-        #
-        # predicted_data_2 = np.load(
-        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-        #                  f"pat_{p}_sz_{sz}_ch_2.npy"))
-        # # predicted_data_2 = predicted_data_2.squeeze(-1)
-        #
-        # predicted_data_3 = np.load(
-        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-        #                  f"pat_{p}_sz_{sz}_ch_3.npy"))
-        # # predicted_data_3 = predicted_data_3.squeeze(-1)
-        #
-        # predicted_data_4 = np.load(
-        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-        #                  f"pat_{p}_sz_{sz}_ch_4.npy"))
-        ##predicted_data_4 = predicted_data_4.squeeze(-1)
+        predicted_data_1 = np.load(
+            os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
+                         f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # predicted_data_1 = predicted_data_1.squeeze(-1)
+
+        predicted_data_2 = np.load(
+            os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
+                         f"pat_{p}_sz_{sz}_ch_2.npy"))
+        # predicted_data_2 = predicted_data_2.squeeze(-1)
+
+        predicted_data_3 = np.load(
+            os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
+                         f"pat_{p}_sz_{sz}_ch_3.npy"))
+        # predicted_data_3 = predicted_data_3.squeeze(-1)
+
+        predicted_data_4 = np.load(
+            os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
+                         f"pat_{p}_sz_{sz}_ch_4.npy"))
+        #predicted_data_4 = predicted_data_4.squeeze(-1)
 
         # predicted_data_1 = np.load(os.path.join(
         #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
@@ -1391,32 +1426,37 @@ for p in range(1, 51):
         # model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_CNN_checkPoint.h5')
         #
         # # #
-        model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\paper_CNN_retrainWithEOG_LSTM_checkPoint.h5')
-        predicted_data_1 = model.predict(new_normalized_data_1)
-        predicted_data_2 = model.predict(new_normalized_data_2)
-        predicted_data_3 = model.predict(new_normalized_data_3)
-        predicted_data_4 = model.predict(new_normalized_data_4)
-
-        predicted_data_1 = predicted_data_1.squeeze(-1)
-        predicted_data_2 = predicted_data_2.squeeze(-1)
-        predicted_data_3 = predicted_data_3.squeeze(-1)
-        predicted_data_4 = predicted_data_4.squeeze(-1)
-
-        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_d ata_filtering_cnn", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
-        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
-        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
-        np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
-
-
+        # model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\paper_CNN_retrainWithEOG_LSTM_checkPoint.h5')
+        # predicted_data_1 = model.predict(new_normalized_data_1)
+        # predicted_data_2 = model.predict(new_normalized_data_2)
+        # predicted_data_3 = model.predict(new_normalized_data_3)
+        # predicted_data_4 = model.predict(new_normalized_data_4)
+        #
+        # predicted_data_1 = predicted_data_1.squeeze(-1)
+        # predicted_data_2 = predicted_data_2.squeeze(-1)
+        # predicted_data_3 = predicted_data_3.squeeze(-1)
+        # predicted_data_4 = predicted_data_4.squeeze(-1)
+        #
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_d ata_filtering_cnn", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
 
 
 
 
 
-        labels_1 = getOnlyLabels(new_normalized_data_1, label, thresholds_old_ch_1)
-        labels_2 = getOnlyLabels(new_normalized_data_2, label, thresholds_old_ch_2)
-        labels_3 = getOnlyLabels(new_normalized_data_3, label, thresholds_old_ch_3)
-        labels_4 = getOnlyLabels(new_normalized_data_4, label, thresholds_old_ch_4)
+
+
+        # labels_1 = getOnlyLabels(new_normalized_data_1, label, thresholds_old_ch_1)
+        # labels_2 = getOnlyLabels(new_normalized_data_2, label, thresholds_old_ch_2)
+        # labels_3 = getOnlyLabels(new_normalized_data_3, label, thresholds_old_ch_3)
+        # labels_4 = getOnlyLabels(new_normalized_data_4, label, thresholds_old_ch_4)
+
+        labels_1 = detectWithLLValues(linelength(new_normalized_data_1), label)
+        labels_2 = detectWithLLValues(linelength(new_normalized_data_2), label)
+        labels_3 = detectWithLLValues(linelength(new_normalized_data_3), label)
+        labels_4 = detectWithLLValues(linelength(new_normalized_data_4), label)
 
         # label_raw_data = np.logical_or(labels_1, labels_2)
         # label_raw_data = np.logical_or(label_raw_data, labels_3)
@@ -1433,8 +1473,6 @@ for p in range(1, 51):
         #innerFPWithPP_old = postProcessFP_firingMethod(label, label_raw_data)
         postProcessedFPList_old_new_post.append(postProcessFP_firingMethod(label, label_raw_data))
         postProcessedFPList_old.append(innerFPWithPP_old)
-
-
 
         labels_45_1 = getOnlyLabels(filteredSignal_1_45, label, thresholds_old_ch_1)
         labels_45_2 = getOnlyLabels(filteredSignal_2_45, label, thresholds_old_ch_2)
@@ -1496,10 +1534,15 @@ for p in range(1, 51):
             conf_mat_45.append(conf)
 
 
-        predicted_labels_1 = getOnlyLabels(predicted_data_1, label, thresholds_new_ch_1)
-        predicted_labels_2 = getOnlyLabels(predicted_data_2, label, thresholds_new_ch_2)
-        predicted_labels_3 = getOnlyLabels(predicted_data_3, label, thresholds_new_ch_3)
-        predicted_labels_4 = getOnlyLabels(predicted_data_4, label, thresholds_new_ch_4)
+        predicted_labels_1 = detectWithLLValues(linelength(predicted_data_1), label)
+        predicted_labels_2 = detectWithLLValues(linelength(predicted_data_2), label)
+        predicted_labels_3 = detectWithLLValues(linelength(predicted_data_3), label)
+        predicted_labels_4 = detectWithLLValues(linelength(predicted_data_4), label)
+
+        # predicted_labels_1 = getOnlyLabels(predicted_data_1, label, thresholds_new_ch_1)
+        # predicted_labels_2 = getOnlyLabels(predicted_data_2, label, thresholds_new_ch_2)
+        # predicted_labels_3 = getOnlyLabels(predicted_data_3, label, thresholds_new_ch_3)
+        # predicted_labels_4 = getOnlyLabels(predicted_data_4, label, thresholds_new_ch_4)
 
         if (np.array_equal(predicted_labels_1, predicted_labels_2) or np.array_equal(predicted_labels_2,
                                                                                       predicted_labels_3) or np.array_equal(
@@ -1591,6 +1634,8 @@ averaged_list = []
 averaged_list_actual_data = []
 averaged_list_45 = []
 
+
+
 ppofFP_new_array = np.array(postProcessedFPList_new)
 ppofFP_new_array = np.mean(ppofFP_new_array, axis=0)
 
@@ -1655,37 +1700,37 @@ for p_i in range(0, len(averaged_list)):
     # plt.plot(1 - spec_actual, sens_actual)
     # #plt.plot(1 - spec_45, sens_45)
     #
-    auc_new = auc(1 - spec_new, sens_new)
-    auc_actual = auc(1 - spec_actual, sens_actual)
-    auc_45 = auc(1 - spec_45, sens_45)
-
-    if(auc_new > auc_actual):
-        improved_situation += 1
-
-    if((auc_new - auc_actual) / auc_actual >= 0.1):
-        improved_situation_10_percent_and_more += 1
-
-
-    # legend_labels = ["Filtered data (AUC={:.2f})".format(auc_new),
-    #                  "Raw data (AUC={:.2f})".format(auc_actual)]
-    #
-    #
-    # plt.title("ROC curve for patient " + str(p_i + 1))
-    #
-    # plt.legend(legend_labels, loc='lower right')
-    #
-    # plt.xlabel("1 - specificity")
-    # plt.ylabel("sensitivity")
-    #
-    # plt.savefig("C:\\Users\\RominaRsn\\PycharmProjects\\MyMasterThesis\\masterThesis\\data_file\\ROC_Per_Patient\\ROC_curve_patient_" + str(p_i + 1) + ".png")
-    #plt.show()
-
-
-print("improved situation percentage: ", improved_situation/50)
-print("improved situation: ", improved_situation)
-
-print("improved situation percentage- more than 10 percent: ", improved_situation_10_percent_and_more/50)
-print("improved situation: ", improved_situation_10_percent_and_more)
+#     auc_new = auc(1 - spec_new, sens_new)
+#     auc_actual = auc(1 - spec_actual, sens_actual)
+#     auc_45 = auc(1 - spec_45, sens_45)
+#
+#     if(auc_new > auc_actual):
+#         improved_situation += 1
+#
+#     if((auc_new - auc_actual) / auc_actual >= 0.1):
+#         improved_situation_10_percent_and_more += 1
+#
+#
+#     # legend_labels = ["Filtered data (AUC={:.2f})".format(auc_new),
+#     #                  "Raw data (AUC={:.2f})".format(auc_actual)]
+#     #
+#     #
+#     # plt.title("ROC curve for patient " + str(p_i + 1))
+#     #
+#     # plt.legend(legend_labels, loc='lower right')
+#     #
+#     # plt.xlabel("1 - specificity")
+#     # plt.ylabel("sensitivity")
+#     #
+#     # plt.savefig("C:\\Users\\RominaRsn\\PycharmProjects\\MyMasterThesis\\masterThesis\\data_file\\ROC_Per_Patient\\ROC_curve_patient_" + str(p_i + 1) + ".png")
+#     #plt.show()
+#
+#
+# print("improved situation percentage: ", improved_situation/50)
+# print("improved situation: ", improved_situation)
+#
+# print("improved situation percentage- more than 10 percent: ", improved_situation_10_percent_and_more/50)
+# print("improved situation: ", improved_situation_10_percent_and_more)
 
 
 averaged_list = np.array(averaged_list)
@@ -1699,6 +1744,14 @@ averaged_list_45_copy = np.array(averaged_list_45)
 averaged_list = np.mean(averaged_list, axis=0)
 averaged_list_actual_data = np.mean(averaged_list_actual_data, axis=0)
 averaged_list_45 = np.mean(averaged_list_45, axis=0)
+
+
+print("the list of TN, FP, FN, TP for the predicted data")
+print("filtered data \n")
+print(averaged_list)
+print("the list of TN, FP, FN, TP for the actual data")
+print(averaged_list_actual_data)
+
 
 
 
