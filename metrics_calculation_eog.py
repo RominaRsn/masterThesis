@@ -226,8 +226,10 @@ def dB_to_linear(dB):
 
 
 def evaluate_model(model_path, data_noisy, data_clean, filters, file_path):
-    model = load_model(model_path)
-    result = model.predict(data_noisy)
+    #model = load_model(model_path)
+    #result = model.predict(data_noisy)
+
+    result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_final_five_layer_eog.npy")
 
     clean_input_test_vec = np.ravel(data_clean)
     noisy_input_test_vec = np.ravel(data_noisy)
@@ -263,52 +265,52 @@ def evaluate_model(model_path, data_noisy, data_clean, filters, file_path):
     fm.write("PSNRClean: {}\n".format(Psnr_clean))
     fm.write("PSNRFiltered: {}\n".format(Psnr_cleaned))
 
-    for cutoff in filters:
-        filtered_signal = nk.signal_filter(data_noisy, sampling_rate=250, highcut=cutoff, method='butterworth', order=4)
-        filtered_signal_vec = np.ravel(filtered_signal)
-
-        diffCleanedClean = filtered_signal_vec - clean_input_test_vec
-        rmsCleaned = np.sqrt(np.mean(diffCleanedClean ** 2))
-
-        cornoisyclean = np.corrcoef(clean_input_test_vec, noisy_input_test_vec)[0, 1]
-        corcleaned = np.corrcoef(clean_input_test_vec, filtered_signal_vec)[0, 1]
-
-        snrnoisy = metrics.metrics.snr(clean_input_test_vec, noisy_input_test_vec)
-        snrcleaned = metrics.metrics.snr(clean_input_test_vec, filtered_signal_vec)
-
-        snr_nosiy_not_db = dB_to_linear(snrnoisy)
-        snr_cleaned_not_db = dB_to_linear(snrcleaned)
-
-        rrmseNoisy = metrics.metrics.rrmseMetric(clean_input_test_vec, noisy_input_test_vec)
-        rrmseCleaned = metrics.metrics.rrmseMetric(clean_input_test_vec, filtered_signal_vec)
-
-        fm.write("Filtered signal with BW filter {}Hz\n".format(cutoff))
-        fm.write("SNRNoisy: {}\n".format(snrnoisy))
-        fm.write("SNRCleaned: {}\n".format(snrcleaned))
-        fm.write("RMSNoisy: {}\n".format(rmsNoisy))
-        fm.write("RMSCleaned: {}\n".format(rmsCleaned))
-        fm.write("RMSENoisy: {}\n".format(rrmseNoisy))
-        fm.write("RMSECleaned: {}\n".format(rrmseCleaned))
-        fm.write("PearsonCorrNoisy: {}\n".format(cornoisyclean))
-        fm.write("PearsonCorrCleaned: {}\n".format(corcleaned))
-        fm.write("SNRNoisyNotDB: {}\n".format(snr_nosiy_not_db))
-        fm.write("SNRCleanedNotDB: {}\n".format(snr_cleaned_not_db))
+    # for cutoff in filters:
+    #     filtered_signal = nk.signal_filter(data_noisy, sampling_rate=250, highcut=cutoff, method='butterworth', order=4)
+    #     filtered_signal_vec = np.ravel(filtered_signal)
+    #
+    #     diffCleanedClean = filtered_signal_vec - clean_input_test_vec
+    #     rmsCleaned = np.sqrt(np.mean(diffCleanedClean ** 2))
+    #
+    #     cornoisyclean = np.corrcoef(clean_input_test_vec, noisy_input_test_vec)[0, 1]
+    #     corcleaned = np.corrcoef(clean_input_test_vec, filtered_signal_vec)[0, 1]
+    #
+    #     snrnoisy = metrics.metrics.snr(clean_input_test_vec, noisy_input_test_vec)
+    #     snrcleaned = metrics.metrics.snr(clean_input_test_vec, filtered_signal_vec)
+    #
+    #     snr_nosiy_not_db = dB_to_linear(snrnoisy)
+    #     snr_cleaned_not_db = dB_to_linear(snrcleaned)
+    #
+    #     rrmseNoisy = metrics.metrics.rrmseMetric(clean_input_test_vec, noisy_input_test_vec)
+    #     rrmseCleaned = metrics.metrics.rrmseMetric(clean_input_test_vec, filtered_signal_vec)
+    #
+    #     fm.write("Filtered signal with BW filter {}Hz\n".format(cutoff))
+    #     fm.write("SNRNoisy: {}\n".format(snrnoisy))
+    #     fm.write("SNRCleaned: {}\n".format(snrcleaned))
+    #     fm.write("RMSNoisy: {}\n".format(rmsNoisy))
+    #     fm.write("RMSCleaned: {}\n".format(rmsCleaned))
+    #     fm.write("RMSENoisy: {}\n".format(rrmseNoisy))
+    #     fm.write("RMSECleaned: {}\n".format(rrmseCleaned))
+    #     fm.write("PearsonCorrNoisy: {}\n".format(cornoisyclean))
+    #     fm.write("PearsonCorrCleaned: {}\n".format(corcleaned))
+    #     fm.write("SNRNoisyNotDB: {}\n".format(snr_nosiy_not_db))
+    #     fm.write("SNRCleanedNotDB: {}\n".format(snr_cleaned_not_db))
 
     fm.close()
 
 
 # Example usage
 data_clean_normalized_cheby = np.load(
-    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_cheby_normalized.npy")
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_normalized.npy")
 data_noisy_normalized_cheby = np.load(
-    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_cheby_normalized.npy")
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_normalized.npy")
 
 noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized_cheby,
                                                                     data_clean_normalized_cheby, test_size=0.2,
                                                                     random_state=42)
 
 user_home = os.path.expanduser("~")
-file_path = os.path.join(user_home, "Downloads", "EOG_With_Noise_All_models.txt")
+file_path = os.path.join(user_home, "Downloads", "EOG_non_Cheby_pre_processing.txt")
 
 filters = [45, 30, 70]  # Define your list of filters here
 
@@ -316,7 +318,9 @@ model_paths = [
     #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5",
     #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_LSTM_checkPoint.h5",
     #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_GRU_checkPoint.h5",
-    r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\paper_CNN_retrainWithEOG_LSTM_checkPoint.h5'
+    #r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\paper_CNN_retrainWithEOG_LSTM_checkPoint.h5'
+
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_3_layers_paper_arch_EMG_EOG.h5"
 ]
 
 for model_path in model_paths:

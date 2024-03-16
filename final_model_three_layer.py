@@ -80,9 +80,15 @@ model.fit(
 
 )
 
+del data_clean_normalized, data_noisy_normalized, noisy_train, noisy_test, clean_train, clean_test  # Free up memory
 
 data_clean_eog = np.load(r"C:\Users\Romina\Downloads\clean_data_eog_normalized.npy")
 data_noisy_eog = np.load(r"C:\Users\Romina\Downloads\noisy_data_eog_normalized.npy")
+
+#
+# data_clean_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_normalized.npy")
+# data_noisy_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_normalized.npy")
+# >>>>>>> d454bb5e2969e0033c4fa8543f846b9c2d3f5504
 
 
 
