@@ -1225,17 +1225,31 @@ for p in range(1, 51):
         # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize", f"pat_{p}_sz_{sz}_ch_4.npy"))
         # ##predicted_data_4 = predicted_data_4.squeeze(-1)
         #
-        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # #predicted_data_1 = predicted_data_1.squeeze(-1)
+        #
+        # predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        # #predicted_data_2 = predicted_data_2.squeeze(-1)
+        #
+        # predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        # #predicted_data_3 = predicted_data_3.squeeze(-1)
+        #
+        # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        ##predicted_data_4 = predicted_data_4.squeeze(-1)
+
+        predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_1.npy"))
         #predicted_data_1 = predicted_data_1.squeeze(-1)
 
-        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_2.npy"))
         #predicted_data_2 = predicted_data_2.squeeze(-1)
 
-        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_3.npy"))
         #predicted_data_3 = predicted_data_3.squeeze(-1)
 
-        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm", f"pat_{p}_sz_{sz}_ch_4.npy"))
-        ##predicted_data_4 = predicted_data_4.squeeze(-1)
+        predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        #predicted_data_4 = predicted_data_4.squeeze(-1)
+
+
 
         # predicted_data_1 = np.load(
         #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
