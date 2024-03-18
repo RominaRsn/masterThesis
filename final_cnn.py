@@ -53,9 +53,11 @@ def model():
 
     flattened_encoded8 = Flatten()(encoded7)
 
+    output1 = Dense(500)(flattened_encoded8)
 
+    reshaped_output1 = Reshape((500, 1))(output1)
 
-    output_layer = Conv1D(1, 3, activation='tanh',kernel_initializer='he_uniform', padding='same')(flattened_encoded8)  # 1 channel for reconstruction
+    output_layer = Conv1D(1, 3, activation='tanh',kernel_initializer='he_uniform', padding='same')(reshaped_output1)  # 1 channel for reconstruction
 
     # Create the autoencoder model
     autoencoder = Model(input_layer, output_layer)
@@ -67,69 +69,69 @@ def model():
     autoencoder.summary()
     return autoencoder
 
+
+model = model()
+
+data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
+data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
+
+noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
+
+
+callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
+
+checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\cnn_emg.h5'
+
+checkpoint = ModelCheckpoint(checkpoint_path,
+                             monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
+                             save_best_only=True,  # Save only if the validation performance improves
+                             mode='min',  # 'min' for loss, 'max' for accuracy, 'auto' will infer automatically
+                             verbose=1)
+
+model.optimizer.learning_rate = 1e-6
+model.fit(
+    noisy_train[0:100],
+    clean_train[0:100],
+    epochs=5,
+    batch_size=32,
+    validation_split=0.1,
+    callbacks=[callback, checkpoint],
+    shuffle=True
+
+)
+
+del data_clean_normalized, data_noisy_normalized, noisy_train, noisy_test, clean_train, clean_test  # Free up memory
+
 #
-# model = model()
-#
-# data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
-# data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
-#
-# noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
-#
-#
-# callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
-#
-# checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_3_layers_paper_arch_EMG.h5'
-#
-# checkpoint = ModelCheckpoint(checkpoint_path,
-#                              monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
-#                              save_best_only=True,  # Save only if the validation performance improves
-#                              mode='min',  # 'min' for loss, 'max' for accuracy, 'auto' will infer automatically
-#                              verbose=1)
-#
-# model.optimizer.learning_rate = 1e-6
-# model.fit(
-#     noisy_train,
-#     clean_train,
-#     epochs=5,
-#     batch_size=32,
-#     validation_split=0.1,
-#     callbacks=[callback, checkpoint],
-#     shuffle=True
-#
-# )
-#
-# del data_clean_normalized, data_noisy_normalized, noisy_train, noisy_test, clean_train, clean_test  # Free up memory
-#
-# #
-# data_clean_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_normalized.npy")
-# data_noisy_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_normalized.npy")
-#
-#
-#
-# # Step 1: Split into training and test sets
-# #noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized_cheby, data_clean_normalized_cheby, test_size=0.2, random_state=42)
-#
-# noisy_train_eog, noisy_test_eog, clean_train_eog, clean_test_eog = train_test_split(data_noisy_eog, data_clean_eog, test_size=0.2, random_state=42)
-#
-# model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_3_layers_paper_arch_EMG.h5')
-#
-# callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
-#
-# checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_3_layers_paper_arch_EMG_EOG.h5'
-#
-# checkpoint = ModelCheckpoint(checkpoint_path,
-#                              monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
-#                              save_best_only=True,  # Save only if the validation performance improves
-#                              mode='min',  # 'min' for loss, 'max' for accuracy, 'auto' will infer automatically
-#                              verbose=1)
-#
-# model.optimizer.learning_rate = 1e-6
-# model.fit(
-#     noisy_train_eog,
-#     clean_train_eog,
-#     epochs=5,
-#     batch_size=32,
-#     validation_split=0.1,
-#     callbacks=[callback, checkpoint],
-#     shuffle=True
-# )
+data_clean_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_normalized.npy")
+data_noisy_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_normalized.npy")
+
+
+
+# Step 1: Split into training and test sets
+#noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized_cheby, data_clean_normalized_cheby, test_size=0.2, random_state=42)
+
+noisy_train_eog, noisy_test_eog, clean_train_eog, clean_test_eog = train_test_split(data_noisy_eog, data_clean_eog, test_size=0.2, random_state=42)
+
+model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\cnn_emg.h5')
+
+callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
+
+checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\cnn_emg_eog.h5'
+
+checkpoint = ModelCheckpoint(checkpoint_path,
+                             monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
+                             save_best_only=True,  # Save only if the validation performance improves
+                             mode='min',  # 'min' for loss, 'max' for accuracy, 'auto' will infer automatically
+                             verbose=1)
+
+model.optimizer.learning_rate = 1e-6
+model.fit(
+    noisy_train_eog[0:100],
+    clean_train_eog[0:100],
+    epochs=5,
+    batch_size=32,
+    validation_split=0.1,
+    callbacks=[callback, checkpoint],
+    shuffle=True
+)
