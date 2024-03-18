@@ -1,21 +1,13 @@
-from keras.constraints import max_norm
-from keras.layers import LeakyReLU, Add
-from keras import layers,Sequential
-from keras.models import *
-from keras.layers import *
-import numpy as np
+from tensorflow.keras.constraints import max_norm
+from tensorflow.keras.layers import LeakyReLU, Add
+from tensorflow.keras import layers,Sequential
+from tensorflow.keras.models import *
+from tensorflow.keras.layers import *
 from sklearn.model_selection import train_test_split
-from scipy.signal import butter,filtfilt,iirnotch
-import metrics
-from keras.utils import plot_model
-import os
-import model
-import spicy
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras.callbacks import ModelCheckpoint
+import numpy as np
 import tensorflow as tf
-import pickle
-import masterThesis.metrics as metrics
-import neurokit2 as nk
-from keras.callbacks import ModelCheckpoint
 
 
 
@@ -60,15 +52,15 @@ def model():
 
 model = model()
 
-data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
-data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
+data_clean_normalized = np.load(r"C:\Users\Romina\Downloads\clean_normalized_new.npy")
+data_noisy_normalized = np.load(r"C:\Users\Romina\Downloads\noisy_normalized_new.npy")
 
 noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
 
 
 callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
 
-checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_3_layers_paper_arch_EMG.h5'
+checkpoint_path = r'C:\Users\Romina\masterThesis\trainedModel\model_with_3_layers_paper_arch_EMG.keras'
 
 checkpoint = ModelCheckpoint(checkpoint_path,
                              monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
@@ -90,9 +82,13 @@ model.fit(
 
 del data_clean_normalized, data_noisy_normalized, noisy_train, noisy_test, clean_train, clean_test  # Free up memory
 
+data_clean_eog = np.load(r"C:\Users\Romina\Downloads\clean_data_eog_normalized.npy")
+data_noisy_eog = np.load(r"C:\Users\Romina\Downloads\noisy_data_eog_normalized.npy")
+
 #
-data_clean_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_normalized.npy")
-data_noisy_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_normalized.npy")
+# data_clean_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_normalized.npy")
+# data_noisy_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\noisy_data_eog_normalized.npy")
+# >>>>>>> d454bb5e2969e0033c4fa8543f846b9c2d3f5504
 
 
 
@@ -101,11 +97,11 @@ data_noisy_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\mas
 
 noisy_train_eog, noisy_test_eog, clean_train_eog, clean_test_eog = train_test_split(data_noisy_eog, data_clean_eog, test_size=0.2, random_state=42)
 
-model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_3_layers_paper_arch_EMG.h5')
+model = load_model(r'C:\Users\Romina\masterThesis\trainedModel\model_with_3_layers_paper_arch_EMG.keras')
 
 callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
 
-checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_3_layers_paper_arch_EMG_EOG.h5'
+checkpoint_path = r'C:\Users\Romina\masterThesis\trainedModel\model_with_3_layers_paper_arch_EMG_EOG.keras'
 
 checkpoint = ModelCheckpoint(checkpoint_path,
                              monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
@@ -123,3 +119,7 @@ model.fit(
     callbacks=[callback, checkpoint],
     shuffle=True
 )
+
+result = model.predict(noisy_test)
+
+np.save(r'C:\Users\Romina\masterThesis\trainedModel\result_final_three_layer.npy', result)
