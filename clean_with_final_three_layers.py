@@ -21,16 +21,16 @@ from keras.callbacks import ModelCheckpoint
 
 model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_3_layers_paper_arch_EMG.h5')
 
-
-data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
-data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
-
-noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
-
-result_emg = model.predict(noisy_test)
-np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_three_layer_emg.npy", result_emg)
-
-del data_clean_normalized, data_noisy_normalized, noisy_train, noisy_test, clean_train, clean_test  # Free up memory
+#
+# data_clean_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\clean_normalized_new.npy")
+# data_noisy_normalized = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\noisy_normalized_new.npy")
+#
+# noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_normalized, data_clean_normalized, test_size=0.2, random_state=42)
+#
+# result_emg = model.predict(noisy_test)
+# np.save(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_three_layer_emg.npy", result_emg)
+#
+# del data_clean_normalized, data_noisy_normalized, noisy_train, noisy_test, clean_train, clean_test  # Free up memory
 
 #
 data_clean_eog = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\clean_data_eog_normalized.npy")
