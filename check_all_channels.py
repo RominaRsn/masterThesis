@@ -754,7 +754,7 @@ def getThresholdsPerPatient(patient_number, channel_number, sz_num):
 
     max_ll = max(max_list)
 
-    thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    thresholds = [avg - 3 * std, avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
     #thresholds = [max_ll * 0.5, max_ll * 0.6, max_ll * 0.7, max_ll * 0.8, max_ll * 0.9]
     return thresholds
 
@@ -909,7 +909,7 @@ def getThresholdsPerPatientAfterCleaning(path, patient_number, channel_number, s
 
     max_ll = np.max(max_list)
 
-    thresholds = [avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
+    thresholds = [avg - 3 * std, avg - 2 * std, avg - std, avg, avg + std, avg + 2 * std, avg + 3 * std, avg + 4 * std, avg + 5 * std, avg + 6 * std]
     #thresholds = [max_ll * 0.5, max_ll * 0.6, max_ll * 0.7, max_ll * 0.8, max_ll * 0.9]
     return thresholds
 
@@ -1263,7 +1263,9 @@ for p in range(1, 51):
     #print("clean data thresholds: ", thresholds_old_ch_1, thresholds_old_ch_2, thresholds_old_ch_3, thresholds_old_ch_4)
 
     #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
-    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering"
+    #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering"
+    #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers"
+    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm"
     thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
     thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
     thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
@@ -1377,45 +1379,58 @@ for p in range(1, 51):
         #compareSeizurePatterns(label, new_normalized_data_1, predicted_data_1)
         ##predicted_data_4 = predicted_data_4.squeeze(-1)
 
-        predicted_data_1 = np.load(
-            os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-                         f"pat_{p}_sz_{sz}_ch_1.npy"))
-        # predicted_data_1 = predicted_data_1.squeeze(-1)
-
-        predicted_data_2 = np.load(
-            os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-                         f"pat_{p}_sz_{sz}_ch_2.npy"))
-        # predicted_data_2 = predicted_data_2.squeeze(-1)
-
-        predicted_data_3 = np.load(
-            os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-                         f"pat_{p}_sz_{sz}_ch_3.npy"))
-        # predicted_data_3 = predicted_data_3.squeeze(-1)
-
-        predicted_data_4 = np.load(
-            os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
-                         f"pat_{p}_sz_{sz}_ch_4.npy"))
-        #predicted_data_4 = predicted_data_4.squeeze(-1)
-
-        # predicted_data_1 = np.load(os.path.join(
-        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-        #     f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # predicted_data_1 = np.load(
+        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
+        #                  f"pat_{p}_sz_{sz}_ch_1.npy"))
         # # predicted_data_1 = predicted_data_1.squeeze(-1)
         #
-        # predicted_data_2 = np.load(os.path.join(
-        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-        #     f"pat_{p}_sz_{sz}_ch_2.npy"))
+        # predicted_data_2 = np.load(
+        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
+        #                  f"pat_{p}_sz_{sz}_ch_2.npy"))
         # # predicted_data_2 = predicted_data_2.squeeze(-1)
         #
-        # predicted_data_3 = np.load(os.path.join(
-        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-        #     f"pat_{p}_sz_{sz}_ch_3.npy"))
+        # predicted_data_3 = np.load(
+        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
+        #                  f"pat_{p}_sz_{sz}_ch_3.npy"))
         # # predicted_data_3 = predicted_data_3.squeeze(-1)
         #
-        # predicted_data_4 = np.load(os.path.join(
-        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-        #     f"pat_{p}_sz_{sz}_ch_4.npy"))
-        # ##predicted_data_4 = predicted_data_4.squeeze(-1)
+        # predicted_data_4 = np.load(
+        #     os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\ae_cheby_normalize",
+        #                  f"pat_{p}_sz_{sz}_ch_4.npy"))
+        #predicted_data_4 = predicted_data_4.squeeze(-1)
+
+        predicted_data_1 = np.load(os.path.join(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+            f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # predicted_data_1 = predicted_data_1.squeeze(-1)
+
+        predicted_data_2 = np.load(os.path.join(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+            f"pat_{p}_sz_{sz}_ch_2.npy"))
+        # predicted_data_2 = predicted_data_2.squeeze(-1)
+
+        predicted_data_3 = np.load(os.path.join(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+            f"pat_{p}_sz_{sz}_ch_3.npy"))
+        # predicted_data_3 = predicted_data_3.squeeze(-1)
+
+        predicted_data_4 = np.load(os.path.join(
+            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+            f"pat_{p}_sz_{sz}_ch_4.npy"))
+        ##predicted_data_4 = predicted_data_4.squeeze(-1)
+
+        # predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # #predicted_data_1 = predicted_data_1.squeeze(-1)
+        #
+        # predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_2.npy"))
+        # #predicted_data_2 = predicted_data_2.squeeze(-1)
+        #
+        # predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_3.npy"))
+        # #predicted_data_3 = predicted_data_3.squeeze(-1)
+        #
+        # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        #predicted_data_4 = predicted_data_4.squeeze(-1)
+
 
 
         ####when the predictions are not calculated yet
@@ -1448,15 +1463,15 @@ for p in range(1, 51):
 
 
 
-        # labels_1 = getOnlyLabels(new_normalized_data_1, label, thresholds_old_ch_1)
-        # labels_2 = getOnlyLabels(new_normalized_data_2, label, thresholds_old_ch_2)
-        # labels_3 = getOnlyLabels(new_normalized_data_3, label, thresholds_old_ch_3)
-        # labels_4 = getOnlyLabels(new_normalized_data_4, label, thresholds_old_ch_4)
+        labels_1 = getOnlyLabels(new_normalized_data_1, label, thresholds_old_ch_1)
+        labels_2 = getOnlyLabels(new_normalized_data_2, label, thresholds_old_ch_2)
+        labels_3 = getOnlyLabels(new_normalized_data_3, label, thresholds_old_ch_3)
+        labels_4 = getOnlyLabels(new_normalized_data_4, label, thresholds_old_ch_4)
 
-        labels_1 = detectWithLLValues(linelength(new_normalized_data_1), label)
-        labels_2 = detectWithLLValues(linelength(new_normalized_data_2), label)
-        labels_3 = detectWithLLValues(linelength(new_normalized_data_3), label)
-        labels_4 = detectWithLLValues(linelength(new_normalized_data_4), label)
+        # labels_1 = detectWithLLValues(linelength(new_normalized_data_1), label)
+        # labels_2 = detectWithLLValues(linelength(new_normalized_data_2), label)
+        # labels_3 = detectWithLLValues(linelength(new_normalized_data_3), label)
+        # labels_4 = detectWithLLValues(linelength(new_normalized_data_4), label)
 
         # label_raw_data = np.logical_or(labels_1, labels_2)
         # label_raw_data = np.logical_or(label_raw_data, labels_3)
@@ -1534,15 +1549,15 @@ for p in range(1, 51):
             conf_mat_45.append(conf)
 
 
-        predicted_labels_1 = detectWithLLValues(linelength(predicted_data_1), label)
-        predicted_labels_2 = detectWithLLValues(linelength(predicted_data_2), label)
-        predicted_labels_3 = detectWithLLValues(linelength(predicted_data_3), label)
-        predicted_labels_4 = detectWithLLValues(linelength(predicted_data_4), label)
+        # predicted_labels_1 = detectWithLLValues(linelength(predicted_data_1), label)
+        # predicted_labels_2 = detectWithLLValues(linelength(predicted_data_2), label)
+        # predicted_labels_3 = detectWithLLValues(linelength(predicted_data_3), label)
+        # predicted_labels_4 = detectWithLLValues(linelength(predicted_data_4), label)
 
-        # predicted_labels_1 = getOnlyLabels(predicted_data_1, label, thresholds_new_ch_1)
-        # predicted_labels_2 = getOnlyLabels(predicted_data_2, label, thresholds_new_ch_2)
-        # predicted_labels_3 = getOnlyLabels(predicted_data_3, label, thresholds_new_ch_3)
-        # predicted_labels_4 = getOnlyLabels(predicted_data_4, label, thresholds_new_ch_4)
+        predicted_labels_1 = getOnlyLabels(predicted_data_1, label, thresholds_new_ch_1)
+        predicted_labels_2 = getOnlyLabels(predicted_data_2, label, thresholds_new_ch_2)
+        predicted_labels_3 = getOnlyLabels(predicted_data_3, label, thresholds_new_ch_3)
+        predicted_labels_4 = getOnlyLabels(predicted_data_4, label, thresholds_new_ch_4)
 
         if (np.array_equal(predicted_labels_1, predicted_labels_2) or np.array_equal(predicted_labels_2,
                                                                                       predicted_labels_3) or np.array_equal(
@@ -1700,16 +1715,16 @@ for p_i in range(0, len(averaged_list)):
     # plt.plot(1 - spec_actual, sens_actual)
     # #plt.plot(1 - spec_45, sens_45)
     #
-#     auc_new = auc(1 - spec_new, sens_new)
-#     auc_actual = auc(1 - spec_actual, sens_actual)
-#     auc_45 = auc(1 - spec_45, sens_45)
-#
-#     if(auc_new > auc_actual):
-#         improved_situation += 1
-#
-#     if((auc_new - auc_actual) / auc_actual >= 0.1):
-#         improved_situation_10_percent_and_more += 1
-#
+    auc_new = auc(1 - spec_new, sens_new)
+    auc_actual = auc(1 - spec_actual, sens_actual)
+    auc_45 = auc(1 - spec_45, sens_45)
+
+    if(auc_new > auc_actual):
+        improved_situation += 1
+
+    if((auc_new - auc_actual) / auc_actual >= 0.1):
+        improved_situation_10_percent_and_more += 1
+
 #
 #     # legend_labels = ["Filtered data (AUC={:.2f})".format(auc_new),
 #     #                  "Raw data (AUC={:.2f})".format(auc_actual)]
@@ -1726,11 +1741,11 @@ for p_i in range(0, len(averaged_list)):
 #     #plt.show()
 #
 #
-# print("improved situation percentage: ", improved_situation/50)
-# print("improved situation: ", improved_situation)
-#
-# print("improved situation percentage- more than 10 percent: ", improved_situation_10_percent_and_more/50)
-# print("improved situation: ", improved_situation_10_percent_and_more)
+print("improved situation percentage: ", improved_situation/50)
+print("improved situation: ", improved_situation)
+
+print("improved situation percentage- more than 10 percent: ", improved_situation_10_percent_and_more/50)
+print("improved situation: ", improved_situation_10_percent_and_more)
 
 
 averaged_list = np.array(averaged_list)

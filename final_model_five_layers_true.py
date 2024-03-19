@@ -47,7 +47,7 @@ def model():
     decoded5 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(decoded6)
     decoded5 = UpSampling1D(2)(decoded5)
 
-    decoded4 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='valid')(decoded5)
+    decoded4 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='same')(decoded5)
     decoded4 = UpSampling1D(2)(decoded4)
 
     decoded3= Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='valid')(decoded4)
@@ -55,11 +55,11 @@ def model():
 
     decoded2 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='valid')(decoded3)
     decoded2 = UpSampling1D(2)(decoded2)
+    #
+    # decoded1 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='valid')(decoded2)
+    # decoded1 = UpSampling1D(2)(decoded1)
 
-    decoded1 = Conv1D(256, 3, activation='relu',kernel_initializer='he_uniform', padding='valid')(decoded2)
-    decoded1 = UpSampling1D(2)(decoded1)
-
-    output_layer = Conv1D(1, 3, activation='tanh',kernel_initializer='he_uniform', padding='same')(decoded1)  # 1 channel for reconstruction
+    output_layer = Conv1D(1, 3, activation='tanh',kernel_initializer='he_uniform', padding='same')(decoded2)  # 1 channel for reconstruction
 
     # Create the autoencoder model
     autoencoder = Model(input_layer, output_layer)
@@ -93,7 +93,7 @@ model.optimizer.learning_rate = 1e-6
 model.fit(
     noisy_train,
     clean_train,
-    epochs=5,
+    epochs=2,
     batch_size=32,
     validation_split=0.1,
     callbacks=[callback, checkpoint],
@@ -117,7 +117,7 @@ model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThe
 
 callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
 
-checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_5_layers_paper_arch_EMG_EOG.h5'
+checkpoint_path = r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_5_layers_true_arch_EMG_EOG.h5'
 
 checkpoint = ModelCheckpoint(checkpoint_path,
                              monitor='val_loss',  # You can choose a different metric, e.g., 'val_accuracy'
@@ -129,7 +129,7 @@ model.optimizer.learning_rate = 1e-6
 model.fit(
     noisy_train_eog,
     clean_train_eog,
-    epochs=5,
+    epochs=2,
     batch_size=32,
     validation_split=0.1,
     callbacks=[callback, checkpoint],

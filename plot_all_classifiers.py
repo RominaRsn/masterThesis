@@ -1177,9 +1177,9 @@ all_plots_pp_10s = []
 
 paths = [
     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering",
-    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn",
-    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru",
-    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+    # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn",
+    # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru",
+    # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
 
 
 ]
@@ -1651,10 +1651,21 @@ for path in paths:
 
 for outer_item in all_plots_pp_10s:
     for inner_item in outer_item:
-        plt.plot(inner_item[0], inner_item[1])
+        array = np.array(inner_item[0])
+        plt.plot(array[0, :])
+        plt.plot(array[1, :])
+
+
+
+for outer_item in all_plots_pp_10s:
+    for inner_item in outer_item:
+        array = np.array(inner_item[0])
+        plt.plot(array[0, :])
+        plt.plot(array[1, :])
     plt.xlabel("False Positive Rate with post processing")
     plt.ylabel("Classified as seizure at least once in the fist 10 seconds of the seizure period")
     legend_labels = ["new", "old"]
     plt.legend(legend_labels, loc='lower right')
-    all_plots_pp_10s.append(plt.gcf())
-    plt.clf()
+    plt.show()
+    # all_plots_pp_10s.append(plt.gcf())
+    # plt.clf()

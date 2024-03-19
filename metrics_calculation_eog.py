@@ -230,6 +230,10 @@ def evaluate_model(model_path, data_noisy, data_clean, filters, file_path):
     #result = model.predict(data_noisy)
 
     result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_final_five_layer_eog.npy")
+    # result = np.load(
+    # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_gru_emg.npy")
+    #result = np.load(
+    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_three_layer_eog.npy")
 
     clean_input_test_vec = np.ravel(data_clean)
     noisy_input_test_vec = np.ravel(data_noisy)
@@ -260,6 +264,8 @@ def evaluate_model(model_path, data_noisy, data_clean, filters, file_path):
     fm.write("RMSCleaned: {}\n".format(rrmseCleaned))
     fm.write("RMSENoisy: {}\n".format(rrmseNoisy))
     fm.write("RMSECleaned: {}\n".format(rrmseCleaned))
+    fm.write("PearsonCorrNoisy: {}\n".format(cornoisyclean[0, 1]))
+    fm.write("PearsonCorrCleaned: {}\n".format(corcleaned[0, 1]))
     fm.write("SNRNoisyNotDB: {}\n".format(snr_nosiy_not_db))
     fm.write("SNRCleanedNotDB: {}\n".format(snr_cleaned_not_db))
     fm.write("PSNRClean: {}\n".format(Psnr_clean))

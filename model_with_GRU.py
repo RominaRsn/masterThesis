@@ -1,11 +1,11 @@
-from tensorflow.keras.constraints import max_norm
-from tensorflow.keras.layers import LeakyReLU, Add
-from tensorflow.keras import layers,Sequential
-from tensorflow.keras.models import *
-from tensorflow.keras.layers import *
+from keras.constraints import max_norm
+from keras.layers import LeakyReLU, Add
+from keras import layers,Sequential
+from keras.models import *
+from keras.layers import *
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.utils import plot_model
-from tensorflow.keras.callbacks import ModelCheckpoint
+from keras.utils import plot_model
+from keras.callbacks import ModelCheckpoint
 import numpy as np
 import tensorflow as tf
 

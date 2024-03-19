@@ -62,8 +62,8 @@ noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_n
     #
     # np.save(fr"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\nonChebyResults\result_{os.path.basename(model_path)[:-3]}.npy", result)
 
-result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_final_five_layer_emg.npy")
-
+#result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_final_five_layer_emg.npy")
+result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_gru_emg.npy")
 
 
 # Filter signals
@@ -105,7 +105,7 @@ file_path = os.path.join(user_home, "Downloads", "EMG_non_Cheby_pre_processing.t
 
 # Write results to file
 with open(file_path, 'a') as fm:
-    fm.write("----------------- Results for Model: {} ---------------------\n".format("final_five_layer_emg.npy"))
+    fm.write("----------------- Results for Model: {} ---------------------\n".format("result_gru_emg.npy"))
     fm.write("SNRNoisy: {}\n".format(snrnoisy))
     fm.write("SNRCleaned: {}\n".format(snrcleaned))
     fm.write("RMSNoisy: {}\n".format(rmsNoisy))
