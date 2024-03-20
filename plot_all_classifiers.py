@@ -1177,8 +1177,8 @@ all_plots_pp_10s = []
 
 paths = [
     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering",
-    # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn",
-    # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn",
+    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru",
     # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
 
 
@@ -1224,7 +1224,7 @@ for path in paths:
     postProcessedFPList_old_new_post = []
     postProcessedFPList_45_new_post = []
 
-    for p in range(1, 2):
+    for p in range(1, 6):
 
         sz_num = countNumberOfSeizuresPerPerson(p)
 
@@ -1649,23 +1649,116 @@ for path in paths:
     # # Clear the plot for the next iteration
     # plt.clf()
 
-for outer_item in all_plots_pp_10s:
-    for inner_item in outer_item:
-        array = np.array(inner_item[0])
-        plt.plot(array[0, :])
-        plt.plot(array[1, :])
+for index, outer_item in enumerate(all_plots_pp_10s):
+    if index == 0:
+        new = np.array(outer_item[0])
+        old = np.array(outer_item[1])
+        old = old.squeeze(0)
+        new = new.squeeze(0)
+
+        plt.plot(old[0, :], old[1, :])
+        plt.plot(new[0, :], new[1, :])
+    else:
+        new = np.array(outer_item[0])
+        new = new.squeeze(0)
+        plt.plot(new[0, :], new[1, :])
 
 
 
-for outer_item in all_plots_pp_10s:
-    for inner_item in outer_item:
-        array = np.array(inner_item[0])
-        plt.plot(array[0, :])
-        plt.plot(array[1, :])
-    plt.xlabel("False Positive Rate with post processing")
-    plt.ylabel("Classified as seizure at least once in the fist 10 seconds of the seizure period")
-    legend_labels = ["new", "old"]
-    plt.legend(legend_labels, loc='lower right')
-    plt.show()
-    # all_plots_pp_10s.append(plt.gcf())
-    # plt.clf()
+        # inner_item = np.array(outer_item[0][i])
+        # inner_item = inner_item.squeeze(0)
+        # # if(i == 0):
+        # #     plt.plot(inner_item[0, :])
+        # #     plt.plot(inner_item[1, :])
+        # # else:
+        # plt.plot(inner_item[0, :], inner_item[1, :])
+
+plt.xlabel("False Positive Rate (FP/h) - with post processing")
+plt.ylabel("classified at least once as seizure in the first 10 seconds of the seizure period")
+plt.legend(["raw data", "AE- 5 layers", "CNN"])
+plt.show()
+
+for index, outer_item in enumerate(all_plots_classified_at_least_once_10s): #all_plots_classified_at_least_once_10s
+    if index == 0:
+        new = np.array(outer_item[0])
+        old = np.array(outer_item[1])
+        old = old.squeeze(0)
+        new = new.squeeze(0)
+
+        plt.plot(old[0, :], old[1, :])
+        plt.plot(new[0, :], new[1, :])
+    else:
+        new = np.array(outer_item[0])
+        new = new.squeeze(0)
+        plt.plot(new[0, :], new[1, :])
+
+
+plt.xlabel("False Positive Rate (FP/h)")
+plt.ylabel("classified at least once as seizure in the first 10 seconds of the seizure period")
+plt.legend(["raw data", "AE- 5 layers", "CNN"])
+plt.show()
+
+
+
+for index, outer_item in enumerate(all_plots_roc ):
+    if index == 0:
+        new = np.array(outer_item[0])
+        old = np.array(outer_item[1])
+        old = old.squeeze(0)
+        new = new.squeeze(0)
+
+        plt.plot(old[0, :], old[1, :])
+        plt.plot(new[0, :], new[1, :])
+    else:
+        new = np.array(outer_item[0])
+        new = new.squeeze(0)
+        plt.plot(new[0, :], new[1, :])
+
+
+plt.xlabel("1 - specificity")
+plt.ylabel("Precision")
+plt.legend(["raw data", "AE- 5 layers", "CNN"])
+plt.show()
+
+
+
+for index, outer_item in enumerate(all_plots_classified_at_least_once):
+    if index == 0:
+        new = np.array(outer_item[0])
+        old = np.array(outer_item[1])
+        old = old.squeeze(0)
+        new = new.squeeze(0)
+
+        plt.plot(old[0, :], old[1, :])
+        plt.plot(new[0, :], new[1, :])
+    else:
+        new = np.array(outer_item[0])
+        new = new.squeeze(0)
+        plt.plot(new[0, :], new[1, :])
+
+
+plt.xlabel("False Positive Rate (FP/h)")
+plt.ylabel("classified at least once as seizure in the seizure period")
+plt.legend(["raw data", "AE- 5 layers", "CNN"])
+plt.show()
+
+
+for index, outer_item in enumerate(all_plots_classified_at_least_once):
+    if index == 0:
+        new = np.array(outer_item[0])
+        old = np.array(outer_item[1])
+        old = old.squeeze(0)
+        new = new.squeeze(0)
+
+        plt.plot(old[0, :], old[1, :])
+        plt.plot(new[0, :], new[1, :])
+    else:
+        new = np.array(outer_item[0])
+        new = new.squeeze(0)
+        plt.plot(new[0, :], new[1, :])
+
+
+plt.xlabel("False Positive Rate (FP/h) - with post processing")
+plt.ylabel("classified at least once as seizure in the seizure period")
+plt.legend(["raw data", "AE- 5 layers", "CNN"])
+plt.show()
