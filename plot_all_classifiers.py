@@ -1566,7 +1566,7 @@ for path in paths:
     temp_list.append(np.array(inner_temp_list))
     outer_temp_list.append(temp_list)
 
-    all_plots_classified_at_least_once.append(temp_list)
+    all_plots_classified_at_least_once.append(outer_temp_list)
 
     # plt.plot(averaged_list[:, 1], classified_at_least_once_new)
     # plt.plot(averaged_list_actual_data[:, 1], classified_at_least_once_old)
@@ -1743,7 +1743,7 @@ plt.legend(["raw data", "AE- 5 layers", "CNN"])
 plt.show()
 
 
-for index, outer_item in enumerate(all_plots_classified_at_least_once):
+for index, outer_item in enumerate(all_plots_pp):
     if index == 0:
         new = np.array(outer_item[0])
         old = np.array(outer_item[1])
