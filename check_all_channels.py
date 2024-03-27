@@ -659,7 +659,7 @@ def plotFalsePositives(index_list, data_1, data_2, data_3, data_4, predictions_1
             plt.show()
 
 def plotFalsePositives_new(index_list, data_1, data_2, data_3, data_4, predictions_1, predictions_2, predictions_3, predictions_4, patient_number, seizure_number, selected_threshold, predicted_label_1, predicted_label_2, predicted_label_3, predicted_label_4,
-                           raw_labels_1, raw_labels_2, raw_labels_3, raw_labels_4):
+                           raw_labels_1, raw_labels_2, raw_labels_3, raw_labels_4, actual_label):
 
     predicted_label_col_1 = raw_labels_1[:, selected_threshold]
     predicted_label_col_2 = raw_labels_2[:, selected_threshold]
@@ -686,37 +686,80 @@ def plotFalsePositives_new(index_list, data_1, data_2, data_3, data_4, predictio
                 whichChannelHasSeizure[3] = 1
 
 
-            display_span = 3
-            # Create subplots with specified axes
-            fig, axes = plt.subplots(4, 1, figsize=(20, 10), sharey='col')
-            fig.suptitle(f'patient: {patient_number}, seizure: {seizure_number}, index: {i}')
-            # Plot each subplot
-            axes[0].plot(data_1[i - display_span:i + display_span, :].ravel(), label='Data 1')
-            axes[0].plot(predictions_1[i - display_span:i + display_span, :].ravel(), label='Predictions 1')
-            axes[0].legend()
-            if(whichChannelHasSeizure[0] == 1):
-                axes[0].set_title("Seizure in this channel")
 
-            axes[1].plot(data_2[i - display_span:i + display_span, :].ravel(), label='Data 2')
-            axes[1].plot(predictions_2[i - display_span:i + display_span, :].ravel(), label='Predictions 2')
-            axes[1].legend()
-            if (whichChannelHasSeizure[1] == 1):
-                axes[1].set_title("Seizure in this channel")
+            display_span = 5
 
-            axes[2].plot(data_3[i - display_span:i + display_span, :].ravel(), label='Data 3')
-            axes[2].plot(predictions_3[i - display_span:i + display_span, :].ravel(), label='Predictions 3')
-            axes[2].legend()
-            if (whichChannelHasSeizure[2] == 1):
-                axes[2].set_title("Seizure in this channel")
+            x_axis = np.linspace(0, 10, 500 * 2 * display_span)
 
-            axes[3].plot(data_4[i - display_span:i + display_span, :].ravel(), label='Data 4')
-            axes[3].plot(predictions_4[i - display_span:i + display_span, :].ravel(), label='Predictions 4')
-            axes[3].legend()
-            if (whichChannelHasSeizure[3] == 1):
-                axes[2].set_title("Seizure in this channel")
+            whichChannelHasSeizure = np.array(whichChannelHasSeizure)
 
-            plt.tight_layout()  # Adjust layout to prevent overlapping
-            plt.show()
+            if(np.count_nonzero(whichChannelHasSeizure ) < 3):
+
+                # Create subplots with specified axes
+                fig, axes = plt.subplots(4, 1, figsize=(20, 10), sharey='col')
+                #fig.suptitle(f'patient: {patient_number}, seizure: {seizure_number}, index: {i}')
+                # Plot each subplot
+                axes[0].plot(x_axis, data_1[i - display_span:i + display_span, :].ravel(), label='Raw Data Channel 1')
+                axes[0].plot(x_axis,predictions_1[i - display_span:i + display_span, :].ravel(), label='Denoised Data Channel 1')
+                axes[0].legend(loc='lower right')
+                # axes[0].set_ylabel('Normalized Signal amplitude(unitless)')
+                # axes[0].set_xlabel('Time(s)')
+                if(whichChannelHasSeizure[0] == 1):
+                    seg_label = predicted_label_col_1[i - display_span:i + display_span]
+                    repeated_array = np.repeat(seg_label, 500)
+                    #axes[0].set_title("Seizure detected in this channel")
+                    axes[0].plot(x_axis, max(data_1[i - display_span:i + display_span, :].ravel())*repeated_array)
+
+                axes[1].plot(x_axis, data_2[i - display_span:i + display_span, :].ravel(), label='Raw Data Channel 2')
+                axes[1].plot(x_axis, predictions_2[i - display_span:i + display_span, :].ravel(), label='Denoised Data Channel 2')
+                axes[1].legend(loc='lower right')
+                # axes[1].set_ylabel('Normalized Signal amplitude(unitless)')
+                # axes[1].set_xlabel('Time(s)')
+                if (whichChannelHasSeizure[1] == 1):
+                    seg_label = predicted_label_col_2[i - display_span:i + display_span]
+                    repeated_array = np.repeat(seg_label, 500)
+                    #axes[1].set_title("Seizure detected in this channel")
+                    axes[1].plot(x_axis, max(data_2[i - display_span:i + display_span, :].ravel()) * repeated_array)
+
+
+                axes[2].plot(x_axis, data_3[i - display_span:i + display_span, :].ravel(), label='Raw Data Channel 3')
+                axes[2].plot(x_axis, predictions_3[i - display_span:i + display_span, :].ravel(), label='Denoised Data Channel 3')
+                axes[2].legend(loc='lower right')
+                # axes[2].set_ylabel('Normalized Signal amplitude(unitless)')
+                # axes[2].set_xlabel('Time(s)')
+                if (whichChannelHasSeizure[2] == 1):
+                    seg_label = predicted_label_col_3[i - display_span:i + display_span]
+                    repeated_array = np.repeat(seg_label, 500)
+                    #axes[2].set_title("Seizure detected in this channel")
+                    axes[2].plot(x_axis, max(data_3[i - display_span:i + display_span, :].ravel()) * repeated_array)
+
+
+
+                axes[3].plot(x_axis, data_4[i - display_span:i + display_span, :].ravel(), label='Raw Data Channel 4')
+                axes[3].plot(x_axis, predictions_4[i - display_span:i + display_span, :].ravel(), label='Denoised Data Channel 4')
+                axes[3].legend(loc='lower right')
+                # axes[3].set_ylabel('Normalized Signal amplitude(unitless)')
+                # axes[3].set_xlabel('Time(s)')
+                if (whichChannelHasSeizure[3] == 1):
+                    seg_label = predicted_label_col_4[i - display_span:i + display_span]
+                    repeated_array = np.repeat(seg_label, 500)
+                    #axes[3].set_title("Seizure detected in this channel")
+                    axes[3].plot(x_axis, max(data_4[i - display_span:i + display_span, :].ravel()) * repeated_array)
+
+
+                #axes[4].plot(label[i - display_span:i + display_span], label='True Label')
+
+                fig.text(0.5, 0.01, 'Time(s)', ha='center', va='center')
+                fig.text(0.006, 0.5, 'Normalized Signal amplitude(unitless)', ha='center', va='center', rotation='vertical')
+
+                for ax in axes:
+                    ax.grid(which='major', axis='x', color='gray', linestyle='-', linewidth=0.5)
+
+
+                plt.tight_layout()  # Adjust layout to prevent overlapping
+                #plt.grid(which='major', axis='x', color='gray', linestyle='-', linewidth=0.5)
+                # plt.xticks(np.arange(0, 500* 2 * display_span + 1, 500))
+                plt.show()
 
 
 def getThresholdsPerPatient(patient_number, channel_number, sz_num):
@@ -1265,7 +1308,7 @@ for p in range(1, 51):
     #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\real_data\new_norm_method"
     #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering"
     #path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers"
-    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm"
+    path = r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\LSTM"
     thresholds_new_ch_1 = getThresholdsPerPatientAfterCleaning(path, p, 1, sz_num)
     thresholds_new_ch_2 = getThresholdsPerPatientAfterCleaning(path, p, 2, sz_num)
     thresholds_new_ch_3 = getThresholdsPerPatientAfterCleaning(path, p, 3, sz_num)
@@ -1399,36 +1442,55 @@ for p in range(1, 51):
         #                  f"pat_{p}_sz_{sz}_ch_4.npy"))
         #predicted_data_4 = predicted_data_4.squeeze(-1)
 
-        predicted_data_1 = np.load(os.path.join(
-            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-            f"pat_{p}_sz_{sz}_ch_1.npy"))
-        # predicted_data_1 = predicted_data_1.squeeze(-1)
-
-        predicted_data_2 = np.load(os.path.join(
-            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-            f"pat_{p}_sz_{sz}_ch_2.npy"))
-        # predicted_data_2 = predicted_data_2.squeeze(-1)
-
-        predicted_data_3 = np.load(os.path.join(
-            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-            f"pat_{p}_sz_{sz}_ch_3.npy"))
-        # predicted_data_3 = predicted_data_3.squeeze(-1)
-
-        predicted_data_4 = np.load(os.path.join(
-            r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-            f"pat_{p}_sz_{sz}_ch_4.npy"))
-        ##predicted_data_4 = predicted_data_4.squeeze(-1)
-
-        # predicted_data_1 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_1.npy"))
-        # #predicted_data_1 = predicted_data_1.squeeze(-1)
+        # predicted_data_1 = np.load(os.path.join(
+        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+        #     f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # # predicted_data_1 = predicted_data_1.squeeze(-1)
         #
-        # predicted_data_2 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_2.npy"))
-        # #predicted_data_2 = predicted_data_2.squeeze(-1)
+        # predicted_data_2 = np.load(os.path.join(
+        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+        #     f"pat_{p}_sz_{sz}_ch_2.npy"))
+        # # predicted_data_2 = predicted_data_2.squeeze(-1)
         #
-        # predicted_data_3 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_3.npy"))
-        # #predicted_data_3 = predicted_data_3.squeeze(-1)
+        # predicted_data_3 = np.load(os.path.join(
+        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+        #     f"pat_{p}_sz_{sz}_ch_3.npy"))
+        # # predicted_data_3 = predicted_data_3.squeeze(-1)
         #
-        # predicted_data_4 = np.load(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers", f"pat_{p}_sz_{sz}_ch_4.npy"))
+        # predicted_data_4 = np.load(os.path.join(
+        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
+        #     f"pat_{p}_sz_{sz}_ch_4.npy"))
+
+        # predicted_data_1 = np.load(os.path.join(
+        #         r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\CNN",
+        #         f"pat_{p}_sz_{sz}_ch_1.npy"))
+        # # predicted_data_1 = predicted_data_1.squeeze(-1)
+        #
+        # predicted_data_2 = np.load(os.path.join(
+        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\CNN",
+        #     f"pat_{p}_sz_{sz}_ch_2.npy"))
+        # # predicted_data_2 = predicted_data_2.squeeze(-1)
+        #
+        # predicted_data_3 = np.load(os.path.join(
+        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\CNN",
+        #     f"pat_{p}_sz_{sz}_ch_3.npy"))
+        # # predicted_data_3 = predicted_data_3.squeeze(-1)
+        #
+        # predicted_data_4 = np.load(os.path.join(
+        #     r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\CNN",
+        #     f"pat_{p}_sz_{sz}_ch_4.npy"))
+        #predicted_data_4 = predicted_data_4.squeeze(-1)
+
+        predicted_data_1 = np.load(os.path.join(path, f"pat_{p}_sz_{sz}_ch_1.npy"))
+        #predicted_data_1 = predicted_data_1.squeeze(-1)
+
+        predicted_data_2 = np.load(os.path.join(path, f"pat_{p}_sz_{sz}_ch_2.npy"))
+        #predicted_data_2 = predicted_data_2.squeeze(-1)
+
+        predicted_data_3 = np.load(os.path.join(path, f"pat_{p}_sz_{sz}_ch_3.npy"))
+        #predicted_data_3 = predicted_data_3.squeeze(-1)
+
+        predicted_data_4 = np.load(os.path.join(path, f"pat_{p}_sz_{sz}_ch_4.npy"))
         #predicted_data_4 = predicted_data_4.squeeze(-1)
 
 
@@ -1442,6 +1504,8 @@ for p in range(1, 51):
         #
         # # #
         # model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\paper_CNN_retrainWithEOG_LSTM_checkPoint.h5')
+        # model = load_model(r'C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\model_with_5_layers_true_arch_EMG_EOG.h5')
+        #
         # predicted_data_1 = model.predict(new_normalized_data_1)
         # predicted_data_2 = model.predict(new_normalized_data_2)
         # predicted_data_3 = model.predict(new_normalized_data_3)
@@ -1452,10 +1516,10 @@ for p in range(1, 51):
         # predicted_data_3 = predicted_data_3.squeeze(-1)
         # predicted_data_4 = predicted_data_4.squeeze(-1)
         #
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_d ata_filtering_cnn", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
-        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_true_5_layer", f"pat_{p}_sz_{sz}_ch_1.npy"), predicted_data_1)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_true_5_layer", f"pat_{p}_sz_{sz}_ch_2.npy"), predicted_data_2)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_true_5_layer", f"pat_{p}_sz_{sz}_ch_3.npy"), predicted_data_3)
+        # np.save(os.path.join(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_true_5_layer", f"pat_{p}_sz_{sz}_ch_4.npy"), predicted_data_4)
 
 
 
@@ -1611,10 +1675,10 @@ for p in range(1, 51):
             #print(selected_threshold)
 
             #false_detections_predicted = getFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
-            #false_detections_predicted = getReducedFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
+            false_detections_predicted = getReducedFlaseDetections(label, predicted_label, label_raw_data, selected_threshold)
             #plotFalsePositives(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4)
-            #plotFalsePositives_new(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4
-            #                      ,labels_1, labels_2, labels_3, labels_4)
+            plotFalsePositives_new(false_detections_predicted, new_normalized_data_1, new_normalized_data_2, new_normalized_data_3, new_normalized_data_4, predicted_data_1, predicted_data_2, predicted_data_3, predicted_data_4, p, sz, selected_threshold, predicted_labels_1, predicted_labels_2, predicted_labels_3, predicted_labels_4
+                                 ,labels_1, labels_2, labels_3, labels_4, label)
             #improved_result = getImprovedResult(label, label_raw_data, predicted_label, selected_threshold)
             #print(f"channel thresholds new: channel 1: {thresholds_new_ch_1[selected_threshold]} channel 2: {thresholds_new_ch_2[selected_threshold]} channel 3: {thresholds_new_ch_3[selected_threshold]} channel 4: {thresholds_new_ch_4[selected_threshold]}")
             #print(f"channel thresholds old: channel 1: {thresholds_old_ch_1[selected_threshold]} channel 2: {thresholds_old_ch_2[selected_threshold]} channel 3: {thresholds_old_ch_3[selected_threshold]} channel 4: {thresholds_old_ch_4[selected_threshold]} ")

@@ -1,7 +1,7 @@
 import subprocess
 
 # List of Python files to run
-files_to_run = [r"C:\Users\Romina\masterThesis\final_model_five_layer.py", r"C:\Users\Romina\masterThesis\final_model_threee_layer.py", r"C:\Users\Romina\masterThesis\model_with_GRU.py"]
+files_to_run = [r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\final_model_five_layers_true.py", r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\check_all_channels.py"]
 
 # Loop through the list and run each file
 for file in files_to_run:

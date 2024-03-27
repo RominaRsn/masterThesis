@@ -1176,11 +1176,15 @@ all_plots_pp_10s = []
 
 
 paths = [
-    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering",
-    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn",
-    #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru",
+    # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering",
+    # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_cnn",
+    # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_gru",
     # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\real_data_filtering_lstm",
-
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_with_three_layers",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\model_true_5_layer",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\CNN",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\GRU",
+    r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\realdataCleaning\LSTM"
 
 ]
 
@@ -1224,7 +1228,7 @@ for path in paths:
     postProcessedFPList_old_new_post = []
     postProcessedFPList_45_new_post = []
 
-    for p in range(1, 6):
+    for p in range(1, 51):
 
         sz_num = countNumberOfSeizuresPerPerson(p)
 
@@ -1649,6 +1653,10 @@ for path in paths:
     # # Clear the plot for the next iteration
     # plt.clf()
 
+plt.rcParams["figure.figsize"] = (12, 12)
+plt.rcParams["lines.linewidth"] = 2
+
+plt.figure()
 for index, outer_item in enumerate(all_plots_pp_10s):
     if index == 0:
         new = np.array(outer_item[0])
@@ -1675,9 +1683,11 @@ for index, outer_item in enumerate(all_plots_pp_10s):
 
 plt.xlabel("False Positive Rate (FP/h) - with post processing")
 plt.ylabel("classified at least once as seizure in the first 10 seconds of the seizure period")
-plt.legend(["raw data", "AE- 5 layers", "CNN"])
-plt.show()
+plt.legend(["Raw Data", "AE- 3 layers", "AE- 5 layers", "CNN", "GRU AE", "LSTM Net"], loc='lower right')
+#plt.savefig(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\plots\plot_pp_10s.png")
+#plt.show()
 
+plt.figure()
 for index, outer_item in enumerate(all_plots_classified_at_least_once_10s): #all_plots_classified_at_least_once_10s
     if index == 0:
         new = np.array(outer_item[0])
@@ -1695,17 +1705,21 @@ for index, outer_item in enumerate(all_plots_classified_at_least_once_10s): #all
 
 plt.xlabel("False Positive Rate (FP/h)")
 plt.ylabel("classified at least once as seizure in the first 10 seconds of the seizure period")
-plt.legend(["raw data", "AE- 5 layers", "CNN"])
+plt.legend(["Raw Data", "AE- 3 layers", "AE- 5 layers", "CNN", "GRU AE", "LSTM Net"], loc='lower right')
+#plt.savefig(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\plots\plot_classified_at_least_once_10s.png")
 plt.show()
 
-
-
-for index, outer_item in enumerate(all_plots_roc ):
+auc_list = []
+plt.figure()
+for index, outer_item in enumerate(all_plots_roc):
     if index == 0:
         new = np.array(outer_item[0])
         old = np.array(outer_item[1])
         old = old.squeeze(0)
         new = new.squeeze(0)
+
+        auc_list.append(auc(old[0, :], old[1, :]))
+        auc_list.append(auc(new[0, :], new[1, :]))
 
         plt.plot(old[0, :], old[1, :])
         plt.plot(new[0, :], new[1, :])
@@ -1713,15 +1727,29 @@ for index, outer_item in enumerate(all_plots_roc ):
         new = np.array(outer_item[0])
         new = new.squeeze(0)
         plt.plot(new[0, :], new[1, :])
+        auc_list.append(auc(new[0, :], new[1, :]))
 
 
-plt.xlabel("1 - specificity")
-plt.ylabel("Precision")
-plt.legend(["raw data", "AE- 5 layers", "CNN"])
-plt.show()
+plt.xlabel("False Positive Rate - new post processing method (discarding for 1 min)")
+plt.ylabel("classified at least once as seizure")
+legend_labels = [
+    "raw data (AUC={:.2f})".format(auc_list[0]),
+    "AE- 3 layers (AUC={:.2f})".format(auc_list[1]),
+    "AE- 5 layers (AUC={:.2f})".format(auc_list[2]),
+    "CNN (AUC={:.2f})".format(auc_list[3]),
+    "GRU AE (AUC={:.2f})".format(auc_list[4]),
+    "LSTM Net (AUC={:.2f})".format(auc_list[5])
+]
 
 
+plt.xlabel("1 - Specificity")
+plt.ylabel("Sensitivity")
+plt.legend(legend_labels, loc='lower right')
+#plt.savefig(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\plots\plot_roc.png")
+#plt.show()
 
+
+plt.figure()
 for index, outer_item in enumerate(all_plots_classified_at_least_once):
     if index == 0:
         new = np.array(outer_item[0])
@@ -1739,10 +1767,11 @@ for index, outer_item in enumerate(all_plots_classified_at_least_once):
 
 plt.xlabel("False Positive Rate (FP/h)")
 plt.ylabel("classified at least once as seizure in the seizure period")
-plt.legend(["raw data", "AE- 5 layers", "CNN"])
-plt.show()
+plt.legend(["Raw Data", "AE- 3 layers", "AE- 5 layers", "CNN", "GRU AE", "LSTM Net"], loc='lower right')
+#plt.savefig(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\plots\plot_classified_at_least_once.png")
+#plt.show()
 
-
+plt.figure()
 for index, outer_item in enumerate(all_plots_pp):
     if index == 0:
         new = np.array(outer_item[0])
@@ -1760,5 +1789,6 @@ for index, outer_item in enumerate(all_plots_pp):
 
 plt.xlabel("False Positive Rate (FP/h) - with post processing")
 plt.ylabel("classified at least once as seizure in the seizure period")
-plt.legend(["raw data", "AE- 5 layers", "CNN"])
-plt.show()
+plt.legend(["Raw Data", "AE- 3 layers", "AE- 5 layers", "CNN", "GRU AE", "LSTM Net"], loc='lower right')
+#plt.savefig(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\plots\plot_pp.png")
+#plt.show()

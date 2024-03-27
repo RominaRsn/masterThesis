@@ -131,7 +131,7 @@ signalIndexVector = range(0, 5)
 for i in signalIndexVector:
     #fig, axes = plt.subplots(nrows=1, ncols=1, sharey='col')
 
-    x = np.linspace(0, 2, 500)
+    x = np.linspace(0, 10, 2500)
 
     #col_index = np.random.randint(0, 11520000/500)
 
@@ -148,22 +148,28 @@ for i in signalIndexVector:
     # axes[1].set_xlabel('Time')
     # #plt.ylim(min_range, max_range)
 
-    plt.figure()
-    plt.plot(x, clean_test_eog[i, :], label = 'clean EEG Signal')
-    plt.suptitle('Normalized Clean EEG Signal')
-    plt.ylabel('Signal amplitude')
-    plt.xlabel('Time(s)')
-    plt.savefig(fr'C:\Users\RominaRsn\Desktop\figs\clean_EEG_Signal_EOG_{i}.png')
-    #plt.show()
-    #plt.ylim(min_range, max_range)
+    y = np.ravel(clean_test_eog[i: i + 5, :])
+
+    vertical_grid_positions = np.linspace(0, 10, num=int(len(y) / 250))
 
     plt.figure()
-    plt.plot(x, noisy_test_eog[i, :], label = 'EEG Signal Contaminated with EOG Noise')
-    plt.suptitle('Normalized EEG Signal Contaminated with EOG Noise')
-    plt.ylabel('Signal amplitude')
+    plt.plot(x, np.ravel(clean_test_eog[i : i+5, :]), label = 'clean EEG Signal', color = 'black')
+    plt.suptitle('Normalized Clean EEG Signal')
+    plt.ylabel('Normalized Signal amplitude [unitless]')
     plt.xlabel('Time(s)')
-    plt.savefig(fr'C:\Users\RominaRsn\Desktop\figs\noisy_EEG_Signal_EOG_{i}.png')
-    #plt.show()
+    plt.xticks(vertical_grid_positions)
+    plt.grid(axis='x')
+    #plt.savefig(fr'C:\Users\RominaRsn\Desktop\figs\clean_EEG_Signal_EOG_{i}.png')
+    plt.show()
+    #plt.ylim(min_range, max_range)
+
+    # plt.figure()
+    # plt.plot(x, noisy_test_eog[i, :], label = 'EEG Signal Contaminated with EOG Noise')
+    # plt.suptitle('Normalized EEG Signal Contaminated with EOG Noise')
+    # plt.ylabel('Signal amplitude')
+    # plt.xlabel('Time(s)')
+    # plt.savefig(fr'C:\Users\RominaRsn\Desktop\figs\noisy_EEG_Signal_EOG_{i}.png')
+    # #plt.show()
 
     # plt.plot(x, noisy_test_eog[i, :], label='EEG Signal Contaminated with EOG Noise')
     # plt.set_title('EEG Signal Contaminated with EOG Noise')

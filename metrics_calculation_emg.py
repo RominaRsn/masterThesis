@@ -63,8 +63,9 @@ noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_n
     # np.save(fr"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\nonChebyResults\result_{os.path.basename(model_path)[:-3]}.npy", result)
 
 #result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_final_five_layer_emg.npy")
-result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_gru_emg.npy")
-
+#result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_gru_emg.npy")
+#result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\cnn_emg_result.npy")
+result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_lstm_emg.npy")
 
 # Filter signals
 # filteredSignal_45 = nk.signal_filter(noisy_test, sampling_rate=250, highcut=40, method='butterworth', order=4)
@@ -105,7 +106,7 @@ file_path = os.path.join(user_home, "Downloads", "EMG_non_Cheby_pre_processing.t
 
 # Write results to file
 with open(file_path, 'a') as fm:
-    fm.write("----------------- Results for Model: {} ---------------------\n".format("result_gru_emg.npy"))
+    fm.write("----------------- Results for Model: {} ---------------------\n".format("result_lstm_emg.npy"))
     fm.write("SNRNoisy: {}\n".format(snrnoisy))
     fm.write("SNRCleaned: {}\n".format(snrcleaned))
     fm.write("RMSNoisy: {}\n".format(rmsNoisy))
@@ -120,35 +121,41 @@ with open(file_path, 'a') as fm:
     fm.write("PSNRFiltered: {}\n".format(Psnr_cleaned))
 
 
-    filters = [30, 40, 70]
-    for cutoff in filters:
-        filtered_signal = nk.signal_filter(noisy_test, sampling_rate=250, highcut=cutoff, method='butterworth', order=4)
-        filtered_signal_vec = np.ravel(filtered_signal)
-
-        diffCleanedClean = filtered_signal_vec - clean_input_test_vec
-        rmsCleaned = np.sqrt(np.mean(diffCleanedClean ** 2))
-
-        cornoisyclean = np.corrcoef(clean_input_test_vec, noisy_input_test_vec)[0, 1]
-        corcleaned = np.corrcoef(clean_input_test_vec, filtered_signal_vec)[0, 1]
-
-        snrnoisy = metrics.metrics.snr(clean_input_test_vec, noisy_input_test_vec)
-        snrcleaned = metrics.metrics.snr(clean_input_test_vec, filtered_signal_vec)
-
-        snr_nosiy_not_db = dB_to_linear(snrnoisy)
-        snr_cleaned_not_db = dB_to_linear(snrcleaned)
-
-        rrmseNoisy = metrics.metrics.rrmseMetric(clean_input_test_vec, noisy_input_test_vec)
-        rrmseCleaned = metrics.metrics.rrmseMetric(clean_input_test_vec, filtered_signal_vec)
-
-        fm.write("Filtered signal with BW filter {}Hz\n".format(cutoff))
-        fm.write("SNRNoisy: {}\n".format(snrnoisy))
-        fm.write("SNRCleaned: {}\n".format(snrcleaned))
-        fm.write("RMSNoisy: {}\n".format(rmsNoisy))
-        fm.write("RMSCleaned: {}\n".format(rmsCleaned))
-        fm.write("RMSENoisy: {}\n".format(rrmseNoisy))
-        fm.write("RMSECleaned: {}\n".format(rrmseCleaned))
-        fm.write("PearsonCorrNoisy: {}\n".format(cornoisyclean))
-        fm.write("PearsonCorrCleaned: {}\n".format(corcleaned))
-        fm.write("SNRNoisyNotDB: {}\n".format(snr_nosiy_not_db))
-        fm.write("SNRCleanedNotDB: {}\n".format(snr_cleaned_not_db))
-
+    # filters = [30, 40, 70]
+    # for cutoff in filters:
+    #     filtered_signal = nk.signal_filter(noisy_test, sampling_rate=250, highcut=cutoff, method='butterworth', order=4)
+    #     filtered_signal_vec = np.ravel(filtered_signal)
+    #
+    #     diffCleanedClean = filtered_signal_vec - clean_input_test_vec
+    #     rmsCleaned = np.sqrt(np.mean(diffCleanedClean ** 2))
+    #
+    #     cornoisyclean = np.corrcoef(clean_input_test_vec, noisy_input_test_vec)[0, 1]
+    #     corcleaned = np.corrcoef(clean_input_test_vec, filtered_signal_vec)[0, 1]
+    #
+    #     snrnoisy = metrics.metrics.snr(clean_input_test_vec, noisy_input_test_vec)
+    #     snrcleaned = metrics.metrics.snr(clean_input_test_vec, filtered_signal_vec)
+    #
+    #     snr_nosiy_not_db = dB_to_linear(snrnoisy)
+    #     snr_cleaned_not_db = dB_to_linear(snrcleaned)
+    #
+    #     rrmseNoisy = metrics.metrics.rrmseMetric(clean_input_test_vec, noisy_input_test_vec)
+    #     rrmseCleaned = metrics.metrics.rrmseMetric(clean_input_test_vec, filtered_signal_vec)
+    #
+    #     Psnr_clean = 10 * np.log10(max(clean_input_test_vec) / rrmseNoisy ** 2)
+    #     Psnr_cleaned = 10 * np.log10(max(clean_input_test_vec) / rrmseCleaned ** 2)
+    #
+    #     fm.write("Filtered signal with BW filter {}Hz\n".format(cutoff))
+    #     fm.write("SNRNoisy: {}\n".format(snrnoisy))
+    #     fm.write("SNRCleaned: {}\n".format(snrcleaned))
+    #     fm.write("RMSNoisy: {}\n".format(rmsNoisy))
+    #     fm.write("RMSCleaned: {}\n".format(rmsCleaned))
+    #     fm.write("RMSENoisy: {}\n".format(rrmseNoisy))
+    #     fm.write("RMSECleaned: {}\n".format(rrmseCleaned))
+    #     fm.write("PearsonCorrNoisy: {}\n".format(cornoisyclean))
+    #     fm.write("PearsonCorrCleaned: {}\n".format(corcleaned))
+    #     fm.write("SNRNoisyNotDB: {}\n".format(snr_nosiy_not_db))
+    #     fm.write("SNRCleanedNotDB: {}\n".format(snr_cleaned_not_db))
+    #     fm.write("PSNRClean: {}\n".format(Psnr_clean))
+    #     fm.write("PSNRFiltered: {}\n".format(Psnr_cleaned))
+    #
+    #

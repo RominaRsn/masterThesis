@@ -229,7 +229,9 @@ def evaluate_model(model_path, data_noisy, data_clean, filters, file_path):
     #model = load_model(model_path)
     #result = model.predict(data_noisy)
 
-    result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_final_five_layer_eog.npy")
+    #result = np.load(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\cnn_eog_result.npy")
+    result = np.load(
+        r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_lstm_eog.npy")
     # result = np.load(
     # r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_gru_emg.npy")
     #result = np.load(
@@ -257,7 +259,7 @@ def evaluate_model(model_path, data_noisy, data_clean, filters, file_path):
     Psnr_cleaned = 10 * np.log10(max(clean_input_test_vec) / rrmseCleaned ** 2)
 
     fm = open(file_path, 'a')
-    fm.write("-----------------Results for model: {}---------------------\n".format(os.path.basename(model_path)))
+    fm.write("-----------------Results for model: {}---------------------\n".format(os.path.basename(r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\retrained_models_no_cheby_filter\result_lstm_eog.npy")))
     fm.write("SNRNoisy: {}\n".format(snrnoisy))
     fm.write("SNRCleaned: {}\n".format(snrcleaned))
     fm.write("RMSNoisy: {}\n".format(rmsNoisy))
@@ -290,6 +292,9 @@ def evaluate_model(model_path, data_noisy, data_clean, filters, file_path):
     #     rrmseNoisy = metrics.metrics.rrmseMetric(clean_input_test_vec, noisy_input_test_vec)
     #     rrmseCleaned = metrics.metrics.rrmseMetric(clean_input_test_vec, filtered_signal_vec)
     #
+    #     Psnr_clean = 10 * np.log10(max(clean_input_test_vec) / rrmseNoisy ** 2)
+    #     Psnr_cleaned = 10 * np.log10(max(clean_input_test_vec) / rrmseCleaned ** 2)
+    #
     #     fm.write("Filtered signal with BW filter {}Hz\n".format(cutoff))
     #     fm.write("SNRNoisy: {}\n".format(snrnoisy))
     #     fm.write("SNRCleaned: {}\n".format(snrcleaned))
@@ -301,6 +306,8 @@ def evaluate_model(model_path, data_noisy, data_clean, filters, file_path):
     #     fm.write("PearsonCorrCleaned: {}\n".format(corcleaned))
     #     fm.write("SNRNoisyNotDB: {}\n".format(snr_nosiy_not_db))
     #     fm.write("SNRCleanedNotDB: {}\n".format(snr_cleaned_not_db))
+    #     fm.write("PSNRClean: {}\n".format(Psnr_clean))
+    #     fm.write("PSNRFiltered: {}\n".format(Psnr_cleaned))
 
     fm.close()
 
@@ -318,7 +325,7 @@ noisy_train, noisy_test, clean_train, clean_test = train_test_split(data_noisy_n
 user_home = os.path.expanduser("~")
 file_path = os.path.join(user_home, "Downloads", "EOG_non_Cheby_pre_processing.txt")
 
-filters = [45, 30, 70]  # Define your list of filters here
+filters = [40, 30, 70]  # Define your list of filters here
 
 model_paths = [
     #r"C:\Users\RominaRsn\PycharmProjects\MyMasterThesis\masterThesis\data_file\EOG_data\retrainWithEOG_checkPoint.h5",
